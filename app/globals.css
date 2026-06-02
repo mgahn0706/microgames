@@ -48,17 +48,6 @@ body {
   }
 }
 
-@keyframes life-fish-motion {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-2deg);
-  }
-
-  50% {
-    transform: translateY(-14px) rotate(2deg);
-  }
-}
-
 .neon-elevator-flicker {
   animation: neon-elevator-flicker 1.8s ease-in-out infinite;
 }
@@ -67,8 +56,4 @@ body {
   animation: neon-loading-bar 1.2s ease-in-out infinite;
   box-shadow: 0 0 18px rgb(103 232 249 / 0.9);
   width: 65%;
-}
-
-.life-fish-motion {
-  animation: life-fish-motion 1.35s ease-in-out infinite;
 }

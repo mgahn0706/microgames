@@ -9,7 +9,6 @@ const ELEVATOR_IMAGES = [
 ];
 
 const FLOW_STEPS = ["Lobby", "Loading", "Mission", "Game Over"];
-const LIFE_LABELS = ["Life 1", "Life 2", "Life 3", "Life 4"];
 
 function NeonButton({
   children,
@@ -98,46 +97,6 @@ function FlowPanel({ currentStep }: Readonly<{ currentStep: string }>) {
   );
 }
 
-function LivesMeter({
-  lives,
-  maxLives,
-}: Readonly<{ lives: number; maxLives: number }>) {
-  return (
-    <div
-      className="pointer-events-none fixed inset-x-0 bottom-3 z-20 flex justify-center px-4 sm:bottom-5"
-      aria-label={`${lives} of ${maxLives} lives remaining`}
-    >
-      <div className="flex w-full max-w-4xl items-end justify-center gap-1 rounded-lg border border-cyan-100/50 bg-black/55 px-3 py-2 shadow-[0_0_32px_rgba(103,232,249,0.24)] backdrop-blur-sm sm:gap-4 sm:px-6 sm:py-3">
-        {LIFE_LABELS.map((label, index) => {
-          const isActive = index < lives;
-
-          return (
-            <div
-              className="life-fish-motion relative h-20 w-24 sm:h-24 sm:w-36 lg:h-28 lg:w-44"
-              key={label}
-              style={{ animationDelay: `${index * 140}ms` }}
-            >
-              <Image
-                src={
-                  isActive
-                    ? "/images/life-active.png"
-                    : "/images/life-deactive.png"
-                }
-                alt={isActive ? `${label} active` : `${label} inactive`}
-                fill
-                sizes="(min-width: 1024px) 176px, (min-width: 640px) 144px, 96px"
-                className={`object-contain ${
-                  isActive ? "drop-shadow-[0_0_18px_#67e8f9]" : ""
-                }`}
-              />
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
   return (
     <NeonShell>
@@ -195,20 +154,10 @@ function LoadingScreen() {
   );
 }
 
-function GameScreen({
-  lives,
-  maxLives,
-  onFinish,
-  onLoseLife,
-}: Readonly<{
-  lives: number;
-  maxLives: number;
-  onFinish: () => void;
-  onLoseLife: () => void;
-}>) {
+function GameScreen({ onFinish }: Readonly<{ onFinish: () => void }>) {
   return (
     <NeonShell>
-      <div className="grid gap-6 pb-28 sm:pb-36 lg:grid-cols-[0.72fr_1.28fr]">
+      <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr]">
         <aside className="space-y-4 rounded-lg border border-cyan-100/70 bg-black/65 p-5 shadow-[0_0_30px_rgba(103,232,249,0.18)] backdrop-blur-sm">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.28em] text-cyan-100">
@@ -229,14 +178,6 @@ function GameScreen({
               </p>
               <p className="mt-2 text-3xl font-black text-cyan-100">000</p>
             </div>
-          </div>
-          <div className="rounded-md border border-white/35 bg-black/45 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-              Lives
-            </p>
-            <p className="mt-2 text-3xl font-black text-cyan-100">
-              {lives}/{maxLives}
-            </p>
           </div>
           <FlowPanel currentStep="Mission" />
         </aside>
@@ -264,17 +205,13 @@ function GameScreen({
               </p>
             </div>
           </div>
-          <div className="flex flex-col justify-end gap-3 sm:flex-row">
-            <NeonButton onClick={onLoseLife} variant="secondary">
-              라이프 차감
-            </NeonButton>
+          <div className="flex justify-end">
             <NeonButton onClick={onFinish} variant="secondary">
               게임 종료
             </NeonButton>
           </div>
         </section>
       </div>
-      <LivesMeter lives={lives} maxLives={maxLives} />
     </NeonShell>
   );
 }
@@ -330,30 +267,15 @@ function GameOverScreen({
 }
 
 export function GameFlowExperience() {
-  const {
-    finishGame,
-    lives,
-    loseLife,
-    maxLives,
-    restartGame,
-    returnToMain,
-    screen,
-    startGame,
-  } = useGameScreenFlow();
+  const { finishGame, restartGame, returnToMain, screen, startGame } =
+    useGameScreenFlow();
 
   if (screen === "loading") {
     return <LoadingScreen />;
   }
 
   if (screen === "playing") {
-    return (
-      <GameScreen
-        lives={lives}
-        maxLives={maxLives}
-        onFinish={finishGame}
-        onLoseLife={loseLife}
-      />
-    );
+    return <GameScreen onFinish={finishGame} />;
   }
 
   if (screen === "gameOver") {

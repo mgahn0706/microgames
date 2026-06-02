@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { ALL_GAME_PRELOAD_ASSETS } from "@/games/preloadAssets";
 
 const MIN_LOADING_TIME_MS = 900;
-const MAX_LIVES = 4;
 
 let allGameAssetsPreloadPromise: Promise<unknown> | null = null;
 
@@ -35,7 +34,6 @@ function preloadAllGameAssets() {
 
 export function useGameScreenFlow() {
   const [screen, setScreen] = useState<GameScreen>("main");
-  const [lives, setLives] = useState(MAX_LIVES);
 
   useEffect(() => {
     if (screen !== "loading") {
@@ -56,42 +54,23 @@ export function useGameScreenFlow() {
   }, [screen]);
 
   const startGame = () => {
-    setLives(MAX_LIVES);
     setScreen("loading");
   };
 
   const finishGame = () => {
-    setLives(0);
     setScreen("gameOver");
   };
 
   const restartGame = () => {
-    setLives(MAX_LIVES);
     setScreen("loading");
   };
 
   const returnToMain = () => {
-    setLives(MAX_LIVES);
     setScreen("main");
-  };
-
-  const loseLife = () => {
-    setLives((currentLives) => {
-      const nextLives = Math.max(currentLives - 1, 0);
-
-      if (nextLives === 0) {
-        setScreen("gameOver");
-      }
-
-      return nextLives;
-    });
   };
 
   return {
     finishGame,
-    lives,
-    loseLife,
-    maxLives: MAX_LIVES,
     restartGame,
     returnToMain,
     screen,
