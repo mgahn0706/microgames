@@ -192,6 +192,67 @@ function RoundLives({
   );
 }
 
+function BeatIndicator({
+  phaseBeatCount,
+  progressBeats,
+}: Readonly<{
+  phaseBeatCount: number;
+  progressBeats: number;
+}>) {
+  return (
+    <div
+      className="mx-auto flex items-center justify-center gap-2"
+      aria-label={`Beat ${progressBeats} of ${phaseBeatCount}`}
+    >
+      {Array.from({ length: phaseBeatCount }, (_, index) => {
+        const isActive = index < progressBeats;
+
+        return (
+          <span
+            className={`size-3 rounded-full border transition ${
+              isActive
+                ? "border-cyan-100 bg-cyan-100 shadow-[0_0_14px_rgba(103,232,249,0.8)]"
+                : "border-white/35 bg-black/55"
+            }`}
+            key={index}
+          />
+        );
+      })}
+      <span className="ml-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-50/80">
+        {progressBeats}/{phaseBeatCount}
+      </span>
+    </div>
+  );
+}
+
+function RoundFooter({
+  getStaggeredRhythmStyle,
+  lives,
+  maxLives,
+  phaseBeatCount,
+  progressBeats,
+}: Readonly<{
+  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
+  lives: number;
+  maxLives: number;
+  phaseBeatCount: number;
+  progressBeats: number;
+}>) {
+  return (
+    <div className="space-y-4">
+      <BeatIndicator
+        phaseBeatCount={phaseBeatCount}
+        progressBeats={progressBeats}
+      />
+      <RoundLives
+        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+        lives={lives}
+        maxLives={maxLives}
+      />
+    </div>
+  );
+}
+
 function CurrentFloorDisplay({
   roundNumber,
   rhythmStyle,
@@ -232,6 +293,8 @@ function InstructionRoundScreen({
   instructionStep,
   lives,
   maxLives,
+  phaseBeatCount,
+  progressBeats,
   rhythmStyle,
   roundNumber,
 }: Readonly<{
@@ -239,6 +302,8 @@ function InstructionRoundScreen({
   instructionStep: "controls" | "floor";
   lives: number;
   maxLives: number;
+  phaseBeatCount: number;
+  progressBeats: number;
   rhythmStyle: SynchronizedRhythmStyle;
   roundNumber: number;
 }>) {
@@ -273,10 +338,12 @@ function InstructionRoundScreen({
           roundNumber={roundNumber}
         />
       )}
-      <RoundLives
+      <RoundFooter
         getStaggeredRhythmStyle={getStaggeredRhythmStyle}
         lives={lives}
         maxLives={maxLives}
+        phaseBeatCount={phaseBeatCount}
+        progressBeats={progressBeats}
       />
     </div>
   );
@@ -291,6 +358,8 @@ function MicrogameRoundScreen({
   onFinish,
   onRecordFailure,
   onRecordSuccess,
+  phaseBeatCount,
+  progressBeats,
 }: Readonly<{
   canRecordResult: boolean;
   gameBeatCount: number;
@@ -300,6 +369,8 @@ function MicrogameRoundScreen({
   onFinish: () => void;
   onRecordFailure: () => void;
   onRecordSuccess: () => void;
+  phaseBeatCount: number;
+  progressBeats: number;
 }>) {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -341,10 +412,12 @@ function MicrogameRoundScreen({
           </NeonButton>
         </div>
       </section>
-      <RoundLives
+      <RoundFooter
         getStaggeredRhythmStyle={getStaggeredRhythmStyle}
         lives={lives}
         maxLives={maxLives}
+        phaseBeatCount={phaseBeatCount}
+        progressBeats={progressBeats}
       />
     </div>
   );
@@ -354,11 +427,15 @@ function ResultRoundScreen({
   getStaggeredRhythmStyle,
   lives,
   maxLives,
+  phaseBeatCount,
+  progressBeats,
   roundResult,
 }: Readonly<{
   getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
   lives: number;
   maxLives: number;
+  phaseBeatCount: number;
+  progressBeats: number;
   roundResult: GameRoundResult;
 }>) {
   const resultTone = {
@@ -400,10 +477,12 @@ function ResultRoundScreen({
           </div>
         </div>
       </section>
-      <RoundLives
+      <RoundFooter
         getStaggeredRhythmStyle={getStaggeredRhythmStyle}
         lives={lives}
         maxLives={maxLives}
+        phaseBeatCount={phaseBeatCount}
+        progressBeats={progressBeats}
       />
     </div>
   );
@@ -439,37 +518,35 @@ function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
 
   return (
     <NeonShell>
-      <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-        <div className="space-y-7 rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] backdrop-blur-sm sm:p-8">
-          <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
-            마이크로게임 천국
-          </p>
-          <div className="space-y-4">
-            <h1 className="max-w-3xl text-5xl font-black leading-none tracking-normal text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.7)] sm:text-7xl">
-              캣타워 오르기
-            </h1>
-            <p className="max-w-2xl text-lg leading-8 text-cyan-50/85">
-              문이 열리면 짧은 규칙을 보고 바로 반응하세요. 엘리베이터는
-              로비에서 게임 화면까지 끊김 없이 이동합니다.
+      <div className="rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] backdrop-blur-sm sm:p-8">
+        <div className="grid gap-7 lg:grid-cols-[1fr_260px] lg:items-center">
+          <div className="space-y-7">
+            <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
+              마이크로게임 천국
             </p>
+            <div className="space-y-4">
+              <h1 className="max-w-3xl text-5xl font-black leading-none tracking-normal text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.7)] sm:text-7xl">
+                캣타워 오르기
+              </h1>
+              <p className="max-w-2xl text-lg leading-8 text-cyan-50/85">
+                고양이가 엘리베이터를 타고 캣타워를 오르는 것을 도와주세요. 과연
+                당신은 몇 층까지 올라갈 수 있을까요? 당신의 센스를 보여주세요!
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <NeonButton onClick={startGame}>게임 시작</NeonButton>
+            </div>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <NeonButton onClick={startGame}>게임 시작</NeonButton>
+          <div className="mx-auto w-full max-w-48 lg:max-w-none">
+            <Image
+              src="/images/game-main-logo.png"
+              alt="캣타워 오르기 로고"
+              width={880}
+              height={1268}
+              priority
+              className="h-auto w-full object-contain drop-shadow-[0_0_24px_rgba(103,232,249,0.45)]"
+            />
           </div>
-        </div>
-
-        <div className="rounded-lg border border-cyan-100/70 bg-black/60 p-5 shadow-[0_0_30px_rgba(103,232,249,0.2)] backdrop-blur-sm">
-          <div className="mb-5 flex items-center justify-between border-b border-cyan-100/50 pb-4">
-            <span className="font-black uppercase tracking-[0.24em] text-cyan-100">
-              Floor 00
-            </span>
-            <span className="rounded border border-white/60 px-3 py-1 text-sm font-black text-white">
-              Lobby
-            </span>
-          </div>
-          <p className="text-lg leading-8 text-cyan-50/80">
-            게임을 시작하면 엘리베이터가 다음 층으로 이동합니다.
-          </p>
         </div>
       </div>
     </NeonShell>
@@ -483,11 +560,21 @@ function LoadingScreen() {
     <NeonShell>
       <div className="mx-auto w-full max-w-2xl rounded-lg border border-cyan-100/70 bg-black/65 p-6 text-center shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm sm:p-8">
         <p className="mb-4 text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
-          Loading All Games
+          Cat Tower
         </p>
         <h1 className="text-4xl font-black text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.65)] sm:text-6xl">
-          모든 게임 준비 중
+          잠시만 기다려 주세요
         </h1>
+        <div className="loading-spinner-vital mx-auto mt-8 grid size-32 place-items-center sm:size-40">
+          <Image
+            src="/images/loading-spinner.png"
+            alt=""
+            width={180}
+            height={151}
+            priority
+            className="h-auto w-full object-contain drop-shadow-[0_0_22px_rgba(103,232,249,0.75)]"
+          />
+        </div>
         <div className="mx-auto my-8 h-4 max-w-md overflow-hidden rounded-full border border-cyan-100/70 bg-black">
           <div className="neon-loading-bar h-full rounded-full bg-cyan-200" />
         </div>
@@ -516,6 +603,8 @@ function GameScreen({
     gameBeatCount,
     instructionStep,
     phase,
+    phaseBeatCount,
+    progressBeats,
     recordFailure,
     recordSuccess,
     roundNumber,
@@ -570,6 +659,8 @@ function GameScreen({
           instructionStep={instructionStep}
           lives={lives}
           maxLives={maxLives}
+          phaseBeatCount={phaseBeatCount}
+          progressBeats={progressBeats}
           rhythmStyle={rhythmStyle}
           roundNumber={roundNumber}
         />
@@ -583,12 +674,16 @@ function GameScreen({
           onFinish={onFinish}
           onRecordFailure={recordFailure}
           onRecordSuccess={recordSuccess}
+          phaseBeatCount={phaseBeatCount}
+          progressBeats={progressBeats}
         />
       ) : (
         <ResultRoundScreen
           getStaggeredRhythmStyle={getStaggeredRhythmStyle}
           lives={lives}
           maxLives={maxLives}
+          phaseBeatCount={phaseBeatCount}
+          progressBeats={progressBeats}
           roundResult={roundResult}
         />
       )}
@@ -597,10 +692,8 @@ function GameScreen({
 }
 
 function GameOverScreen({
-  onRestart,
   onReturnToMain,
 }: Readonly<{
-  onRestart: () => void;
   onReturnToMain: () => void;
 }>) {
   useEffect(() => {
@@ -609,9 +702,11 @@ function GameOverScreen({
     });
 
     const resultMusicTimer = window.setTimeout(() => {
-      bgmLibrary.play("resultsAndMain", "loop", "now").catch((error: unknown) => {
-        console.error(error);
-      });
+      bgmLibrary
+        .play("resultsAndMain", "loop", "now")
+        .catch((error: unknown) => {
+          console.error(error);
+        });
     }, GAME_OVER_DURATION_MS);
 
     return () => {
@@ -619,12 +714,12 @@ function GameOverScreen({
     };
   }, []);
 
-  const restartGame = () => {
+  const returnToMain = () => {
     unlockBgmLibrary()
       .catch((error: unknown) => {
         console.error(error);
       })
-      .finally(onRestart);
+      .finally(onReturnToMain);
   };
 
   return (
@@ -656,11 +751,8 @@ function GameOverScreen({
             <p className="mt-2 text-3xl font-black text-cyan-100">End</p>
           </div>
         </div>
-        <div className="flex flex-col justify-center gap-3 sm:flex-row">
-          <NeonButton onClick={restartGame}>다시 시작</NeonButton>
-          <NeonButton onClick={onReturnToMain} variant="secondary">
-            메인으로
-          </NeonButton>
+        <div className="flex justify-center">
+          <NeonButton onClick={returnToMain}>메인으로</NeonButton>
         </div>
       </div>
     </NeonShell>
@@ -675,7 +767,6 @@ export function GameFlowExperience() {
     maxLives,
     recordSuccess,
     resetRoundResult,
-    restartGame,
     returnToMain,
     screen,
     startGame,
@@ -699,9 +790,7 @@ export function GameFlowExperience() {
   }
 
   if (screen === "gameOver") {
-    return (
-      <GameOverScreen onRestart={restartGame} onReturnToMain={returnToMain} />
-    );
+    return <GameOverScreen onReturnToMain={returnToMain} />;
   }
 
   return <MainScreen onStart={startGame} />;

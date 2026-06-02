@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Microgames",
-  description: "A fast web microgame project built with Next.js.",
+  title: "캣타워 오르기",
+  description: "고양이가 캣타워를 오르는 것을 도와주세요.",
 };
 
 export default function RootLayout({

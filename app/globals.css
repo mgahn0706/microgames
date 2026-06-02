@@ -122,6 +122,16 @@ body {
   }
 }
 
+@keyframes loading-spinner-vital {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .neon-elevator-flicker {
   animation: neon-elevator-flicker var(--game-rhythm-duration, 1.2s) linear
     infinite;
@@ -152,4 +162,10 @@ body {
 .floor-number-rise-in {
   animation: floor-number-rise-in var(--floor-rise-duration, 2.338s)
     cubic-bezier(0.22, 0.76, 0.28, 1) both;
+}
+
+.loading-spinner-vital {
+  animation: loading-spinner-vital 680ms linear infinite;
+  transform-origin: center;
+  will-change: transform;
 }

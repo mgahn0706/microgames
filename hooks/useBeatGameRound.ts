@@ -7,7 +7,7 @@ import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 const DEFAULT_GAME_BEATS = 8;
 const INSTRUCTION_BEATS = 8;
 const PROGRESS_TICK_MS = 50;
-const RESULT_BEATS = 2;
+const RESULT_BEATS = 4;
 
 export type GameRoundPhase = "instruction" | "game" | "result";
 export type InstructionStep = "controls" | "floor";

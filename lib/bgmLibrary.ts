@@ -23,15 +23,13 @@ const ATTACK_FADE_SECONDS = 0.012;
 const RELEASE_FADE_SECONDS = 0.045;
 
 const BGM_TRACK_BEATS = {
-  fail: 2,
-  gameOver: 5,
-  intermission: 4,
-  resultsAndMain: 42,
-  success: 2,
-} satisfies Record<BgmTrack, number>;
+  fail: 4,
+  intermission: 8,
+  resultsAndMain: 83,
+  success: 4,
+} satisfies Record<Exclude<BgmTrack, "gameOver">, number>;
 
-export const GAME_OVER_DURATION_MS =
-  BGM_TRACK_BEATS.gameOver * RHYTHM_DURATION_MS;
+export const GAME_OVER_DURATION_MS = 5208;
 
 export type BgmPlaybackMode = "loop" | "once";
 export type BgmStartPolicy = "beat" | "now";
@@ -66,6 +64,7 @@ class BgmLibrary {
   private desiredPlayback: DesiredPlayback | null = null;
   private playRequestId = 0;
   private scheduledSources: ScheduledSource[] = [];
+  private scheduledTransitionTimer: number | null = null;
   private timelineOriginSeconds = 0;
 
   async unlock() {
@@ -106,6 +105,8 @@ class BgmLibrary {
       return;
     }
 
+    this.clearScheduledTransitionTimer();
+
     if (this.isCurrentSource(track, mode, audioContext.currentTime)) {
       return;
     }
@@ -122,8 +123,7 @@ class BgmLibrary {
         : audioContext.currentTime;
     const gainNode = audioContext.createGain();
     const source = audioContext.createBufferSource();
-    const targetDurationSeconds =
-      BGM_TRACK_BEATS[track] * BEAT_DURATION_SECONDS;
+    const targetDurationSeconds = this.getTargetDurationSeconds(track, buffer);
     const playbackRate =
       mode === "once" && buffer.duration < targetDurationSeconds
         ? buffer.duration / targetDurationSeconds
@@ -197,8 +197,10 @@ class BgmLibrary {
     this.clearScheduledSources();
 
     const firstStartAt = audioContext.currentTime;
-    const firstTargetDurationSeconds =
-      BGM_TRACK_BEATS[firstTrack] * BEAT_DURATION_SECONDS;
+    const firstTargetDurationSeconds = this.getTargetDurationSeconds(
+      firstTrack,
+      firstBuffer,
+    );
     const nextStartAt = firstStartAt + firstTargetDurationSeconds;
 
     const firstSource = this.createSource(
@@ -218,11 +220,13 @@ class BgmLibrary {
     this.currentSource = firstSource;
     this.scheduledSources = [nextSource];
 
-    window.setTimeout(() => {
+    this.clearScheduledTransitionTimer();
+    this.scheduledTransitionTimer = window.setTimeout(() => {
       if (requestId === this.playRequestId) {
         this.currentSource = nextSource;
         this.scheduledSources = [];
       }
+      this.scheduledTransitionTimer = null;
     }, firstTargetDurationSeconds * 1000);
   }
 
@@ -232,6 +236,7 @@ class BgmLibrary {
     }
 
     this.playRequestId += 1;
+    this.clearScheduledTransitionTimer();
     this.clearScheduledSources();
     this.stopCurrentSource(this.audioContext.currentTime);
     this.currentSource = null;
@@ -245,8 +250,7 @@ class BgmLibrary {
   ) {
     const gainNode = this.getAudioContext().createGain();
     const source = this.getAudioContext().createBufferSource();
-    const targetDurationSeconds =
-      BGM_TRACK_BEATS[track] * BEAT_DURATION_SECONDS;
+    const targetDurationSeconds = this.getTargetDurationSeconds(track, buffer);
     const playbackRate =
       mode === "once" && buffer.duration < targetDurationSeconds
         ? buffer.duration / targetDurationSeconds
@@ -336,6 +340,14 @@ class BgmLibrary {
     return this.timelineOriginSeconds + elapsedBeats * BEAT_DURATION_SECONDS;
   }
 
+  private getTargetDurationSeconds(track: BgmTrack, buffer: AudioBuffer) {
+    if (track === "gameOver") {
+      return buffer.duration;
+    }
+
+    return BGM_TRACK_BEATS[track] * BEAT_DURATION_SECONDS;
+  }
+
   private isCurrentSource(
     track: BgmTrack,
     mode: BgmPlaybackMode,
@@ -375,6 +387,15 @@ class BgmLibrary {
       }
     });
     this.scheduledSources = [];
+  }
+
+  private clearScheduledTransitionTimer() {
+    if (this.scheduledTransitionTimer === null) {
+      return;
+    }
+
+    window.clearTimeout(this.scheduledTransitionTimer);
+    this.scheduledTransitionTimer = null;
   }
 
   private stopCurrentSource(stopAt: number) {
