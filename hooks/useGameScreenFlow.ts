@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ALL_GAME_PRELOAD_ASSETS } from "@/games/preloadAssets";
+import { bgmLibrary } from "@/lib/bgmLibrary";
 
 const MIN_LOADING_TIME_MS = 900;
 const MAX_LIVES = 4;
@@ -28,6 +29,7 @@ function preloadAsset(assetPath: string) {
 function preloadAllGameAssets() {
   allGameAssetsPreloadPromise ??= Promise.allSettled([
     ...ALL_GAME_PRELOAD_ASSETS.map(preloadAsset),
+    bgmLibrary.preloadAll(),
     waitForMinimumLoadingTime(),
   ]);
 
@@ -35,7 +37,7 @@ function preloadAllGameAssets() {
 }
 
 export function useGameScreenFlow() {
-  const [screen, setScreen] = useState<GameScreen>("main");
+  const [screen, setScreen] = useState<GameScreen>("loading");
   const [lives, setLives] = useState(MAX_LIVES);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
 
@@ -48,7 +50,7 @@ export function useGameScreenFlow() {
 
     preloadAllGameAssets().then(() => {
       if (isCurrentLoadingScreen) {
-        setScreen("playing");
+        setScreen("main");
       }
     });
 
@@ -57,45 +59,43 @@ export function useGameScreenFlow() {
     };
   }, [screen]);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     setLives(MAX_LIVES);
     setRoundResult("idle");
-    setScreen("loading");
-  };
+    setScreen("playing");
+  }, []);
 
-  const finishGame = () => {
+  const finishGame = useCallback(() => {
     setLives(0);
     setScreen("gameOver");
-  };
+  }, []);
 
-  const restartGame = () => {
+  const restartGame = useCallback(() => {
     setLives(MAX_LIVES);
     setRoundResult("idle");
-    setScreen("loading");
-  };
+    setScreen("playing");
+  }, []);
 
-  const returnToMain = () => {
+  const returnToMain = useCallback(() => {
     setLives(MAX_LIVES);
     setRoundResult("idle");
     setScreen("main");
-  };
+  }, []);
 
-  const recordSuccess = () => {
+  const recordSuccess = useCallback(() => {
     setRoundResult("success");
-  };
+  }, []);
 
-  const loseLife = () => {
+  const resetRoundResult = useCallback(() => {
+    setRoundResult("idle");
+  }, []);
+
+  const loseLife = useCallback(() => {
     setRoundResult("failure");
     setLives((currentLives) => {
-      const nextLives = Math.max(currentLives - 1, 0);
-
-      if (nextLives === 0) {
-        setScreen("gameOver");
-      }
-
-      return nextLives;
+      return Math.max(currentLives - 1, 0);
     });
-  };
+  }, []);
 
   return {
     finishGame,
@@ -103,6 +103,7 @@ export function useGameScreenFlow() {
     loseLife,
     maxLives: MAX_LIVES,
     recordSuccess,
+    resetRoundResult,
     restartGame,
     returnToMain,
     roundResult,

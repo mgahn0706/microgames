@@ -7,5 +7,9 @@ export const ALL_GAME_PRELOAD_ASSETS = [
   "/images/main-elevator-success-2.png",
   "/images/life-active.png",
   "/images/life-deactive.png",
-  "/sounds/095. Museum - Intermissions.mp3",
+  "/sounds/fail.mp3",
+  "/sounds/game-over.mp3",
+  "/sounds/intermission.mp3",
+  "/sounds/results-and-main.mp3",
+  "/sounds/success.mp3",
 ];

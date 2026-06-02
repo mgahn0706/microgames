@@ -1,14 +1,23 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect } from "react";
+import { useBgmTrack } from "@/hooks/useBgmTrack";
 import {
   type GameRoundResult,
   useGameScreenFlow,
 } from "@/hooks/useGameScreenFlow";
+import { useBeatGameRound } from "@/hooks/useBeatGameRound";
 import {
   type SynchronizedRhythmStyle,
   useSynchronizedRhythm,
 } from "@/hooks/useSynchronizedRhythm";
+import {
+  bgmLibrary,
+  GAME_OVER_DURATION_MS,
+  unlockBgmLibrary,
+  type BgmTrack,
+} from "@/lib/bgmLibrary";
 
 const ELEVATOR_IMAGES = [
   "/images/main-elevator-1.png",
@@ -26,7 +35,6 @@ const ELEVATOR_RESULT_IMAGES = {
   ],
 } satisfies Record<GameRoundResult, string[]>;
 
-const FLOW_STEPS = ["Lobby", "Loading", "Mission", "Game Over"];
 const LIFE_LABELS = ["Life 1", "Life 2", "Life 3", "Life 4"];
 
 function NeonButton({
@@ -108,29 +116,6 @@ function NeonShell({
   );
 }
 
-function FlowPanel({ currentStep }: Readonly<{ currentStep: string }>) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-4">
-      {FLOW_STEPS.map((step) => {
-        const isActive = step === currentStep;
-
-        return (
-          <div
-            className={`rounded-md border px-4 py-3 text-sm font-black uppercase tracking-[0.16em] ${
-              isActive
-                ? "border-cyan-200 bg-cyan-200 text-black shadow-[0_0_22px_rgba(103,232,249,0.5)]"
-                : "border-white/35 bg-black/45 text-white/70"
-            }`}
-            key={step}
-          >
-            {step}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function LivesMeter({
   getStaggeredRhythmStyle,
   lives,
@@ -183,9 +168,175 @@ function LivesMeter({
   );
 }
 
-function ResultPanel({
+function RoundLives({
+  getStaggeredRhythmStyle,
+  lives,
+  maxLives,
+}: Readonly<{
+  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
+  lives: number;
+  maxLives: number;
+}>) {
+  return (
+    <LivesMeter
+      getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+      lives={lives}
+      maxLives={maxLives}
+    />
+  );
+}
+
+function CurrentFloorDisplay({
+  roundNumber,
+  rhythmStyle,
+}: Readonly<{
+  roundNumber: number;
+  rhythmStyle: SynchronizedRhythmStyle;
+}>) {
+  return (
+    <div
+      className="life-fish-motion mx-auto grid size-56 place-items-center rounded-md border-2 border-cyan-100 bg-black/70 shadow-[0_0_38px_rgba(103,232,249,0.32)] sm:size-72"
+      style={rhythmStyle}
+    >
+      <div className="text-center">
+        <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
+          Current Floor
+        </p>
+        <p className="mt-3 text-8xl font-black leading-none text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.75)] sm:text-9xl">
+          {roundNumber.toString().padStart(2, "0")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function InstructionRoundScreen({
+  getStaggeredRhythmStyle,
+  lives,
+  maxLives,
+  rhythmStyle,
+  roundNumber,
+}: Readonly<{
+  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
+  lives: number;
+  maxLives: number;
+  rhythmStyle: SynchronizedRhythmStyle;
+  roundNumber: number;
+}>) {
+  return (
+    <div className="mx-auto w-full max-w-5xl space-y-8 text-center">
+      <CurrentFloorDisplay rhythmStyle={rhythmStyle} roundNumber={roundNumber} />
+      <div className="mx-auto grid max-w-3xl gap-5 rounded-lg border border-cyan-100/70 bg-black/70 p-6 shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm sm:grid-cols-[220px_1fr] sm:text-left">
+        <div className="relative mx-auto aspect-square w-44 sm:w-full">
+          <Image
+            src="/images/forms/space.png"
+            alt="Space key control form"
+            fill
+            sizes="220px"
+            className="object-contain drop-shadow-[0_0_18px_rgba(103,232,249,0.55)]"
+          />
+        </div>
+        <div className="flex flex-col justify-center">
+          <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
+            Form
+          </p>
+          <h1 className="mt-3 text-4xl font-black text-white sm:text-5xl">
+            스페이스로 박자에 맞춰 입력
+          </h1>
+          <p className="mt-4 leading-7 text-cyan-50/80">
+            현재 층을 확인하고, 안내 사운드가 끝나면 바로 본게임으로
+            전환됩니다.
+          </p>
+        </div>
+      </div>
+      <RoundLives
+        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+        lives={lives}
+        maxLives={maxLives}
+      />
+    </div>
+  );
+}
+
+function MicrogameRoundScreen({
+  canRecordResult,
+  gameBeatCount,
+  getStaggeredRhythmStyle,
+  lives,
+  maxLives,
+  onFinish,
+  onRecordFailure,
+  onRecordSuccess,
+}: Readonly<{
+  canRecordResult: boolean;
+  gameBeatCount: number;
+  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
+  lives: number;
+  maxLives: number;
+  onFinish: () => void;
+  onRecordFailure: () => void;
+  onRecordSuccess: () => void;
+}>) {
+  return (
+    <div className="mx-auto w-full max-w-5xl space-y-8">
+      <section className="flex min-h-[520px] flex-col justify-between rounded-lg border border-cyan-200 bg-cyan-950/75 p-6 text-center shadow-[0_0_42px_rgba(103,232,249,0.25)] backdrop-blur-sm">
+        <div className="border-b border-cyan-100/50 pb-4">
+          <p className="font-black uppercase tracking-[0.24em] text-cyan-100">
+            Microgame
+          </p>
+        </div>
+        <div className="grid flex-1 place-items-center py-12">
+          <div className="space-y-4">
+            <h1 className="text-6xl font-black leading-tight drop-shadow-[0_0_18px_rgba(103,232,249,0.7)] sm:text-8xl">
+              Press at the beat
+            </h1>
+            <p className="mx-auto max-w-md text-cyan-50/75">
+              본게임은 소리 없이 {gameBeatCount}비트 동안 진행됩니다.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col justify-center gap-3 sm:flex-row">
+          <button
+            className="min-h-12 rounded-md border border-white/70 bg-black/50 px-6 py-3 text-base font-black uppercase tracking-[0.18em] text-white transition enabled:hover:border-cyan-200 enabled:hover:text-cyan-100 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!canRecordResult}
+            onClick={onRecordSuccess}
+            type="button"
+          >
+            성공 처리
+          </button>
+          <button
+            className="min-h-12 rounded-md border border-white/70 bg-black/50 px-6 py-3 text-base font-black uppercase tracking-[0.18em] text-white transition enabled:hover:border-cyan-200 enabled:hover:text-cyan-100 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!canRecordResult}
+            onClick={onRecordFailure}
+            type="button"
+          >
+            실패 처리
+          </button>
+          <NeonButton onClick={onFinish} variant="secondary">
+            게임 종료
+          </NeonButton>
+        </div>
+      </section>
+      <RoundLives
+        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+        lives={lives}
+        maxLives={maxLives}
+      />
+    </div>
+  );
+}
+
+function ResultRoundScreen({
+  getStaggeredRhythmStyle,
+  lives,
+  maxLives,
   roundResult,
-}: Readonly<{ roundResult: GameRoundResult }>) {
+}: Readonly<{
+  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
+  lives: number;
+  maxLives: number;
+  roundResult: GameRoundResult;
+}>) {
   const resultTone = {
     failure: {
       label: "Failure",
@@ -195,51 +346,82 @@ function ResultPanel({
     },
     idle: {
       label: "Ready",
-      message: "아직 판정이 없습니다. 게임 화면에서 액션을 실행하세요.",
+      message: "판정 대기 중입니다.",
       state: "대기 중",
       tone: "border-white/35 bg-black/45 text-cyan-50/80",
     },
     success: {
       label: "Success",
-      message: "성공했습니다. 다음 반응을 준비하세요.",
+      message: "성공했습니다. 사운드가 끝나면 다음 게임으로 넘어갑니다.",
       state: "성공",
       tone: "border-emerald-200/80 bg-emerald-950/55 text-emerald-100",
     },
   }[roundResult];
 
   return (
-    <aside className="flex min-h-[280px] flex-col justify-between rounded-lg border border-cyan-100/70 bg-black/65 p-5 shadow-[0_0_30px_rgba(103,232,249,0.18)] backdrop-blur-sm">
-      <div className="space-y-4">
-        <div>
+    <div className="mx-auto w-full max-w-4xl space-y-8 text-center">
+      <section className="rounded-lg border border-cyan-100/70 bg-black/70 p-8 shadow-[0_0_42px_rgba(103,232,249,0.25)] backdrop-blur-sm sm:p-12">
+        <div className="mx-auto max-w-2xl">
           <p className="text-sm font-black uppercase tracking-[0.28em] text-cyan-100">
             Result
           </p>
-          <h2 className="mt-2 text-4xl font-black text-white">성공/실패</h2>
-        </div>
-        <div className={`rounded-md border p-5 ${resultTone.tone}`}>
-          <p className="text-xs font-black uppercase tracking-[0.24em]">
+          <p className="mt-4 text-xs font-black uppercase tracking-[0.24em] text-white/60">
             {resultTone.label}
           </p>
-          <p className="mt-3 text-4xl font-black">{resultTone.state}</p>
-          <p className="mt-4 leading-7">{resultTone.message}</p>
+          <div className={`mt-6 rounded-md border p-8 ${resultTone.tone}`}>
+            <h1 className="text-7xl font-black sm:text-9xl">
+              {resultTone.state}
+            </h1>
+            <p className="mt-5 text-lg leading-8">{resultTone.message}</p>
+          </div>
         </div>
-      </div>
-      <FlowPanel currentStep="Mission" />
-    </aside>
+      </section>
+      <RoundLives
+        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+        lives={lives}
+        maxLives={maxLives}
+      />
+    </div>
   );
 }
 
 function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
+  useBgmTrack("resultsAndMain", "loop");
+
+  useEffect(() => {
+    const unlockMainBgm = () => {
+      unlockBgmLibrary().catch((error: unknown) => {
+        console.error(error);
+      });
+    };
+
+    window.addEventListener("pointerdown", unlockMainBgm, { once: true });
+    window.addEventListener("keydown", unlockMainBgm, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockMainBgm);
+      window.removeEventListener("keydown", unlockMainBgm);
+    };
+  }, []);
+
+  const startGame = () => {
+    unlockBgmLibrary()
+      .catch((error: unknown) => {
+        console.error(error);
+      })
+      .finally(onStart);
+  };
+
   return (
     <NeonShell>
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
         <div className="space-y-7 rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] backdrop-blur-sm sm:p-8">
           <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
-            Elevator Ready
+            마이크로게임 천국
           </p>
           <div className="space-y-4">
             <h1 className="max-w-3xl text-5xl font-black leading-none tracking-normal text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.7)] sm:text-7xl">
-              미션 층으로 이동합니다.
+              캣타워 오르기
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-cyan-50/85">
               문이 열리면 짧은 규칙을 보고 바로 반응하세요. 엘리베이터는
@@ -247,7 +429,7 @@ function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <NeonButton onClick={onStart}>게임 시작</NeonButton>
+            <NeonButton onClick={startGame}>게임 시작</NeonButton>
           </div>
         </div>
 
@@ -260,7 +442,9 @@ function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
               Lobby
             </span>
           </div>
-          <FlowPanel currentStep="Lobby" />
+          <p className="text-lg leading-8 text-cyan-50/80">
+            게임을 시작하면 엘리베이터가 다음 층으로 이동합니다.
+          </p>
         </div>
       </div>
     </NeonShell>
@@ -268,6 +452,8 @@ function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
 }
 
 function LoadingScreen() {
+  useBgmTrack("resultsAndMain", "loop");
+
   return (
     <NeonShell>
       <div className="mx-auto w-full max-w-2xl rounded-lg border border-cyan-100/70 bg-black/65 p-6 text-center shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm sm:p-8">
@@ -280,7 +466,6 @@ function LoadingScreen() {
         <div className="mx-auto my-8 h-4 max-w-md overflow-hidden rounded-full border border-cyan-100/70 bg-black">
           <div className="neon-loading-bar h-full rounded-full bg-cyan-200" />
         </div>
-        <FlowPanel currentStep="Loading" />
       </div>
     </NeonShell>
   );
@@ -291,104 +476,74 @@ function GameScreen({
   maxLives,
   onFinish,
   onLoseLife,
+  onResetResult,
   onSuccess,
-  roundResult,
 }: Readonly<{
   lives: number;
   maxLives: number;
   onFinish: () => void;
   onLoseLife: () => void;
+  onResetResult: () => void;
   onSuccess: () => void;
-  roundResult: GameRoundResult;
 }>) {
   const { getStaggeredRhythmStyle, rhythmStyle } = useSynchronizedRhythm();
+  const {
+    gameBeatCount,
+    phase,
+    recordFailure,
+    recordSuccess,
+    roundNumber,
+    roundResult,
+  } = useBeatGameRound({
+    onFailure: onLoseLife,
+    onFinish,
+    onResetResult,
+    onSuccess,
+    shouldFinishAfterResult: lives <= 0,
+  });
+  const canRecordResult = phase === "game";
+  const bgmTrack =
+    phase === "instruction"
+      ? "intermission"
+      : phase === "result"
+        ? ({
+            failure: "fail",
+            idle: null,
+            success: "success",
+          } satisfies Record<GameRoundResult, BgmTrack | null>)[roundResult]
+        : null;
+
+  useBgmTrack(bgmTrack, "once");
 
   return (
     <NeonShell roundResult={roundResult} rhythmStyle={rhythmStyle}>
-      <div className="grid gap-6 lg:grid-cols-[0.78fr_1.24fr_0.78fr]">
-        <aside className="space-y-4 rounded-lg border border-cyan-100/70 bg-black/65 p-5 shadow-[0_0_30px_rgba(103,232,249,0.18)] backdrop-blur-sm">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.28em] text-cyan-100">
-              Floor 01
-            </p>
-            <h1 className="mt-2 text-4xl font-black text-white">조작법 안내</h1>
-          </div>
-          <div className="rounded-md border border-white/35 bg-black/45 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-              Rule
-            </p>
-            <p className="mt-3 leading-7 text-cyan-50/85">
-              박자에 맞춰 버튼을 누르세요. 실패하면 라이프가 1개
-              줄어듭니다.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-md border border-white/35 bg-black/45 p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-                Round
-              </p>
-              <p className="mt-2 text-3xl font-black text-cyan-100">01</p>
-            </div>
-            <div className="rounded-md border border-white/35 bg-black/45 p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-                Score
-              </p>
-              <p className="mt-2 text-3xl font-black text-cyan-100">000</p>
-            </div>
-          </div>
-          <div className="rounded-md border border-white/35 bg-black/45 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-              Lives
-            </p>
-            <p className="mt-2 text-3xl font-black text-cyan-100">
-              {lives}/{maxLives}
-            </p>
-          </div>
-        </aside>
-
-        <section className="flex min-h-[420px] flex-col justify-between rounded-lg border border-cyan-100/70 bg-black/70 p-6 shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm">
-          <div className="flex items-center justify-between gap-4 border-b border-cyan-100/50 pb-4">
-            <p className="font-black uppercase tracking-[0.24em] text-cyan-100">
-              실제 게임 화면
-            </p>
-            <p className="rounded border border-white/60 px-3 py-1 text-sm font-black">
-              Time 08
-            </p>
-          </div>
-          <div className="grid flex-1 place-items-center py-12 text-center">
-            <div className="space-y-4">
-              <p className="text-sm font-black uppercase tracking-[0.28em] text-cyan-100">
-                Play Area
-              </p>
-              <h2 className="text-5xl font-black leading-tight drop-shadow-[0_0_18px_rgba(103,232,249,0.7)]">
-                Press at the beat
-              </h2>
-              <p className="mx-auto max-w-md text-cyan-50/75">
-                실제 마이크로게임이 들어갈 영역입니다. 지금은 화면 흐름 확인을
-                위한 기본 레이아웃만 표시합니다.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col justify-end gap-3 sm:flex-row">
-            <NeonButton onClick={onSuccess} variant="secondary">
-              성공 처리
-            </NeonButton>
-            <NeonButton onClick={onLoseLife} variant="secondary">
-              실패 처리
-            </NeonButton>
-            <NeonButton onClick={onFinish} variant="secondary">
-              게임 종료
-            </NeonButton>
-          </div>
-        </section>
-
-        <ResultPanel roundResult={roundResult} />
-      </div>
-      <LivesMeter
-        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-        lives={lives}
-        maxLives={maxLives}
-      />
+      {phase === "instruction" ? (
+        <InstructionRoundScreen
+          getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+          lives={lives}
+          maxLives={maxLives}
+          rhythmStyle={rhythmStyle}
+          roundNumber={roundNumber}
+        />
+      ) : phase === "game" ? (
+        <MicrogameRoundScreen
+          canRecordResult={canRecordResult}
+          gameBeatCount={gameBeatCount}
+          getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+          lives={lives}
+          maxLives={maxLives}
+          onFinish={onFinish}
+          onRecordFailure={recordFailure}
+          onRecordSuccess={recordSuccess}
+        />
+      ) : (
+        <ResultRoundScreen
+          getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+          lives={lives}
+          maxLives={maxLives}
+          roundResult={roundResult}
+        />
+      )}
     </NeonShell>
   );
 }
@@ -400,9 +555,33 @@ function GameOverScreen({
   onRestart: () => void;
   onReturnToMain: () => void;
 }>) {
+  useEffect(() => {
+    bgmLibrary.play("gameOver", "once").catch((error: unknown) => {
+      console.error(error);
+    });
+
+    const resultMusicTimer = window.setTimeout(() => {
+      bgmLibrary.play("resultsAndMain", "loop", "now").catch((error: unknown) => {
+        console.error(error);
+      });
+    }, GAME_OVER_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(resultMusicTimer);
+    };
+  }, []);
+
+  const restartGame = () => {
+    unlockBgmLibrary()
+      .catch((error: unknown) => {
+        console.error(error);
+      })
+      .finally(onRestart);
+  };
+
   return (
     <NeonShell>
-      <div className="mx-auto w-full max-w-3xl rounded-lg border border-cyan-100/70 bg-black/70 p-6 text-center shadow-[0_0_38px_rgba(103,232,249,0.24)] backdrop-blur-sm sm:p-8">
+      <div className="game-over-comic-drop mx-auto w-full max-w-3xl rounded-lg border border-cyan-100/70 bg-black/70 p-6 text-center shadow-[0_0_38px_rgba(103,232,249,0.24)] backdrop-blur-sm sm:p-8">
         <p className="mb-4 text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
           Final Floor
         </p>
@@ -429,11 +608,8 @@ function GameOverScreen({
             <p className="mt-2 text-3xl font-black text-cyan-100">End</p>
           </div>
         </div>
-        <div className="mb-8">
-          <FlowPanel currentStep="Game Over" />
-        </div>
         <div className="flex flex-col justify-center gap-3 sm:flex-row">
-          <NeonButton onClick={onRestart}>다시 시작</NeonButton>
+          <NeonButton onClick={restartGame}>다시 시작</NeonButton>
           <NeonButton onClick={onReturnToMain} variant="secondary">
             메인으로
           </NeonButton>
@@ -450,9 +626,9 @@ export function GameFlowExperience() {
     loseLife,
     maxLives,
     recordSuccess,
+    resetRoundResult,
     restartGame,
     returnToMain,
-    roundResult,
     screen,
     startGame,
   } = useGameScreenFlow();
@@ -468,8 +644,8 @@ export function GameFlowExperience() {
         maxLives={maxLives}
         onFinish={finishGame}
         onLoseLife={loseLife}
+        onResetResult={resetRoundResult}
         onSuccess={recordSuccess}
-        roundResult={roundResult}
       />
     );
   }

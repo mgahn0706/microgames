@@ -2,7 +2,10 @@
 
 import type { CSSProperties } from "react";
 
-const RHYTHM_DURATION_MS = 1200;
+const INTERMISSION_DURATION_MS = 4676;
+const INTERMISSION_BEATS = 8;
+
+export const RHYTHM_DURATION_MS = INTERMISSION_DURATION_MS / INTERMISSION_BEATS;
 const RHYTHM_STAGGER_MS = 120;
 
 export type SynchronizedRhythmStyle = CSSProperties & {
