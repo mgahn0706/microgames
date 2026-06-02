@@ -43,7 +43,10 @@ Guidelines:
 
 Workflow rule for Codex:
 
+- Follow `docs/WORKFLOW.md` for branch and PR handling.
+- For every accepted plan, create a new `feat/<number>-<short-topic>` branch before changing files.
 - For every Codex task, summarize the changes before any commit.
+- After each commit, push the feature branch and open or update a GitHub PR.
 - If the user asks to commit, run the repo-local `pre-commit-review` skill before committing.
 - Share the pre-commit review report before committing.
 - If the review passes and the user already asked to commit, commit automatically without asking again.
