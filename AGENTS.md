@@ -44,8 +44,9 @@ Guidelines:
 Workflow rule for Codex:
 
 - Follow `docs/WORKFLOW.md` for branch and PR handling.
-- Create a new `feat/<number>-<short-topic>` branch only when the user explicitly asks Codex to plan work.
-- Always create task branches from `main`, never from another feature branch.
+- Do not create branches automatically.
+- Create a new `feat/<number>-<short-topic>` branch only when the user explicitly asks Codex to create a branch.
+- When the user explicitly asks for a branch, always create it from `main`, never from another feature branch.
 - For every Codex task, summarize the changes before any commit.
 - When working on a task branch, push the branch and open or update a GitHub PR after each commit.
 - If the user asks to commit, run the repo-local `pre-commit-review` skill before committing.

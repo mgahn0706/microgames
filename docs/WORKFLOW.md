@@ -1,12 +1,13 @@
 # Codex Branch and PR Workflow
 
-Use this workflow only when the user explicitly asks Codex to plan work.
+Use this workflow only when the user explicitly asks Codex to create a branch.
 
 ## Branch Rule
 
 - Start from a clean working tree on `main`.
 - Update local `main` first when possible.
-- Create task branches only for user-requested plan work.
+- Do not create branches automatically.
+- Create task branches only when the user explicitly asks for a branch.
 - Always create task branches from `main`, never from another feature branch.
 - Use this branch name format:
 
@@ -48,6 +49,6 @@ feat/3-plan-pr-workflow
 
 ## Completion Rule
 
-- A planned task branch is complete only after the commit is pushed and the PR URL is reported.
+- A task branch is complete only after the commit is pushed and the PR URL is reported.
 - Non-plan tasks may be committed directly to `main` when they are cohesive and commit-ready.
 - If push or PR creation is blocked by authentication, permissions, or network failure, report the exact blocker and leave the branch ready for the user.
