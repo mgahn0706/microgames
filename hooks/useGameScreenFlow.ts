@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const PRELOAD_ASSETS = [
-  "/images/main-elevator-1.png",
-  "/images/main-elevator-2.png",
-  "/sounds/095. Museum - Intermissions.mp3",
-];
+import { ALL_GAME_PRELOAD_ASSETS } from "@/games/preloadAssets";
 
 const MIN_LOADING_TIME_MS = 900;
+
+let allGameAssetsPreloadPromise: Promise<unknown> | null = null;
 
 export type GameScreen = "main" | "loading" | "playing" | "gameOver";
 
@@ -26,11 +23,13 @@ function preloadAsset(assetPath: string) {
   });
 }
 
-function preloadGameAssets() {
-  return Promise.allSettled([
-    ...PRELOAD_ASSETS.map(preloadAsset),
+function preloadAllGameAssets() {
+  allGameAssetsPreloadPromise ??= Promise.allSettled([
+    ...ALL_GAME_PRELOAD_ASSETS.map(preloadAsset),
     waitForMinimumLoadingTime(),
   ]);
+
+  return allGameAssetsPreloadPromise;
 }
 
 export function useGameScreenFlow() {
@@ -43,7 +42,7 @@ export function useGameScreenFlow() {
 
     let isCurrentLoadingScreen = true;
 
-    preloadGameAssets().then(() => {
+    preloadAllGameAssets().then(() => {
       if (isCurrentLoadingScreen) {
         setScreen("playing");
       }

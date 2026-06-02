@@ -140,10 +140,10 @@ function LoadingScreen() {
     <NeonShell>
       <div className="mx-auto w-full max-w-2xl rounded-lg border border-cyan-100/70 bg-black/65 p-6 text-center shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm sm:p-8">
         <p className="mb-4 text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
-          Loading Assets
+          Loading All Games
         </p>
         <h1 className="text-4xl font-black text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.65)] sm:text-6xl">
-          엘리베이터 이동 중
+          모든 게임 준비 중
         </h1>
         <div className="mx-auto my-8 h-4 max-w-md overflow-hidden rounded-full border border-cyan-100/70 bg-black">
           <div className="neon-loading-bar h-full rounded-full bg-cyan-200" />
