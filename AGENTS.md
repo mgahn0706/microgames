@@ -1,11 +1,3 @@
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-
-<!-- END:nextjs-agent-rules -->
-
 # Commit Message Rule
 
 Allowed commit types:
@@ -15,37 +7,8 @@ Allowed commit types:
 - `chore`
 - `docs`
 
-Every commit message must include:
-
-- The feature list number in the title
-- A `Confirmed:` line in the body
-- An `Unclear at first:` line in the body
-
-Use the following commit title format:
-
-```text
-feat: #3 뉴스 카드 컴포넌트
-```
-
-Write the commit body in English using this format:
-
-```text
-Confirmed: Checked the component layout and decided to further split components because the structure was complex.
-Unclear at first: Confirmed why `useCallback` was used.
-```
-
-Guidelines:
-
-- Include the feature list number as `#<number>` in every commit title.
-- Start confirmed items with `Confirmed:`.
-- Start things that were unclear at first but later understood with `Unclear at first:`.
-- Keep each line short, direct, and written in natural English.
-
 Workflow rule for Codex:
 
-- Follow `docs/WORKFLOW.md` for branch and PR handling.
-- Do not create branches automatically.
-- Create a new `feat/<number>-<short-topic>` branch only when the user explicitly asks Codex to create a branch.
 - When the user explicitly asks for a branch, always create it from `main`, never from another feature branch.
 - For every Codex task, summarize the changes before any commit.
 - When working on a task branch, push the branch and open or update a GitHub PR after each commit.

@@ -13,11 +13,14 @@ const RHYTHM_STAGGER_MS = 120;
 export type SynchronizedRhythmStyle = CSSProperties & {
   "--game-rhythm-delay"?: string;
   "--game-rhythm-duration": string;
+  "--setup-life-delay"?: string;
 };
 
-export function useSynchronizedRhythm() {
+export function useSynchronizedRhythm(
+  beatDurationMs: number = RHYTHM_DURATION_MS,
+) {
   const rhythmStyle = {
-    "--game-rhythm-duration": `${RHYTHM_DURATION_MS}ms`,
+    "--game-rhythm-duration": `${beatDurationMs}ms`,
   } satisfies SynchronizedRhythmStyle;
 
   const getStaggeredRhythmStyle = (index: number) =>

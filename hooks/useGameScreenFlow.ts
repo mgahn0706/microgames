@@ -9,7 +9,7 @@ const MAX_LIVES = 4;
 
 let allGameAssetsPreloadPromise: Promise<unknown> | null = null;
 
-export type GameScreen = "main" | "loading" | "playing" | "gameOver";
+export type GameScreen = "main" | "loading" | "setup" | "playing" | "gameOver";
 export type GameRoundResult = "idle" | "success" | "failure";
 
 function waitForMinimumLoadingTime() {
@@ -62,6 +62,10 @@ export function useGameScreenFlow() {
   const startGame = useCallback(() => {
     setLives(MAX_LIVES);
     setRoundResult("idle");
+    setScreen("setup");
+  }, []);
+
+  const completeSetup = useCallback(() => {
     setScreen("playing");
   }, []);
 
@@ -73,7 +77,7 @@ export function useGameScreenFlow() {
   const restartGame = useCallback(() => {
     setLives(MAX_LIVES);
     setRoundResult("idle");
-    setScreen("playing");
+    setScreen("setup");
   }, []);
 
   const returnToMain = useCallback(() => {
@@ -98,6 +102,7 @@ export function useGameScreenFlow() {
   }, []);
 
   return {
+    completeSetup,
     finishGame,
     lives,
     loseLife,

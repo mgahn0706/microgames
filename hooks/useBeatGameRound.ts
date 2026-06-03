@@ -8,14 +8,19 @@ const DEFAULT_GAME_BEATS = 8;
 const INSTRUCTION_BEATS = 8;
 const PROGRESS_TICK_MS = 50;
 const RESULT_BEATS = 4;
+const SPEED_UP_BEATS = 8;
+const SPEED_UP_INTERVAL_ROUNDS = 4;
+const SPEED_UP_BEAT_DURATION_MULTIPLIER = 0.96;
+const MIN_SPEED_RATE = 0.65;
 
-export type GameRoundPhase = "instruction" | "game" | "result";
-export type InstructionStep = "controls" | "floor";
+export type GameRoundPhase = "instruction" | "game" | "result" | "speedUp";
+export type InstructionStep = "formPhoto" | "formDescription" | "floor";
 
 const PHASE_LABELS = {
   game: "본게임",
   instruction: "조작법 안내",
   result: "성공/실패 안내",
+  speedUp: "속도 증가",
 } satisfies Record<GameRoundPhase, string>;
 
 type UseBeatGameRoundParams = Readonly<{
@@ -36,7 +41,20 @@ function getPhaseBeatCount(phase: GameRoundPhase, gameBeatCount: number) {
     return RESULT_BEATS;
   }
 
+  if (phase === "speedUp") {
+    return SPEED_UP_BEATS;
+  }
+
   return gameBeatCount;
+}
+
+function getBeatDurationMs(speedLevel: number) {
+  const speedRate = Math.max(
+    Math.pow(SPEED_UP_BEAT_DURATION_MULTIPLIER, speedLevel),
+    MIN_SPEED_RATE,
+  );
+
+  return RHYTHM_DURATION_MS * speedRate;
 }
 
 export function useBeatGameRound({
@@ -51,8 +69,10 @@ export function useBeatGameRound({
   const [elapsedMs, setElapsedMs] = useState(0);
   const [roundNumber, setRoundNumber] = useState(1);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
+  const [speedLevel, setSpeedLevel] = useState(0);
   const phaseBeatCount = getPhaseBeatCount(phase, gameBeatCount);
-  const phaseDurationMs = phaseBeatCount * RHYTHM_DURATION_MS;
+  const beatDurationMs = getBeatDurationMs(speedLevel);
+  const phaseDurationMs = phaseBeatCount * beatDurationMs;
 
   const beginInstruction = useCallback(() => {
     setElapsedMs(0);
@@ -105,6 +125,19 @@ export function useBeatGameRound({
         return;
       }
 
+      if (phase === "result" && roundNumber % SPEED_UP_INTERVAL_ROUNDS === 0) {
+        setElapsedMs(0);
+        setPhase("speedUp");
+        return;
+      }
+
+      if (phase === "speedUp") {
+        setSpeedLevel((currentSpeedLevel) => currentSpeedLevel + 1);
+        setRoundNumber((currentRoundNumber) => currentRoundNumber + 1);
+        beginInstruction();
+        return;
+      }
+
       setRoundNumber((currentRoundNumber) => currentRoundNumber + 1);
       beginInstruction();
     }, phaseDurationMs);
@@ -118,22 +151,26 @@ export function useBeatGameRound({
     onFinish,
     phase,
     phaseDurationMs,
+    roundNumber,
     shouldFinishAfterResult,
     showResult,
   ]);
 
   const progressBeats = Math.min(
-    Math.ceil(elapsedMs / RHYTHM_DURATION_MS),
+    Math.ceil(elapsedMs / beatDurationMs),
     phaseBeatCount,
   );
   const phaseLabel = PHASE_LABELS[phase];
   const instructionStep: InstructionStep =
-    elapsedMs < (INSTRUCTION_BEATS / 2) * RHYTHM_DURATION_MS
-      ? "controls"
-      : "floor";
+    elapsedMs < 2 * beatDurationMs
+      ? "formPhoto"
+      : elapsedMs < (INSTRUCTION_BEATS / 2) * beatDurationMs
+        ? "formDescription"
+        : "floor";
 
   return useMemo(
     () => ({
+      beatDurationMs,
       gameBeatCount,
       instructionStep,
       phase,
@@ -144,8 +181,10 @@ export function useBeatGameRound({
       recordSuccess: () => showResult("success"),
       roundNumber,
       roundResult,
+      speedLevel,
     }),
     [
+      beatDurationMs,
       gameBeatCount,
       instructionStep,
       phase,
@@ -155,6 +194,7 @@ export function useBeatGameRound({
       roundNumber,
       roundResult,
       showResult,
+      speedLevel,
     ],
   );
 }

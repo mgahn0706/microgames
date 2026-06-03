@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
 import {
   type GameRoundResult,
@@ -13,12 +14,14 @@ import {
   type SynchronizedRhythmStyle,
   useSynchronizedRhythm,
 } from "@/hooks/useSynchronizedRhythm";
+import { useGameSetupTransition } from "@/hooks/useGameSetupTransition";
 import {
   bgmLibrary,
   GAME_OVER_DURATION_MS,
   unlockBgmLibrary,
   type BgmTrack,
 } from "@/lib/bgmLibrary";
+import { useRandomFormInstruction } from "@/hooks/useRandomFormInstruction";
 
 const ELEVATOR_IMAGES = [
   "/images/main-elevator-1.png",
@@ -42,6 +45,7 @@ const RESULT_BGM_TRACKS = {
   idle: null,
   success: "success",
 } satisfies Record<GameRoundResult, BgmTrack | null>;
+const MAIN_SCREEN_EXIT_MS = 680;
 
 function NeonButton({
   children,
@@ -69,17 +73,18 @@ function NeonButton({
 }
 
 function ElevatorBackdrop({
+  shouldDim = true,
   roundResult = "idle",
-}: Readonly<{ roundResult?: GameRoundResult }>) {
+}: Readonly<{ shouldDim?: boolean; roundResult?: GameRoundResult }>) {
   const elevatorImages = ELEVATOR_RESULT_IMAGES[roundResult];
 
   return (
     <div
-      className="absolute inset-0 overflow-hidden"
+      className="fixed inset-0 overflow-hidden"
       aria-label="Neon elevator scene"
     >
       <Image
-        className="absolute inset-0 size-full object-cover opacity-100"
+        className="absolute inset-0 size-full object-cover object-center opacity-100"
         src={elevatorImages[0]}
         alt=""
         fill
@@ -87,15 +92,19 @@ function ElevatorBackdrop({
         sizes="100vw"
       />
       <Image
-        className="neon-elevator-flicker absolute inset-0 size-full object-cover"
+        className="neon-elevator-flicker absolute inset-0 size-full object-cover object-center"
         src={elevatorImages[1]}
         alt=""
         fill
         priority
         sizes="100vw"
       />
-      <div className="absolute inset-0 bg-black/30" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.08),rgba(0,0,0,0.65)_70%)]" />
+      {shouldDim ? (
+        <>
+          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.08),rgba(0,0,0,0.65)_70%)]" />
+        </>
+      ) : null}
     </div>
   );
 }
@@ -104,17 +113,19 @@ function NeonShell({
   children,
   roundResult = "idle",
   rhythmStyle,
+  shouldDim = true,
 }: Readonly<{
   children: React.ReactNode;
   rhythmStyle?: SynchronizedRhythmStyle;
   roundResult?: GameRoundResult;
+  shouldDim?: boolean;
 }>) {
   return (
     <main
       className="relative min-h-screen overflow-hidden bg-black text-white"
       style={rhythmStyle}
     >
-      <ElevatorBackdrop roundResult={roundResult} />
+      <ElevatorBackdrop roundResult={roundResult} shouldDim={shouldDim} />
       <section className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-5 py-8 sm:px-8 lg:px-10">
         {children}
       </section>
@@ -122,73 +133,71 @@ function NeonShell({
   );
 }
 
-function LivesMeter({
+function FixedLivesOverlay({
+  animateSetup = false,
   getStaggeredRhythmStyle,
   lives,
   maxLives,
 }: Readonly<{
+  animateSetup?: boolean;
   getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
   lives: number;
   maxLives: number;
 }>) {
   return (
     <div
-      className="mt-6 flex justify-center"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center pb-8 sm:pb-12"
       aria-label={`${lives} of ${maxLives} lives remaining`}
     >
-      <div className="flex w-full max-w-4xl items-end justify-center gap-1 px-3 py-2 sm:gap-4 sm:px-6 sm:py-3">
+      <div
+        className={`${animateSetup ? "setup-screen" : ""} relative h-28 w-[min(92vw,720px)] sm:h-32`}
+      >
         {LIFE_LABELS.map((label, index) => {
           const isActive = index < lives;
+          const shouldAnimateInactive = !animateSetup && !isActive;
+          const lifeSlotStyle = {
+            "--setup-life-delay": animateSetup ? `${index * 140}ms` : "0ms",
+            left: `${12.5 + index * 25}%`,
+          } satisfies CSSProperties & {
+            "--setup-life-delay": string;
+          };
 
           return (
             <div
-              className="life-fish-motion relative h-20 w-24 sm:h-24 sm:w-36 lg:h-28 lg:w-44"
+              className="setup-life-slot absolute top-0 h-20 w-24 sm:h-24 sm:w-36 lg:h-28 lg:w-44"
               key={label}
-              style={getStaggeredRhythmStyle(index)}
+              style={lifeSlotStyle}
             >
-              <Image
-                src="/images/life-deactive.png"
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 176px, (min-width: 640px) 144px, 96px"
-                className={`object-contain transition-opacity duration-300 ${
-                  isActive ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <Image
-                src="/images/life-active.png"
-                alt={isActive ? `${label} active` : ""}
-                fill
-                sizes="(min-width: 1024px) 176px, (min-width: 640px) 144px, 96px"
-                className={`object-contain transition-opacity duration-300 ${
-                  isActive
-                    ? "opacity-100 drop-shadow-[0_0_18px_#67e8f9]"
-                    : "opacity-0"
-                }`}
-              />
+              <div
+                className="life-fish-motion relative size-full"
+                style={getStaggeredRhythmStyle(index)}
+              >
+                <Image
+                  src="/images/life-deactive.png"
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 176px, (min-width: 640px) 144px, 96px"
+                  className={`object-contain transition-opacity duration-300 ${
+                    isActive ? "opacity-0" : "opacity-100"
+                  } ${shouldAnimateInactive ? "life-bone-enter" : ""}`}
+                />
+                <Image
+                  src="/images/life-active.png"
+                  alt={isActive ? `${label} active` : ""}
+                  fill
+                  sizes="(min-width: 1024px) 176px, (min-width: 640px) 144px, 96px"
+                  className={`object-contain transition-opacity duration-300 ${
+                    isActive
+                      ? "opacity-100 drop-shadow-[0_0_18px_#67e8f9]"
+                      : "opacity-0"
+                  } ${shouldAnimateInactive ? "life-active-exit" : ""}`}
+                />
+              </div>
             </div>
           );
         })}
       </div>
     </div>
-  );
-}
-
-function RoundLives({
-  getStaggeredRhythmStyle,
-  lives,
-  maxLives,
-}: Readonly<{
-  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
-  lives: number;
-  maxLives: number;
-}>) {
-  return (
-    <LivesMeter
-      getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-      lives={lives}
-      maxLives={maxLives}
-    />
   );
 }
 
@@ -226,30 +235,17 @@ function BeatIndicator({
 }
 
 function RoundFooter({
-  getStaggeredRhythmStyle,
-  lives,
-  maxLives,
   phaseBeatCount,
   progressBeats,
 }: Readonly<{
-  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
-  lives: number;
-  maxLives: number;
   phaseBeatCount: number;
   progressBeats: number;
 }>) {
   return (
-    <div className="space-y-4">
-      <BeatIndicator
-        phaseBeatCount={phaseBeatCount}
-        progressBeats={progressBeats}
-      />
-      <RoundLives
-        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-        lives={lives}
-        maxLives={maxLives}
-      />
-    </div>
+    <BeatIndicator
+      phaseBeatCount={phaseBeatCount}
+      progressBeats={progressBeats}
+    />
   );
 }
 
@@ -268,18 +264,18 @@ function CurrentFloorDisplay({
 
   return (
     <div
-      className="mx-auto grid size-56 place-items-center rounded-md border-2 border-cyan-100 bg-black/70 shadow-[0_0_38px_rgba(103,232,249,0.32)] sm:size-72"
+      className="floor-display-card mx-auto grid size-56 place-items-center rounded-md border-2 border-cyan-100 bg-black/70 shadow-[0_0_38px_rgba(103,232,249,0.32)] sm:size-72"
       style={floorRiseStyle}
     >
       <div className="text-center">
         <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
-          Current Floor
+          현재 층
         </p>
         <div className="relative mt-3 h-28 overflow-hidden sm:h-36">
-          <p className="floor-number-rise-out absolute inset-0 text-8xl font-black leading-none text-white/55 drop-shadow-[0_0_18px_rgba(103,232,249,0.45)] sm:text-9xl">
+          <p className="floor-number-rise-out absolute inset-0 grid place-items-center text-8xl font-black leading-none text-white/55 drop-shadow-[0_0_18px_rgba(103,232,249,0.45)] sm:text-9xl">
             {previousRoundNumber.toString().padStart(2, "0")}
           </p>
-          <p className="floor-number-rise-in absolute inset-0 text-8xl font-black leading-none text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.75)] sm:text-9xl">
+          <p className="floor-number-rise-in absolute inset-0 grid place-items-center text-8xl font-black leading-none text-white drop-shadow-[0_0_18px_rgba(103,232,249,0.75)] sm:text-9xl">
             {roundNumber.toString().padStart(2, "0")}
           </p>
         </div>
@@ -289,47 +285,61 @@ function CurrentFloorDisplay({
 }
 
 function InstructionRoundScreen({
-  getStaggeredRhythmStyle,
   instructionStep,
-  lives,
-  maxLives,
   phaseBeatCount,
   progressBeats,
   rhythmStyle,
   roundNumber,
 }: Readonly<{
-  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
-  instructionStep: "controls" | "floor";
-  lives: number;
-  maxLives: number;
+  instructionStep: "formPhoto" | "formDescription" | "floor";
   phaseBeatCount: number;
   progressBeats: number;
   rhythmStyle: SynchronizedRhythmStyle;
   roundNumber: number;
 }>) {
+  const formInstruction = useRandomFormInstruction(roundNumber);
+  const shouldShowFormDescription = instructionStep === "formDescription";
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8 text-center">
-      {instructionStep === "controls" ? (
-        <div className="mx-auto grid max-w-3xl gap-5 rounded-lg border border-cyan-100/70 bg-black/70 p-6 shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm sm:grid-cols-[220px_1fr] sm:text-left">
-          <div className="relative mx-auto aspect-square w-44 sm:w-full">
-            <Image
-              src="/images/forms/space.png"
-              alt="Space key control form"
-              fill
-              sizes="220px"
-              className="object-contain drop-shadow-[0_0_18px_rgba(103,232,249,0.55)]"
-            />
+      {instructionStep !== "floor" ? (
+        <div
+          className={`instruction-form-stage ${
+            shouldShowFormDescription ? "instruction-form-stage-description" : ""
+          }`}
+        >
+          <div className="instruction-photo-only-card rounded-lg border border-cyan-100/70 bg-black/70 p-3 shadow-[0_0_28px_rgba(103,232,249,0.18)]">
+            <div className="relative aspect-[4/3] w-full">
+              <Image
+                src={formInstruction.imageSrc}
+                alt={formInstruction.alt}
+                fill
+                sizes="(min-width: 640px) 240px, 62vw"
+                className="object-contain drop-shadow-[0_0_22px_rgba(103,232,249,0.62)]"
+              />
+            </div>
           </div>
-          <div className="flex flex-col justify-center">
-            <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
-              Form
-            </p>
-            <h1 className="mt-3 text-4xl font-black text-white sm:text-5xl">
-              스페이스로 박자에 맞춰 입력
-            </h1>
-            <p className="mt-4 leading-7 text-cyan-50/80">
-              조작법을 확인하면 현재 층이 올라갑니다.
-            </p>
+          <div className="instruction-description-card rounded-lg border border-cyan-100/70 bg-black/70 p-5 shadow-[0_0_28px_rgba(103,232,249,0.18)] sm:p-6">
+            <div className="relative mx-auto aspect-[4/3] w-52 sm:w-56">
+              <Image
+                src={formInstruction.imageSrc}
+                alt={formInstruction.alt}
+                fill
+                sizes="224px"
+                className="object-contain drop-shadow-[0_0_18px_rgba(103,232,249,0.55)]"
+              />
+            </div>
+            <div className="flex flex-col justify-center">
+              <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
+                조작법
+              </p>
+              <h1 className="mt-3 text-4xl font-black text-white sm:text-5xl">
+                {formInstruction.title}
+              </h1>
+              <p className="mt-4 leading-7 text-cyan-50/80">
+                {formInstruction.description}
+              </p>
+            </div>
           </div>
         </div>
       ) : (
@@ -339,9 +349,6 @@ function InstructionRoundScreen({
         />
       )}
       <RoundFooter
-        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-        lives={lives}
-        maxLives={maxLives}
         phaseBeatCount={phaseBeatCount}
         progressBeats={progressBeats}
       />
@@ -352,9 +359,6 @@ function InstructionRoundScreen({
 function MicrogameRoundScreen({
   canRecordResult,
   gameBeatCount,
-  getStaggeredRhythmStyle,
-  lives,
-  maxLives,
   onFinish,
   onRecordFailure,
   onRecordSuccess,
@@ -363,9 +367,6 @@ function MicrogameRoundScreen({
 }: Readonly<{
   canRecordResult: boolean;
   gameBeatCount: number;
-  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
-  lives: number;
-  maxLives: number;
   onFinish: () => void;
   onRecordFailure: () => void;
   onRecordSuccess: () => void;
@@ -413,9 +414,6 @@ function MicrogameRoundScreen({
         </div>
       </section>
       <RoundFooter
-        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-        lives={lives}
-        maxLives={maxLives}
         phaseBeatCount={phaseBeatCount}
         progressBeats={progressBeats}
       />
@@ -424,63 +422,45 @@ function MicrogameRoundScreen({
 }
 
 function ResultRoundScreen({
-  getStaggeredRhythmStyle,
-  lives,
-  maxLives,
   phaseBeatCount,
   progressBeats,
-  roundResult,
 }: Readonly<{
-  getStaggeredRhythmStyle: (index: number) => SynchronizedRhythmStyle;
-  lives: number;
-  maxLives: number;
   phaseBeatCount: number;
   progressBeats: number;
-  roundResult: GameRoundResult;
 }>) {
-  const resultTone = {
-    failure: {
-      label: "Failure",
-      message: "실패했습니다. 라이프가 1개 줄어듭니다.",
-      state: "실패",
-      tone: "border-rose-300/80 bg-rose-950/55 text-rose-100",
-    },
-    idle: {
-      label: "Ready",
-      message: "판정 대기 중입니다.",
-      state: "대기 중",
-      tone: "border-white/35 bg-black/45 text-cyan-50/80",
-    },
-    success: {
-      label: "Success",
-      message: "성공했습니다. 사운드가 끝나면 다음 게임으로 넘어갑니다.",
-      state: "성공",
-      tone: "border-emerald-200/80 bg-emerald-950/55 text-emerald-100",
-    },
-  }[roundResult];
-
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-8 text-center">
-      <section className="rounded-lg border border-cyan-100/70 bg-black/70 p-8 shadow-[0_0_42px_rgba(103,232,249,0.25)] backdrop-blur-sm sm:p-12">
-        <div className="mx-auto max-w-2xl">
-          <p className="text-sm font-black uppercase tracking-[0.28em] text-cyan-100">
-            Result
-          </p>
-          <p className="mt-4 text-xs font-black uppercase tracking-[0.24em] text-white/60">
-            {resultTone.label}
-          </p>
-          <div className={`mt-6 rounded-md border p-8 ${resultTone.tone}`}>
-            <h1 className="text-7xl font-black sm:text-9xl">
-              {resultTone.state}
-            </h1>
-            <p className="mt-5 text-lg leading-8">{resultTone.message}</p>
-          </div>
-        </div>
-      </section>
+    <div className="mx-auto flex min-h-screen w-full max-w-5xl items-end justify-center pb-40 text-center">
       <RoundFooter
-        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-        lives={lives}
-        maxLives={maxLives}
+        phaseBeatCount={phaseBeatCount}
+        progressBeats={progressBeats}
+      />
+    </div>
+  );
+}
+
+function SpeedUpScreen({
+  phaseBeatCount,
+  progressBeats,
+  speedLevel,
+}: Readonly<{
+  phaseBeatCount: number;
+  progressBeats: number;
+  speedLevel: number;
+}>) {
+  return (
+    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-center gap-8 pb-24 text-center">
+      <div className="speed-up-typography">
+        <p className="text-sm font-black uppercase tracking-[0.34em] text-cyan-100">
+          Speed Up
+        </p>
+        <h1 className="mt-4 text-6xl font-black leading-none text-white drop-shadow-[0_0_24px_rgba(103,232,249,0.8)] sm:text-8xl">
+          BPM UP
+        </h1>
+        <p className="mt-5 text-xl font-black tracking-[0.24em] text-cyan-50/80">
+          LEVEL {speedLevel + 1}
+        </p>
+      </div>
+      <RoundFooter
         phaseBeatCount={phaseBeatCount}
         progressBeats={progressBeats}
       />
@@ -490,6 +470,8 @@ function ResultRoundScreen({
 
 function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
   useBgmTrack("resultsAndMain", "loop", "now");
+  const [isStarting, setIsStarting] = useState(false);
+  const { rhythmStyle } = useSynchronizedRhythm();
 
   useEffect(() => {
     const unlockMainBgm = () => {
@@ -509,16 +491,29 @@ function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
   }, []);
 
   const startGame = () => {
+    if (isStarting) {
+      return;
+    }
+
+    setIsStarting(true);
     unlockBgmLibrary()
       .catch((error: unknown) => {
         console.error(error);
       })
-      .finally(onStart);
+      .finally(() => {
+        window.setTimeout(() => {
+          onStart();
+        }, MAIN_SCREEN_EXIT_MS);
+      });
   };
 
   return (
-    <NeonShell>
-      <div className="rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] backdrop-blur-sm sm:p-8">
+    <NeonShell rhythmStyle={rhythmStyle}>
+      <div
+        className={`rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] backdrop-blur-sm sm:p-8 ${
+          isStarting ? "main-screen-exit-up" : ""
+        }`}
+      >
         <div className="grid gap-7 lg:grid-cols-[1fr_260px] lg:items-center">
           <div className="space-y-7">
             <p className="text-sm font-black uppercase tracking-[0.32em] text-cyan-100">
@@ -534,7 +529,9 @@ function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <NeonButton onClick={startGame}>게임 시작</NeonButton>
+              <NeonButton onClick={startGame}>
+                {isStarting ? "준비 중" : "게임 시작"}
+              </NeonButton>
             </div>
           </div>
           <div className="mx-auto w-full max-w-48 lg:max-w-none">
@@ -544,11 +541,39 @@ function MainScreen({ onStart }: Readonly<{ onStart: () => void }>) {
               width={880}
               height={1268}
               priority
-              className="h-auto w-full object-contain drop-shadow-[0_0_24px_rgba(103,232,249,0.45)]"
+              className="main-logo-bounce h-auto w-full object-contain drop-shadow-[0_0_24px_rgba(103,232,249,0.45)]"
             />
           </div>
         </div>
       </div>
+    </NeonShell>
+  );
+}
+
+function SetupScreen({
+  lives,
+  maxLives,
+  onComplete,
+}: Readonly<{
+  lives: number;
+  maxLives: number;
+  onComplete: () => void;
+}>) {
+  const { getStaggeredRhythmStyle, rhythmStyle } = useSynchronizedRhythm();
+
+  useGameSetupTransition({
+    isActive: true,
+    onComplete,
+  });
+
+  return (
+    <NeonShell rhythmStyle={rhythmStyle} shouldDim={false}>
+      <FixedLivesOverlay
+        animateSetup
+        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+        lives={lives}
+        maxLives={maxLives}
+      />
     </NeonShell>
   );
 }
@@ -598,8 +623,8 @@ function GameScreen({
   onResetResult: () => void;
   onSuccess: () => void;
 }>) {
-  const { getStaggeredRhythmStyle, rhythmStyle } = useSynchronizedRhythm();
   const {
+    beatDurationMs,
     gameBeatCount,
     instructionStep,
     phase,
@@ -609,6 +634,7 @@ function GameScreen({
     recordSuccess,
     roundNumber,
     roundResult,
+    speedLevel,
   } = useBeatGameRound({
     onFailure: onLoseLife,
     onFinish,
@@ -616,8 +642,12 @@ function GameScreen({
     onSuccess,
     shouldFinishAfterResult: lives <= 0,
   });
+  const { getStaggeredRhythmStyle, rhythmStyle } =
+    useSynchronizedRhythm(beatDurationMs);
   const canRecordResult = phase === "game";
   useEffect(() => {
+    bgmLibrary.setBeatDurationMs(beatDurationMs);
+
     if (phase === "instruction") {
       bgmLibrary.play("intermission", "once").catch((error: unknown) => {
         console.error(error);
@@ -630,8 +660,16 @@ function GameScreen({
       return;
     }
 
+    if (phase === "speedUp") {
+      bgmLibrary.play("speedUp", "once").catch((error: unknown) => {
+        console.error(error);
+      });
+      return;
+    }
+
     const nextResultBgmTrack = RESULT_BGM_TRACKS[roundResult];
     const shouldGoToGameOver = roundResult === "failure" && lives <= 0;
+    const shouldSpeedUpAfterResult = roundNumber % 4 === 0;
 
     if (!nextResultBgmTrack) {
       return;
@@ -644,21 +682,34 @@ function GameScreen({
       return;
     }
 
+    if (shouldSpeedUpAfterResult) {
+      bgmLibrary.play(nextResultBgmTrack, "once").catch((error: unknown) => {
+        console.error(error);
+      });
+      return;
+    }
+
     bgmLibrary
       .playSequence(nextResultBgmTrack, "once", "intermission", "once")
       .catch((error: unknown) => {
         console.error(error);
       });
-  }, [lives, phase, roundResult]);
+  }, [beatDurationMs, lives, phase, roundNumber, roundResult]);
 
   return (
-    <NeonShell roundResult={roundResult} rhythmStyle={rhythmStyle}>
+    <NeonShell
+      roundResult={roundResult}
+      rhythmStyle={rhythmStyle}
+      shouldDim={false}
+    >
+      <FixedLivesOverlay
+        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+        lives={lives}
+        maxLives={maxLives}
+      />
       {phase === "instruction" ? (
         <InstructionRoundScreen
-          getStaggeredRhythmStyle={getStaggeredRhythmStyle}
           instructionStep={instructionStep}
-          lives={lives}
-          maxLives={maxLives}
           phaseBeatCount={phaseBeatCount}
           progressBeats={progressBeats}
           rhythmStyle={rhythmStyle}
@@ -668,23 +719,22 @@ function GameScreen({
         <MicrogameRoundScreen
           canRecordResult={canRecordResult}
           gameBeatCount={gameBeatCount}
-          getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-          lives={lives}
-          maxLives={maxLives}
           onFinish={onFinish}
           onRecordFailure={recordFailure}
           onRecordSuccess={recordSuccess}
           phaseBeatCount={phaseBeatCount}
           progressBeats={progressBeats}
         />
-      ) : (
-        <ResultRoundScreen
-          getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-          lives={lives}
-          maxLives={maxLives}
+      ) : phase === "speedUp" ? (
+        <SpeedUpScreen
           phaseBeatCount={phaseBeatCount}
           progressBeats={progressBeats}
-          roundResult={roundResult}
+          speedLevel={speedLevel}
+        />
+      ) : (
+        <ResultRoundScreen
+          phaseBeatCount={phaseBeatCount}
+          progressBeats={progressBeats}
         />
       )}
     </NeonShell>
@@ -761,6 +811,7 @@ function GameOverScreen({
 
 export function GameFlowExperience() {
   const {
+    completeSetup,
     finishGame,
     lives,
     loseLife,
@@ -774,6 +825,16 @@ export function GameFlowExperience() {
 
   if (screen === "loading") {
     return <LoadingScreen />;
+  }
+
+  if (screen === "setup") {
+    return (
+      <SetupScreen
+        lives={lives}
+        maxLives={maxLives}
+        onComplete={completeSetup}
+      />
+    );
   }
 
   if (screen === "playing") {

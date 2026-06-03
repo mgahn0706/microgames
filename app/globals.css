@@ -59,6 +59,47 @@ body {
   }
 }
 
+@keyframes life-active-exit {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 18px #67e8f9);
+  }
+
+  45% {
+    opacity: 1;
+    transform: scale(1.18) rotate(-8deg);
+    filter: drop-shadow(0 0 24px #67e8f9);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.42) rotate(18deg);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+@keyframes life-bone-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.45) rotate(-18deg);
+  }
+
+  56% {
+    opacity: 1;
+    transform: scale(1.16) rotate(8deg);
+  }
+
+  78% {
+    transform: scale(0.94) rotate(-3deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
 @keyframes game-over-comic-drop {
   0% {
     opacity: 0;
@@ -132,6 +173,141 @@ body {
   }
 }
 
+@keyframes setup-life-fish-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(42px) scale(0.72) rotate(-8deg);
+  }
+
+  68% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.06) rotate(3deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes main-screen-exit-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-160px) scale(0.96);
+  }
+}
+
+@keyframes main-logo-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  18% {
+    transform: scale(1.04);
+  }
+
+  36% {
+    transform: scale(0.985);
+  }
+
+  52% {
+    transform: scale(1.02);
+  }
+
+  68% {
+    transform: scale(1);
+  }
+}
+
+@keyframes instruction-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+
+  55% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes instruction-form-arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+
+  62% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.025);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes instruction-photo-selected {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgb(103 232 249 / 0.45));
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 24px rgb(103 232 249 / 0.82));
+    transform: translateY(-6px) scale(1.018);
+  }
+}
+
+@keyframes speed-up-typography {
+  0% {
+    opacity: 0;
+    transform: scale(0.78);
+  }
+
+  18% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+
+  34% {
+    transform: scale(0.96);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes speed-up-text-flash {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 16px rgb(103 232 249 / 0.55));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 36px rgb(103 232 249 / 0.95));
+  }
+}
+
 .neon-elevator-flicker {
   animation: neon-elevator-flicker var(--game-rhythm-duration, 1.2s) linear
     infinite;
@@ -147,6 +323,16 @@ body {
   animation: life-fish-motion var(--game-rhythm-duration, 1.2s) steps(2, end)
     infinite;
   animation-delay: var(--game-rhythm-delay, 0ms);
+}
+
+.life-active-exit {
+  animation: life-active-exit 520ms cubic-bezier(0.16, 0.8, 0.24, 1) both;
+  transform-origin: center;
+}
+
+.life-bone-enter {
+  animation: life-bone-enter 620ms cubic-bezier(0.18, 0.88, 0.22, 1.14) both;
+  transform-origin: center;
 }
 
 .game-over-comic-drop {
@@ -168,4 +354,114 @@ body {
   animation: loading-spinner-vital 680ms linear infinite;
   transform-origin: center;
   will-change: transform;
+}
+
+.main-screen-exit-up {
+  animation: main-screen-exit-up 680ms cubic-bezier(0.2, 0.78, 0.24, 1) both;
+  pointer-events: none;
+}
+
+.instruction-description-pop {
+  animation: instruction-pop 440ms cubic-bezier(0.2, 0.72, 0.24, 1) both;
+  backface-visibility: hidden;
+  contain: paint;
+  opacity: 0;
+  transform-origin: center;
+  transform: translateY(18px) scale(0.96);
+  will-change: transform, opacity;
+}
+
+.floor-display-card {
+  animation: instruction-pop 440ms cubic-bezier(0.2, 0.72, 0.24, 1) both;
+  backface-visibility: hidden;
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.speed-up-typography {
+  animation:
+    speed-up-typography calc(var(--game-rhythm-duration, 1.2s) * 2)
+      cubic-bezier(0.18, 0.9, 0.2, 1.18) both,
+    speed-up-text-flash var(--game-rhythm-duration, 1.2s) ease-in-out infinite;
+  backface-visibility: hidden;
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+}
+
+.instruction-form-stage {
+  animation: instruction-form-arrive 420ms cubic-bezier(0.2, 0.72, 0.24, 1)
+    both;
+  display: grid;
+  min-height: 19rem;
+  place-items: center;
+  position: relative;
+}
+
+.instruction-photo-only-card {
+  animation: instruction-photo-selected var(--game-rhythm-duration, 1.2s)
+    ease-in-out infinite;
+  backface-visibility: hidden;
+  grid-area: 1 / 1;
+  transform-origin: center;
+  transition:
+    opacity 260ms ease-out,
+    transform 420ms cubic-bezier(0.2, 0.72, 0.24, 1);
+  width: min(62vw, 15rem);
+  will-change: transform, opacity, filter;
+}
+
+.instruction-description-card {
+  backface-visibility: hidden;
+  display: grid;
+  gap: 1.25rem;
+  grid-area: 1 / 1;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: min(92vw, 48rem);
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+  transform: translateY(14px) scale(0.96);
+  transform-origin: center;
+  transition:
+    opacity 320ms ease-out,
+    transform 480ms cubic-bezier(0.2, 0.72, 0.24, 1);
+  width: min(92vw, 28rem);
+  will-change: transform, opacity;
+}
+
+.instruction-form-stage-description .instruction-photo-only-card {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.92);
+}
+
+.instruction-form-stage-description .instruction-description-card {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+@media (min-width: 640px) {
+  .instruction-form-stage {
+    min-height: 20rem;
+  }
+
+  .instruction-description-card {
+    grid-template-columns: 14rem minmax(0, 1fr);
+    text-align: left;
+    width: min(92vw, 48rem);
+  }
+}
+
+.setup-life-slot {
+  transform: translateX(-50%);
+}
+
+.setup-screen .life-fish-motion {
+  animation:
+    setup-life-fish-pop 560ms cubic-bezier(0.18, 0.88, 0.3, 1.2) both,
+    life-fish-motion var(--game-rhythm-duration, 1.2s) steps(2, end) infinite;
+  animation-delay:
+    var(--setup-life-delay, 0ms), calc(560ms + var(--setup-life-delay, 0ms));
 }
