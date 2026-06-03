@@ -4,7 +4,8 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useState } from "react";
 import { FORM_INSTRUCTIONS } from "@/games/formInstructions";
-import { useRandomFormInstruction } from "@/hooks/useRandomFormInstruction";
+import type { Microgame } from "@/games/microgames";
+import { getMicrogameFormInstruction } from "@/games/microgames";
 import type { SynchronizedRhythmStyle } from "@/hooks/useSynchronizedRhythm";
 import {
   getRandomBossStageMessage,
@@ -54,15 +55,17 @@ function CurrentFloorDisplay({
 export function InstructionRoundScreen({
   beatDurationMs,
   instructionStep,
+  microgame,
   rhythmStyle,
   roundNumber,
 }: Readonly<{
   beatDurationMs: number;
   instructionStep: "idle" | "formPhoto" | "floor";
+  microgame: Microgame;
   rhythmStyle: SynchronizedRhythmStyle;
   roundNumber: number;
 }>) {
-  const formInstruction = useRandomFormInstruction(roundNumber);
+  const formInstruction = getMicrogameFormInstruction(microgame);
   const selectedFormIndex = FORM_INSTRUCTIONS.findIndex(
     (candidate) => candidate.imageSrc === formInstruction.imageSrc,
   );
@@ -144,15 +147,13 @@ export function InstructionRoundScreen({
 export function MicrogameRoundScreen({
   canRecordResult,
   gameBeatCount,
+  microgame,
   onFinish,
-  onRecordFailure,
-  onRecordSuccess,
 }: Readonly<{
   canRecordResult: boolean;
   gameBeatCount: number;
+  microgame: Microgame;
   onFinish: () => void;
-  onRecordFailure: () => void;
-  onRecordSuccess: () => void;
 }>) {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -165,30 +166,20 @@ export function MicrogameRoundScreen({
         <div className="grid flex-1 place-items-center py-12">
           <div className="space-y-4">
             <h1 className="text-6xl font-black leading-tight drop-shadow-[0_0_18px_rgba(103,232,249,0.7)] sm:text-8xl">
-              Press at the beat
+              {microgame.title}
             </h1>
             <p className="mx-auto max-w-md text-cyan-50/75">
-              본게임은 소리 없이 {gameBeatCount}비트 동안 진행됩니다.
+              {microgame.instruction}
+            </p>
+            <p className="mx-auto max-w-md text-sm font-black uppercase tracking-[0.18em] text-cyan-100/80">
+              {gameBeatCount} Beats
             </p>
           </div>
         </div>
         <div className="flex flex-col justify-center gap-3 sm:flex-row">
-          <button
-            className="min-h-12 rounded-md border border-white/70 bg-black/50 px-6 py-3 text-base font-black uppercase tracking-[0.18em] text-white transition enabled:hover:border-cyan-200 enabled:hover:text-cyan-100 disabled:cursor-not-allowed disabled:opacity-40"
-            disabled={!canRecordResult}
-            onClick={onRecordSuccess}
-            type="button"
-          >
-            성공 처리
-          </button>
-          <button
-            className="min-h-12 rounded-md border border-white/70 bg-black/50 px-6 py-3 text-base font-black uppercase tracking-[0.18em] text-white transition enabled:hover:border-cyan-200 enabled:hover:text-cyan-100 disabled:cursor-not-allowed disabled:opacity-40"
-            disabled={!canRecordResult}
-            onClick={onRecordFailure}
-            type="button"
-          >
-            실패 처리
-          </button>
+          <p className="min-h-12 rounded-md border border-white/40 bg-black/35 px-6 py-3 text-center text-base font-black uppercase tracking-[0.18em] text-white/75">
+            {canRecordResult ? "입력 대기" : "판정 종료"}
+          </p>
           <NeonButton onClick={onFinish} variant="secondary">
             게임 종료
           </NeonButton>

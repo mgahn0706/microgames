@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getMicrogameForRound, isMicrogameClearKey } from "@/games/microgames";
 import { useBeatGameRound } from "@/hooks/useBeatGameRound";
 import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
 import { bgmLibrary, type SoundEffectTrack } from "@/lib/bgmLibrary";
@@ -47,19 +48,26 @@ export function GameScreen({
   onResetResult: () => void;
   onSuccess: (roundNumber: number) => void;
 }>) {
+  const [microgameSessionSeed] = useState(() => Math.random());
   const oneUpAppliedRoundRef = useRef<number | null>(null);
   const clearSoundPlayedRoundRef = useRef<number | null>(null);
+  const getRoundMicrogame = useCallback(
+    (nextRoundNumber: number) =>
+      getMicrogameForRound(nextRoundNumber, microgameSessionSeed),
+    [microgameSessionSeed],
+  );
 
   const {
     beatDurationMs,
     gameBeatCount,
     instructionStep,
     phase,
-    recordFailure,
     recordSuccess,
     roundNumber,
     roundResult,
   } = useBeatGameRound({
+    getGameBeatCount: (nextRoundNumber) =>
+      getRoundMicrogame(nextRoundNumber).beatCount,
     onFailure: onLoseLife,
     onFinish,
     onResetResult,
@@ -69,8 +77,12 @@ export function GameScreen({
   });
   const { getStaggeredRhythmStyle, rhythmStyle } =
     useSynchronizedRhythm(beatDurationMs);
+  const microgame = useMemo(
+    () => getRoundMicrogame(roundNumber),
+    [getRoundMicrogame, roundNumber],
+  );
   const canRecordResult = phase === "game";
-  const recordSuccessWithClearSound = () => {
+  const recordSuccessWithClearSound = useCallback(() => {
     recordSuccess();
 
     if (clearSoundPlayedRoundRef.current === roundNumber) {
@@ -83,7 +95,41 @@ export function GameScreen({
       .catch((error: unknown) => {
         console.error(error);
       });
-  };
+  }, [recordSuccess, roundNumber]);
+
+  useEffect(() => {
+    if (phase !== "game") {
+      return;
+    }
+
+    const recordKeyboardClear = (event: KeyboardEvent) => {
+      if (isMicrogameClearKey(microgame.control, event)) {
+        event.preventDefault();
+        recordSuccessWithClearSound();
+      }
+    };
+    const recordPointerClear = () => {
+      if (microgame.control === "mouseClick") {
+        recordSuccessWithClearSound();
+      }
+    };
+    const recordWheelClear = (event: WheelEvent) => {
+      if (microgame.control === "scroll") {
+        event.preventDefault();
+        recordSuccessWithClearSound();
+      }
+    };
+
+    window.addEventListener("keydown", recordKeyboardClear);
+    window.addEventListener("pointerdown", recordPointerClear);
+    window.addEventListener("wheel", recordWheelClear, { passive: false });
+
+    return () => {
+      window.removeEventListener("keydown", recordKeyboardClear);
+      window.removeEventListener("pointerdown", recordPointerClear);
+      window.removeEventListener("wheel", recordWheelClear);
+    };
+  }, [microgame.control, phase, recordSuccessWithClearSound]);
 
   useEffect(() => {
     bgmLibrary.setBeatDurationMs(beatDurationMs);
@@ -171,6 +217,7 @@ export function GameScreen({
         <InstructionRoundScreen
           beatDurationMs={beatDurationMs}
           instructionStep={instructionStep}
+          microgame={microgame}
           rhythmStyle={rhythmStyle}
           roundNumber={roundNumber}
         />
@@ -178,9 +225,8 @@ export function GameScreen({
         <MicrogameRoundScreen
           canRecordResult={canRecordResult}
           gameBeatCount={gameBeatCount}
+          microgame={microgame}
           onFinish={onFinish}
-          onRecordFailure={recordFailure}
-          onRecordSuccess={recordSuccessWithClearSound}
         />
       ) : phase === "speedUp" ? (
         <SpeedUpScreen />

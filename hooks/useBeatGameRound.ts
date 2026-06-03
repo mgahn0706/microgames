@@ -36,6 +36,7 @@ const PHASE_LABELS = {
 
 type UseBeatGameRoundParams = Readonly<{
   gameBeatCount?: number;
+  getGameBeatCount?: (roundNumber: number) => number;
   shouldPlayOneUp: boolean;
   onFailure: () => void;
   onFinish: () => void;
@@ -91,6 +92,7 @@ function getPhaseBeatDurationMs(phase: GameRoundPhase, speedLevel: number) {
 
 export function useBeatGameRound({
   gameBeatCount = DEFAULT_GAME_BEATS,
+  getGameBeatCount,
   onFailure,
   onFinish,
   onResetResult,
@@ -105,7 +107,8 @@ export function useBeatGameRound({
   const [speedLevel, setSpeedLevel] = useState(0);
   const [hasClearedCurrentGame, setHasClearedCurrentGame] = useState(false);
   const [shouldOneUpAfterResult, setShouldOneUpAfterResult] = useState(false);
-  const phaseBeatCount = getPhaseBeatCount(phase, gameBeatCount);
+  const currentGameBeatCount = getGameBeatCount?.(roundNumber) ?? gameBeatCount;
+  const phaseBeatCount = getPhaseBeatCount(phase, currentGameBeatCount);
   const beatDurationMs = getPhaseBeatDurationMs(phase, speedLevel);
   const phaseDurationMs = phaseBeatCount * beatDurationMs;
 
@@ -244,7 +247,7 @@ export function useBeatGameRound({
   return useMemo(
     () => ({
       beatDurationMs,
-      gameBeatCount,
+      gameBeatCount: currentGameBeatCount,
       instructionStep,
       phase,
       phaseBeatCount,
@@ -258,7 +261,7 @@ export function useBeatGameRound({
     }),
     [
       beatDurationMs,
-      gameBeatCount,
+      currentGameBeatCount,
       instructionStep,
       phase,
       phaseBeatCount,
