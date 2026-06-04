@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getMicrogameForRound } from "@/games/microgames";
+import { getMicrogameForRound } from "@/data/microgames";
 import { useBeatGameRound } from "@/hooks/useBeatGameRound";
 import { useMicrogameInput } from "@/hooks/useMicrogameInput";
 import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
@@ -61,6 +61,7 @@ export function GameScreen({
   const {
     beatDurationMs,
     beatsLeft,
+    gameBeatCount,
     instructionStep,
     phase,
     recordSuccess,
@@ -83,6 +84,9 @@ export function GameScreen({
     [getRoundMicrogame, roundNumber],
   );
   const canRecordResult = phase === "game";
+  const shouldShowStartPrompt =
+    instructionStep === "prompt" ||
+    (phase === "game" && beatsLeft > gameBeatCount - 2);
   const recordSuccessWithClearSound = useCallback(() => {
     recordSuccess();
 
@@ -214,6 +218,14 @@ export function GameScreen({
       ) : (
         <ResultRoundScreen />
       )}
+      {shouldShowStartPrompt ? (
+        <div
+          className="microgame-start-prompt pointer-events-none fixed inset-0 z-30 grid place-items-center"
+          key={microgame.id}
+        >
+          <p>{microgame.startPrompt}</p>
+        </div>
+      ) : null}
     </NeonShell>
   );
 }

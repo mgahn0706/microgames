@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ALL_GAME_PRELOAD_ASSETS } from "@/games/preloadAssets";
+import { ALL_GAME_PRELOAD_ASSETS } from "@/data/preloadAssets";
 import { useHighestClearedRound } from "@/hooks/useHighestClearedRound";
 import { bgmLibrary } from "@/lib/bgmLibrary";
 

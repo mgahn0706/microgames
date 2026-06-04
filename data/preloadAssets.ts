@@ -1,4 +1,4 @@
-import { FORM_INSTRUCTIONS } from "@/games/formInstructions";
+import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
 
 export const ALL_GAME_PRELOAD_ASSETS = [
   "/images/main-elevator-1.png",

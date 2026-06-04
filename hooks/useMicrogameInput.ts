@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import type { Microgame } from "@/games/microgames";
-import { isMicrogameClearKey } from "@/games/microgames";
+import type { Microgame } from "@/data/microgames";
+import { isMicrogameClearKey } from "@/data/microgames";
 
 type UseMicrogameInputParams = Readonly<{
   isActive: boolean;

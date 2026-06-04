@@ -1,5 +1,5 @@
-import type { FormInstruction } from "@/games/formInstructions";
-import { FORM_INSTRUCTIONS } from "@/games/formInstructions";
+import type { FormInstruction } from "@/data/formInstructions";
+import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
 
 export type MicrogameControl =
   | "arrowAndSpace"
@@ -13,12 +13,19 @@ export type MicrogameControl =
   | "wasd";
 
 export type MicrogameType = "boss" | "normal";
+export type MicrogameCanvas =
+  | "chromeDinoSpace"
+  | "courseRegistrationNumber"
+  | "default"
+  | "undertaleMouse";
 
 export type Microgame = Readonly<{
   beatCount: number;
+  canvas: MicrogameCanvas;
   control: MicrogameControl;
   id: string;
   instruction: string;
+  startPrompt: string;
   title: string;
   type: MicrogameType;
 }>;
@@ -38,97 +45,121 @@ const FORM_INSTRUCTIONS_BY_CONTROL = {
 export const MICROGAMES = [
   {
     beatCount: 8,
+    canvas: "default",
     control: "arrowKeys",
     id: "catch-arrow",
     instruction: "방향키 중 아무 키나 눌러 엘리베이터를 붙잡으세요.",
+    startPrompt: "붙잡아라!",
     title: "방향 잡기",
     type: "normal",
   },
   {
     beatCount: 8,
+    canvas: "chromeDinoSpace",
     control: "space",
     id: "jump-gap",
     instruction: "스페이스를 눌러 틈을 뛰어넘으세요.",
+    startPrompt: "점프해라!",
     title: "점프",
     type: "normal",
   },
   {
     beatCount: 8,
+    canvas: "undertaleMouse",
     control: "mouseClick",
     id: "press-button",
     instruction: "마우스로 버튼을 클릭하세요.",
+    startPrompt: "피해라!",
     title: "버튼 누르기",
     type: "normal",
   },
   {
     beatCount: 10,
+    canvas: "default",
     control: "wasd",
     id: "balance-wasd",
     instruction: "WASD 중 아무 키나 눌러 균형을 잡으세요.",
+    startPrompt: "균형 잡아라!",
     title: "균형 잡기",
     type: "normal",
   },
   {
     beatCount: 8,
+    canvas: "default",
     control: "scroll",
     id: "scroll-lift",
     instruction: "마우스 휠을 굴려 엘리베이터를 올리세요.",
+    startPrompt: "굴려라!",
     title: "휠 올리기",
     type: "normal",
   },
   {
     beatCount: 12,
+    canvas: "default",
     control: "arrowAndSpace",
     id: "dash-jump",
     instruction: "방향키나 스페이스를 눌러 대시 점프를 성공시키세요.",
+    startPrompt: "대시해라!",
     title: "대시 점프",
     type: "normal",
   },
   {
     beatCount: 8,
+    canvas: "courseRegistrationNumber",
     control: "numberKeys",
     id: "code-pad",
     instruction: "숫자키 중 아무 키나 눌러 비밀번호를 입력하세요.",
+    startPrompt: "숫자를 입력해라!",
     title: "비밀번호",
     type: "normal",
   },
   {
     beatCount: 8,
+    canvas: "default",
     control: "koreanKeyboard",
     id: "type-meow",
     instruction: "한글 키를 눌러 고양이에게 신호를 보내세요.",
+    startPrompt: "야옹쳐라!",
     title: "야옹 입력",
     type: "normal",
   },
   {
     beatCount: 8,
+    canvas: "default",
     control: "microphone",
     id: "call-cat",
     instruction: "임시 구현: 아무 키나 눌러 마이크 입력을 성공 처리하세요.",
+    startPrompt: "불러라!",
     title: "고양이 부르기",
     type: "normal",
   },
   {
     beatCount: 12,
+    canvas: "default",
     control: "arrowAndSpace",
     id: "boss-emergency-dash",
     instruction: "방향키나 스페이스를 눌러 보스 엘리베이터의 급가속을 버티세요.",
+    startPrompt: "버텨라!",
     title: "보스 급가속",
     type: "boss",
   },
   {
     beatCount: 12,
+    canvas: "default",
     control: "numberKeys",
     id: "boss-master-code",
     instruction: "숫자키 중 아무 키나 눌러 보스층 잠금 장치를 해제하세요.",
+    startPrompt: "해제해라!",
     title: "보스 암호",
     type: "boss",
   },
   {
     beatCount: 12,
+    canvas: "default",
     control: "scroll",
     id: "boss-overdrive-lift",
     instruction: "마우스 휠을 굴려 보스 엘리베이터를 끝까지 끌어올리세요.",
+    startPrompt: "끌어올려라!",
     title: "보스 오버드라이브",
     type: "boss",
   },

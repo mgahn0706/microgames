@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GameRoundResult } from "@/hooks/useGameScreenFlow";
 import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 
@@ -22,7 +22,7 @@ export type GameRoundPhase =
   | "oneUp"
   | "result"
   | "speedUp";
-export type InstructionStep = "idle" | "formPhoto" | "floor";
+export type InstructionStep = "floor" | "formPhoto" | "idle" | "prompt";
 
 const PHASE_LABELS = {
   game: "본게임",
@@ -109,7 +109,7 @@ export function useBeatGameRound({
     key: "instruction-1",
   });
   const [speedLevel, setSpeedLevel] = useState(0);
-  const [hasClearedCurrentGame, setHasClearedCurrentGame] = useState(false);
+  const hasClearedCurrentGameRef = useRef(false);
   const [shouldOneUpAfterResult, setShouldOneUpAfterResult] = useState(false);
   const currentGameBeatCount = getGameBeatCount?.(roundNumber) ?? gameBeatCount;
   const phaseBeatCount = getPhaseBeatCount(phase, currentGameBeatCount);
@@ -121,7 +121,7 @@ export function useBeatGameRound({
     setInstructionStep("idle");
     setPhase("instruction");
     setRoundResult("idle");
-    setHasClearedCurrentGame(false);
+    hasClearedCurrentGameRef.current = false;
     onResetResult();
   }, [onResetResult]);
 
@@ -151,7 +151,7 @@ export function useBeatGameRound({
       }
 
       if (phase === "game") {
-        showResult(hasClearedCurrentGame ? "success" : "failure");
+        showResult(hasClearedCurrentGameRef.current ? "success" : "failure");
         return;
       }
 
@@ -216,7 +216,6 @@ export function useBeatGameRound({
     onFinish,
     phase,
     phaseDurationMs,
-    hasClearedCurrentGame,
     roundNumber,
     shouldOneUpAfterResult,
     shouldFinishAfterResult,
@@ -235,10 +234,14 @@ export function useBeatGameRound({
     const floorTimer = window.setTimeout(() => {
       setInstructionStep("floor");
     }, 4 * beatDurationMs);
+    const promptTimer = window.setTimeout(() => {
+      setInstructionStep("prompt");
+    }, (INSTRUCTION_BEATS - 1) * beatDurationMs);
 
     return () => {
       window.clearTimeout(formPhotoTimer);
       window.clearTimeout(floorTimer);
+      window.clearTimeout(promptTimer);
     };
   }, [beatDurationMs, phase, roundNumber]);
 
@@ -279,8 +282,12 @@ export function useBeatGameRound({
       phase,
       phaseBeatCount,
       phaseLabel,
-      recordFailure: () => setHasClearedCurrentGame(false),
-      recordSuccess: () => setHasClearedCurrentGame(true),
+      recordFailure: () => {
+        hasClearedCurrentGameRef.current = false;
+      },
+      recordSuccess: () => {
+        hasClearedCurrentGameRef.current = true;
+      },
       roundNumber,
       roundResult,
       speedLevel,

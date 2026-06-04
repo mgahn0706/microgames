@@ -3,9 +3,10 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useState } from "react";
-import { FORM_INSTRUCTIONS } from "@/games/formInstructions";
-import type { Microgame } from "@/games/microgames";
-import { getMicrogameFormInstruction } from "@/games/microgames";
+import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
+import type { Microgame } from "@/data/microgames";
+import { getMicrogameFormInstruction } from "@/data/microgames";
+import type { InstructionStep } from "@/hooks/useBeatGameRound";
 import type { SynchronizedRhythmStyle } from "@/hooks/useSynchronizedRhythm";
 import {
   getRandomBossStageMessage,
@@ -61,7 +62,7 @@ export function InstructionRoundScreen({
   roundNumber,
 }: Readonly<{
   beatDurationMs: number;
-  instructionStep: "idle" | "formPhoto" | "floor";
+  instructionStep: InstructionStep;
   microgame: Microgame;
   rhythmStyle: SynchronizedRhythmStyle;
   roundNumber: number;
@@ -72,7 +73,12 @@ export function InstructionRoundScreen({
   );
   const shouldShowIdle = instructionStep === "idle";
   const shouldShowFloor = instructionStep === "floor";
-  const shouldShowForm = instructionStep !== "floor";
+  const shouldShowPrompt = instructionStep === "prompt";
+  const shouldShowForm = instructionStep !== "floor" && !shouldShowPrompt;
+
+  if (shouldShowPrompt) {
+    return <div className="mx-auto min-h-screen w-full max-w-5xl" />;
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8 text-center">
