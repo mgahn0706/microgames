@@ -11,6 +11,7 @@ import {
   getRandomBossStageMessage,
   getRandomSpeedUpMessage,
 } from "./gameFlowConstants";
+import { MicrogameCanvas } from "./MicrogameCanvas";
 import { NeonButton } from "./NeonShell";
 
 function CurrentFloorDisplay({
@@ -145,46 +146,40 @@ export function InstructionRoundScreen({
 }
 
 export function MicrogameRoundScreen({
+  beatsLeft,
   canRecordResult,
-  gameBeatCount,
   microgame,
   onFinish,
 }: Readonly<{
+  beatsLeft: number;
   canRecordResult: boolean;
-  gameBeatCount: number;
   microgame: Microgame;
   onFinish: () => void;
 }>) {
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-8">
-      <section className="flex min-h-[520px] flex-col justify-between rounded-lg border border-cyan-200 bg-cyan-950/75 p-6 text-center shadow-[0_0_42px_rgba(103,232,249,0.25)] backdrop-blur-sm">
-        <div className="border-b border-cyan-100/50 pb-4">
-          <p className="font-black uppercase tracking-[0.24em] text-cyan-100">
-            Microgame
-          </p>
-        </div>
-        <div className="grid flex-1 place-items-center py-12">
-          <div className="space-y-4">
-            <h1 className="text-6xl font-black leading-tight drop-shadow-[0_0_18px_rgba(103,232,249,0.7)] sm:text-8xl">
-              {microgame.title}
-            </h1>
-            <p className="mx-auto max-w-md text-cyan-50/75">
-              {microgame.instruction}
-            </p>
-            <p className="mx-auto max-w-md text-sm font-black uppercase tracking-[0.18em] text-cyan-100/80">
-              {gameBeatCount} Beats
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col justify-center gap-3 sm:flex-row">
-          <p className="min-h-12 rounded-md border border-white/40 bg-black/35 px-6 py-3 text-center text-base font-black uppercase tracking-[0.18em] text-white/75">
-            {canRecordResult ? "입력 대기" : "판정 종료"}
-          </p>
-          <NeonButton onClick={onFinish} variant="secondary">
-            게임 종료
-          </NeonButton>
-        </div>
-      </section>
+    <div className="fixed inset-0 bg-black">
+      <MicrogameCanvas microgame={microgame} />
+      <div className="timer-beat-shell absolute left-4 top-4 size-28 sm:left-6 sm:top-6 sm:size-32">
+        <Image
+          src="/images/timer.png"
+          alt=""
+          fill
+          sizes="(min-width: 640px) 128px, 112px"
+          className="object-contain drop-shadow-[0_0_16px_rgba(103,232,249,0.55)]"
+          priority
+        />
+        <p className="timer-beat-number absolute inset-0 grid place-items-center pt-2 text-4xl font-black leading-none text-white sm:text-5xl">
+          {beatsLeft}
+        </p>
+      </div>
+      <div className="absolute bottom-5 right-5 flex items-center gap-3">
+        <p className="min-h-12 rounded-md border border-white/40 bg-black/55 px-6 py-3 text-center text-base font-black uppercase tracking-[0.18em] text-white/75">
+          {canRecordResult ? "입력 대기" : "판정 종료"}
+        </p>
+        <NeonButton onClick={onFinish} variant="secondary">
+          게임 종료
+        </NeonButton>
+      </div>
     </div>
   );
 }

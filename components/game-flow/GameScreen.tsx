@@ -60,7 +60,7 @@ export function GameScreen({
 
   const {
     beatDurationMs,
-    gameBeatCount,
+    beatsLeft,
     instructionStep,
     phase,
     recordSuccess,
@@ -180,13 +180,16 @@ export function GameScreen({
     <NeonShell
       roundResult={roundResult}
       rhythmStyle={rhythmStyle}
+      showBackdrop={phase !== "game"}
       shouldDim={false}
     >
-      <FixedLivesOverlay
-        getStaggeredRhythmStyle={getStaggeredRhythmStyle}
-        lives={lives}
-        maxLives={maxLives}
-      />
+      {phase === "game" ? null : (
+        <FixedLivesOverlay
+          getStaggeredRhythmStyle={getStaggeredRhythmStyle}
+          lives={lives}
+          maxLives={maxLives}
+        />
+      )}
       {phase === "instruction" ? (
         <InstructionRoundScreen
           beatDurationMs={beatDurationMs}
@@ -197,8 +200,8 @@ export function GameScreen({
         />
       ) : phase === "game" ? (
         <MicrogameRoundScreen
+          beatsLeft={beatsLeft}
           canRecordResult={canRecordResult}
-          gameBeatCount={gameBeatCount}
           microgame={microgame}
           onFinish={onFinish}
         />

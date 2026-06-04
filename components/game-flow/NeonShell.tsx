@@ -70,6 +70,7 @@ function ElevatorBackdrop({
 
 export function NeonShell({
   children,
+  showBackdrop = true,
   roundResult = "idle",
   rhythmStyle,
   shouldDim = true,
@@ -77,6 +78,7 @@ export function NeonShell({
   children: ReactNode;
   rhythmStyle?: SynchronizedRhythmStyle;
   roundResult?: GameRoundResult;
+  showBackdrop?: boolean;
   shouldDim?: boolean;
 }>) {
   return (
@@ -84,7 +86,9 @@ export function NeonShell({
       className="relative min-h-screen overflow-hidden bg-black text-white"
       style={rhythmStyle}
     >
-      <ElevatorBackdrop roundResult={roundResult} shouldDim={shouldDim} />
+      {showBackdrop ? (
+        <ElevatorBackdrop roundResult={roundResult} shouldDim={shouldDim} />
+      ) : null}
       <section className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-5 py-8 sm:px-8 lg:px-10">
         {children}
       </section>

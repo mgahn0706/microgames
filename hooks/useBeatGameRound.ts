@@ -104,6 +104,10 @@ export function useBeatGameRound({
     useState<InstructionStep>("idle");
   const [roundNumber, setRoundNumber] = useState(1);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
+  const [gameBeatProgress, setGameBeatProgress] = useState({
+    beatsLeft: DEFAULT_GAME_BEATS,
+    key: "instruction-1",
+  });
   const [speedLevel, setSpeedLevel] = useState(0);
   const [hasClearedCurrentGame, setHasClearedCurrentGame] = useState(false);
   const [shouldOneUpAfterResult, setShouldOneUpAfterResult] = useState(false);
@@ -111,6 +115,7 @@ export function useBeatGameRound({
   const phaseBeatCount = getPhaseBeatCount(phase, currentGameBeatCount);
   const beatDurationMs = getPhaseBeatDurationMs(phase, speedLevel);
   const phaseDurationMs = phaseBeatCount * beatDurationMs;
+  const beatProgressKey = `${phase}-${roundNumber}-${phaseBeatCount}`;
 
   const beginInstruction = useCallback(() => {
     setInstructionStep("idle");
@@ -237,11 +242,38 @@ export function useBeatGameRound({
     };
   }, [beatDurationMs, phase, roundNumber]);
 
+  useEffect(() => {
+    if (phase !== "game") {
+      return;
+    }
+
+    const startedAt = window.performance.now();
+    const beatTimer = window.setInterval(() => {
+      const elapsedBeats = Math.floor(
+        (window.performance.now() - startedAt) / beatDurationMs,
+      );
+
+      setGameBeatProgress({
+        beatsLeft: Math.max(phaseBeatCount - elapsedBeats, 0),
+        key: beatProgressKey,
+      });
+    }, beatDurationMs);
+
+    return () => {
+      window.clearInterval(beatTimer);
+    };
+  }, [beatDurationMs, beatProgressKey, phase, phaseBeatCount]);
+
   const phaseLabel = PHASE_LABELS[phase];
+  const beatsLeft =
+    gameBeatProgress.key === beatProgressKey
+      ? gameBeatProgress.beatsLeft
+      : phaseBeatCount;
 
   return useMemo(
     () => ({
       beatDurationMs,
+      beatsLeft,
       gameBeatCount: currentGameBeatCount,
       instructionStep,
       phase,
@@ -255,6 +287,7 @@ export function useBeatGameRound({
     }),
     [
       beatDurationMs,
+      beatsLeft,
       currentGameBeatCount,
       instructionStep,
       phase,

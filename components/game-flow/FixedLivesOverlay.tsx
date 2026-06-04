@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { useState } from "react";
 import type { SynchronizedRhythmStyle } from "@/hooks/useSynchronizedRhythm";
 import { LIFE_LABELS } from "./gameFlowConstants";
 
@@ -16,6 +17,23 @@ export function FixedLivesOverlay({
   lives: number;
   maxLives: number;
 }>) {
+  const [lifeAnimationState, setLifeAnimationState] = useState({
+    lives,
+    lostLifeIndexes: [] as readonly number[],
+  });
+
+  if (lifeAnimationState.lives !== lives) {
+    const lostLifeIndexes =
+      !animateSetup && lives < lifeAnimationState.lives
+        ? Array.from(
+            { length: lifeAnimationState.lives - lives },
+            (_, offset) => lives + offset,
+          )
+        : [];
+
+    setLifeAnimationState({ lives, lostLifeIndexes });
+  }
+
   return (
     <div
       className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center pb-8 sm:pb-12"
@@ -26,7 +44,8 @@ export function FixedLivesOverlay({
       >
         {LIFE_LABELS.map((label, index) => {
           const isActive = index < lives;
-          const shouldAnimateInactive = !animateSetup && !isActive;
+          const shouldAnimateLostLife =
+            lifeAnimationState.lostLifeIndexes.includes(index);
           const lifeSlotStyle = {
             "--setup-life-delay": animateSetup ? `${index * 140}ms` : "0ms",
             left: `${12.5 + index * 25}%`,
@@ -51,7 +70,7 @@ export function FixedLivesOverlay({
                   sizes="(min-width: 1024px) 176px, (min-width: 640px) 144px, 96px"
                   className={`object-contain transition-opacity duration-300 ${
                     isActive ? "opacity-0" : "opacity-100"
-                  } ${shouldAnimateInactive ? "life-bone-enter" : ""}`}
+                  } ${shouldAnimateLostLife ? "life-bone-enter" : ""}`}
                 />
                 <Image
                   src="/images/life-active.png"
@@ -62,7 +81,7 @@ export function FixedLivesOverlay({
                     isActive
                       ? "opacity-100 drop-shadow-[0_0_18px_#67e8f9]"
                       : "opacity-0"
-                  } ${shouldAnimateInactive ? "life-active-exit" : ""}`}
+                  } ${shouldAnimateLostLife ? "life-active-exit" : ""}`}
                 />
               </div>
             </div>
