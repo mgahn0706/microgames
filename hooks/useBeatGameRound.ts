@@ -90,6 +90,12 @@ function getBossStageSpeedLevel(roundNumber: number) {
   return Math.max(roundNumber / BOSS_STAGE_INTERVAL_ROUNDS - 1, 0);
 }
 
+function isBossGameRound(roundNumber: number) {
+  return (
+    roundNumber > 1 && (roundNumber - 1) % BOSS_STAGE_INTERVAL_ROUNDS === 0
+  );
+}
+
 function getPhaseBeatDurationMs(phase: GameRoundPhase, speedLevel: number) {
   if (phase === "oneUp") {
     return RHYTHM_DURATION_MS;
@@ -147,6 +153,10 @@ export function useBeatGameRound({
         onSuccess(roundNumber);
       } else {
         onFailure();
+      }
+
+      if (isBossGameRound(roundNumber)) {
+        setShouldOneUpAfterResult(result === "success");
       }
     },
     [onFailure, onSuccess, phase, roundNumber],
@@ -209,7 +219,7 @@ export function useBeatGameRound({
       }
 
       if (phase === "bossStage") {
-        setShouldOneUpAfterResult(true);
+        setShouldOneUpAfterResult(false);
         setRoundNumber((currentRoundNumber) => currentRoundNumber + 1);
         beginInstruction();
         return;
