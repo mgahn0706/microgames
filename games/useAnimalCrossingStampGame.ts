@@ -23,10 +23,13 @@ const STAMP_TARGET_RATIOS = [
 
 type GameState = {
   hasCleared: boolean;
+  hasFailed: boolean;
   lastStampedTargetIndex: number | null;
   lastPointer: Point | null;
   lastTimestamp: number | null;
   missPulseMs: number;
+  misplacedStamp: Point | null;
+  misplacedStampPulseMs: number;
   stampedTargets: boolean[];
   stampPulseMs: number;
   stamps: number;
@@ -54,10 +57,13 @@ function playStampSound() {
 function createInitialState() {
   return {
     hasCleared: false,
+    hasFailed: false,
     lastStampedTargetIndex: null,
     lastPointer: null,
     lastTimestamp: null,
     missPulseMs: 0,
+    misplacedStamp: null,
+    misplacedStampPulseMs: 0,
     stampedTargets: Array.from({ length: STAMP_COUNT }, () => false),
     stampPulseMs: 0,
     stamps: 0,
@@ -275,6 +281,29 @@ function drawScene(
     }
   });
 
+  if (state.misplacedStamp) {
+    const animationRatio =
+      state.misplacedStampPulseMs > 0
+        ? 1 - Math.max(state.misplacedStampPulseMs / STAMP_ANIMATION_MS, 0)
+        : 1;
+
+    drawInkBurst(
+      context,
+      state.misplacedStamp.x,
+      state.misplacedStamp.y,
+      targetRadius,
+      animationRatio,
+    );
+    drawStamp(
+      context,
+      images.stamp,
+      state.misplacedStamp.x,
+      state.misplacedStamp.y,
+      stampRadius,
+      animationRatio,
+    );
+  }
+
   if (state.lastPointer && state.missPulseMs > 0) {
     const missRatio = state.missPulseMs / MISS_PULSE_MS;
 
@@ -345,7 +374,7 @@ export function useAnimalCrossingStampGameCanvas() {
     const handlePointerDown = (event: PointerEvent) => {
       const state = stateRef.current;
 
-      if (state.hasCleared) {
+      if (state.hasCleared || state.hasFailed) {
         return;
       }
 
@@ -363,7 +392,11 @@ export function useAnimalCrossingStampGameCanvas() {
       state.lastPointer = pointer;
 
       if (targetIndex < 0) {
+        state.hasFailed = true;
+        state.misplacedStamp = pointer;
+        state.misplacedStampPulseMs = STAMP_ANIMATION_MS;
         state.missPulseMs = MISS_PULSE_MS;
+        playStampSound();
         return;
       }
 
@@ -388,6 +421,10 @@ export function useAnimalCrossingStampGameCanvas() {
 
       state.lastTimestamp = timestamp;
       state.stampPulseMs = Math.max(state.stampPulseMs - deltaMs, 0);
+      state.misplacedStampPulseMs = Math.max(
+        state.misplacedStampPulseMs - deltaMs,
+        0,
+      );
       state.missPulseMs = Math.max(state.missPulseMs - deltaMs, 0);
       drawScene(context, state, imagesRef.current, canvasWidth, canvasHeight);
       animationFrame = window.requestAnimationFrame(render);
