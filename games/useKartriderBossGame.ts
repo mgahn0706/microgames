@@ -17,7 +17,7 @@ const FRICTION = 2400;
 const MAX_MOVE_SPEED = 960;
 const CHECKPOINT_RADIUS = 82;
 const CAR_COLLISION_RADIUS = 13;
-const COLLISION_FLASH_SECONDS = 0.16;
+const COLLISION_EFFECT_SECONDS = 0.22;
 const KARTRIDER_ASSETS = {
   kart: "/games/kartrider/images/kart.png",
   minimap: "/games/kartrider/images/minimap.png",
@@ -66,7 +66,9 @@ type TrackLayout = Readonly<{
 
 type GameState = {
   angle: number;
-  collisionFlashSeconds: number;
+  collisionEffectSeconds: number;
+  collisionEffectX: number;
+  collisionEffectY: number;
   elapsedMs: number;
   hasCleared: boolean;
   lastTimestamp: number | null;
@@ -93,7 +95,9 @@ function createInitialState() {
 
   return {
     angle: 0,
-    collisionFlashSeconds: 0,
+    collisionEffectSeconds: 0,
+    collisionEffectX: start.x,
+    collisionEffectY: start.y,
     elapsedMs: 0,
     hasCleared: false,
     lastTimestamp: null,
@@ -349,6 +353,13 @@ function updateDrivingState(
 
   const canMoveX = canPlaceKart(mask, nextX, previousY);
   const canMoveY = canPlaceKart(mask, previousX, nextY);
+  const didCollide = !canMoveX || !canMoveY;
+
+  if (didCollide) {
+    state.collisionEffectSeconds = COLLISION_EFFECT_SECONDS;
+    state.collisionEffectX = nextX;
+    state.collisionEffectY = nextY;
+  }
 
   if (canMoveX) {
     state.x = nextX;
@@ -369,7 +380,7 @@ function updateDrivingState(
     return;
   }
 
-  state.collisionFlashSeconds = COLLISION_FLASH_SECONDS;
+  state.collisionEffectSeconds = COLLISION_EFFECT_SECONDS;
 }
 
 function getTrackLayout(width: number, height: number): TrackLayout {
@@ -495,6 +506,38 @@ function drawKart(
   context.restore();
 }
 
+function drawCollisionEffect(
+  context: CanvasRenderingContext2D,
+  state: GameState,
+  layout: TrackLayout,
+) {
+  if (state.collisionEffectSeconds <= 0) {
+    return;
+  }
+
+  const effectRatio = state.collisionEffectSeconds / COLLISION_EFFECT_SECONDS;
+  const progress = 1 - effectRatio;
+  const effectPoint = mapToCanvas(
+    { x: state.collisionEffectX, y: state.collisionEffectY },
+    layout,
+  );
+  const radius = 10 + progress * 22;
+
+  context.save();
+  context.globalAlpha = effectRatio;
+  context.strokeStyle = "#facc15";
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(effectPoint.x, effectPoint.y, radius, 0, Math.PI * 2);
+  context.stroke();
+  context.fillStyle = "#f97316";
+  context.font = "900 22px Arial, Helvetica, sans-serif";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText("쿵!", effectPoint.x, effectPoint.y - 22 - progress * 12);
+  context.restore();
+}
+
 function drawHud(
   context: CanvasRenderingContext2D,
   state: GameState,
@@ -571,13 +614,7 @@ function drawScene(
   context.restore();
   drawCheckpoint(context, state, layout);
   drawKart(context, images.kart, state, layout);
-
-  if (state.collisionFlashSeconds > 0) {
-    context.fillStyle = `rgba(239, 68, 68, ${
-      state.collisionFlashSeconds / COLLISION_FLASH_SECONDS / 4
-    })`;
-    context.fillRect(0, 0, width, height);
-  }
+  drawCollisionEffect(context, state, layout);
 
   if (state.hasCleared) {
     context.fillStyle = "rgba(34, 197, 94, 0.16)";
@@ -697,8 +734,8 @@ export function useKartriderBossGameCanvas(gameBeatCount: number) {
         );
       }
 
-      state.collisionFlashSeconds = Math.max(
-        state.collisionFlashSeconds - deltaSeconds,
+      state.collisionEffectSeconds = Math.max(
+        state.collisionEffectSeconds - deltaSeconds,
         0,
       );
 
