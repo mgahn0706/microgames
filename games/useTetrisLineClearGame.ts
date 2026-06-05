@@ -62,9 +62,7 @@ function createBoard(holeColumn: number) {
         return null;
       }
 
-      return FILLED_CELL_COLORS[
-        (row + column) % FILLED_CELL_COLORS.length
-      ];
+      return FILLED_CELL_COLORS[(row + column) % FILLED_CELL_COLORS.length];
     }),
   );
 }
@@ -99,12 +97,7 @@ function getPieceCells(piece: Piece) {
 
 function canPlacePiece(board: readonly BoardCell[][], piece: Piece) {
   return getPieceCells(piece).every(({ column, row }) => {
-    if (
-      column < 0 ||
-      column >= BOARD_COLUMNS ||
-      row < 0 ||
-      row >= BOARD_ROWS
-    ) {
+    if (column < 0 || column >= BOARD_COLUMNS || row < 0 || row >= BOARD_ROWS) {
       return false;
     }
 
@@ -277,15 +270,15 @@ function drawScene(
     });
   });
 
-  context.fillStyle = "rgba(250, 204, 21, 0.22)";
-  context.fillRect(
-    boardX + state.holeColumn * cellSize,
-    boardY + (BOARD_ROWS - CLEAR_ROWS) * cellSize,
-    cellSize,
-    CLEAR_ROWS * cellSize,
-  );
-
   if (!state.hasCleared) {
+    context.fillStyle = "rgba(250, 204, 21, 0.22)";
+    context.fillRect(
+      boardX + state.holeColumn * cellSize,
+      boardY + (BOARD_ROWS - CLEAR_ROWS) * cellSize,
+      cellSize,
+      CLEAR_ROWS * cellSize,
+    );
+
     getPieceCells(state.piece).forEach(({ column, row }) => {
       drawCell(
         context,
