@@ -25,6 +25,7 @@ export type MicrogameCanvas =
   | "kartriderCourse"
   | "laytonShapeMatch"
   | "maplestoryLieDetector"
+  | "maplestoryRune"
   | "minecraftMining"
   | "pianoMelody"
   | "pokemonTyping"
@@ -162,6 +163,16 @@ export const MICROGAMES = [
     id: "maplestory-lie-detector",
     startPrompt: "보이는 대로 입력해라!",
     title: "MapleStory",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "maplestoryRune",
+    control: "arrowKeys",
+    id: "maplestory-rune-sequence",
+    startPrompt: "순서대로 입력해라!",
+    title: "MapleStory Rune",
     type: "normal",
   },
 

@@ -11,6 +11,7 @@ import { GeometryDashGame } from "@/games/GeometryDashGame";
 import { KartriderBossGame } from "@/games/KartriderBossGame";
 import { LaytonShapeMatchGame } from "@/games/LaytonShapeMatchGame";
 import { MaplestoryLieDetectorGame } from "@/games/MaplestoryLieDetectorGame";
+import { MaplestoryRuneGame } from "@/games/MaplestoryRuneGame";
 import { MinecraftMiningGame } from "@/games/MinecraftMiningGame";
 import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
@@ -58,6 +59,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "maplestoryLieDetector") {
     return <MaplestoryLieDetectorGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "maplestoryRune") {
+    return <MaplestoryRuneGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "laytonShapeMatch") {

@@ -14,6 +14,7 @@ export type BgmTrack =
   | "kartrider"
   | "layton"
   | "maplestory"
+  | "mapleRune"
   | "minecraft"
   | "oneUp"
   | "pokemon"
@@ -33,7 +34,8 @@ export type SoundEffectTrack =
   | "clear5"
   | "animalCrossingStamp"
   | "minecraftDig1"
-  | "minecraftDig2";
+  | "minecraftDig2"
+  | "runeEffect";
 
 const BGM_TRACK_PATHS = {
   animalCrossing: "/games/animal-crossing/sounds/animal-crossing-bgm.mp3",
@@ -47,6 +49,7 @@ const BGM_TRACK_PATHS = {
   kartrider: "/games/kartrider/sounds/kartrider-bgm.mp3",
   layton: "/games/layton/sounds/layton-bgm.mp3",
   maplestory: "/games/maplestory-lie-detector/sounds/maplestory-bgm.mp3",
+  mapleRune: "/games/maple-story-rune/sounds/maple-rune-bgm.mp3",
   minecraft: "/games/minecraft/sounds/minecraft-bgm.mp3",
   oneUp: "/games/game-flow/sounds/1-up.mp3",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
@@ -68,6 +71,7 @@ const SOUND_EFFECT_TRACK_PATHS = {
   animalCrossingStamp: "/games/animal-crossing/sounds/stamp.mp3",
   minecraftDig1: "/games/minecraft/sounds/dig-1.mp3",
   minecraftDig2: "/games/minecraft/sounds/dig-2.mp3",
+  runeEffect: "/games/maple-story-rune/sounds/rune-effect.mp3",
 } satisfies Record<SoundEffectTrack, string>;
 
 const AUDIO_TRACK_PATHS = {
@@ -95,6 +99,7 @@ const BGM_TRACK_BEATS = {
   kartrider: 36,
   layton: 8,
   maplestory: 12,
+  mapleRune: 8,
   minecraft: 8,
   oneUp: 8,
   pokemon: 12,
