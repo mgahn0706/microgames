@@ -81,6 +81,7 @@ export const ALL_GAME_PRELOAD_ASSETS = [
   "/games/brain-academy/sounds/brain-academy-bgm.mp3",
   "/games/geometry-dash/sounds/death.mp3",
   "/games/geometry-dash/sounds/geometry-dash-bgm.mp3",
+  "/games/kartrider/sounds/kartrider-bgm.mp3",
   "/games/minecraft/sounds/dig-1.mp3",
   "/games/minecraft/sounds/dig-2.mp3",
   "/games/minecraft/sounds/minecraft-bgm.mp3",

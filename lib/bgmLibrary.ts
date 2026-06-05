@@ -11,6 +11,7 @@ export type BgmTrack =
   | "gameOver"
   | "geometryDash"
   | "intermission"
+  | "kartrider"
   | "minecraft"
   | "oneUp"
   | "pokemon"
@@ -41,6 +42,7 @@ const BGM_TRACK_PATHS = {
   gameOver: "/games/game-flow/sounds/game-over.mp3",
   geometryDash: "/games/geometry-dash/sounds/geometry-dash-bgm.mp3",
   intermission: "/games/game-flow/sounds/intermission.mp3",
+  kartrider: "/games/kartrider/sounds/kartrider-bgm.mp3",
   minecraft: "/games/minecraft/sounds/minecraft-bgm.mp3",
   oneUp: "/games/game-flow/sounds/1-up.mp3",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
@@ -86,6 +88,7 @@ const BGM_TRACK_BEATS = {
   fail: 4,
   geometryDash: 12,
   intermission: 8,
+  kartrider: 36,
   minecraft: 8,
   oneUp: 8,
   pokemon: 12,
