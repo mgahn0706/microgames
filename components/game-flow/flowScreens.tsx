@@ -102,10 +102,16 @@ function HomeHeader({
       <nav className="w-full bg-white/10 px-4 py-3 shadow-[0_0_28px_rgba(103,232,249,0.18)] backdrop-blur-xl sm:px-6">
         <div className="flex items-center justify-between gap-3">
           <Link
-            className="shrink-0 px-2 text-sm font-black tracking-normal text-cyan-50 drop-shadow-[0_0_12px_rgba(103,232,249,0.72)] sm:px-3 sm:text-base"
+            className="flex shrink-0 items-center gap-2 px-2 text-sm font-black tracking-normal text-cyan-50 drop-shadow-[0_0_12px_rgba(103,232,249,0.72)] sm:px-3 sm:text-base"
             href="/"
           >
-            캣타워 오르기
+            <span
+              aria-hidden="true"
+              className="relative grid size-7 place-items-center rounded-full border border-cyan-100/70 bg-cyan-50 text-[15px] leading-none text-slate-950 shadow-[0_0_14px_rgba(103,232,249,0.42)] before:absolute before:-top-1 before:left-1 before:size-3 before:rotate-45 before:rounded-[2px] before:border-l before:border-t before:border-cyan-100/70 before:bg-cyan-50 after:absolute after:-top-1 after:right-1 after:size-3 after:rotate-45 after:rounded-[2px] after:border-r after:border-t after:border-cyan-100/70 after:bg-cyan-50"
+            >
+              <span className="relative z-10">:3</span>
+            </span>
+            <span>캣타워 오르기</span>
           </Link>
           <div className="grid grid-cols-3 gap-1 rounded-md border border-white/10 bg-black/20 p-1">
             {HOME_NAV_ITEMS.map((item) => {
