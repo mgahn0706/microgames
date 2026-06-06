@@ -18,6 +18,7 @@ export type MicrogameCanvas =
   | "amongUsWires"
   | "brainAcademyBlocks"
   | "chromeDinoSpace"
+  | "cookieRun"
   | "courseRegistrationNumber"
   | "default"
   | "geometryDashSpikes"
@@ -105,6 +106,16 @@ export const MICROGAMES = [
     id: "jump-gap",
     startPrompt: "점프해라!",
     title: "점프",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "cookieRun",
+    control: "arrowAndSpace",
+    id: "cookie-run-obstacle-dodge",
+    startPrompt: "달려라!",
+    title: "Cookie Run",
     type: "normal",
   },
 

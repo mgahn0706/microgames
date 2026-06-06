@@ -4,6 +4,7 @@ import type { ChangeEvent, CompositionEvent, RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 import { MICROGAME_CLEAR_EVENT } from "@/hooks/useMicrogameInput";
+import { convertEnglishKeyboardInputToKorean } from "@/lib/hangulInput";
 
 const HANCOM_WORD_POOL = [
   "나무",
@@ -50,7 +51,13 @@ function createTargetWords() {
 }
 
 function normalizeHancomInput(value: string) {
-  return value.normalize("NFC").replaceAll(/[^\uAC00-\uD7A3]/g, "");
+  const sanitizedValue = value
+    .normalize("NFC")
+    .replaceAll(/[^A-Za-z\uAC00-\uD7A3]/g, "");
+
+  return convertEnglishKeyboardInputToKorean(sanitizedValue)
+    .normalize("NFC")
+    .replaceAll(/[^\uAC00-\uD7A3]/g, "");
 }
 
 function resolveTypedProgress(

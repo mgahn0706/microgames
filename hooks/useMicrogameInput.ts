@@ -59,6 +59,7 @@ export function useMicrogameInput({
       if (
         microgame.canvas === "animalFarmReverseTyping" ||
         microgame.canvas === "brainAcademyBlocks" ||
+        microgame.canvas === "cookieRun" ||
         microgame.canvas === "geometryDashSpikes" ||
         microgame.canvas === "hancomTyping" ||
         microgame.canvas === "kartriderCourse" ||

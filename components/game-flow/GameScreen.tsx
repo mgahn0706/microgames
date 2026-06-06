@@ -348,6 +348,13 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "cookieRun") {
+        bgmLibrary.play("cookieRun", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "maplestoryLieDetector") {
         bgmLibrary.play("maplestory", "once", "now").catch((error: unknown) => {
           console.error(error);

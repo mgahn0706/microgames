@@ -5,6 +5,7 @@ import { AnimalFarmBossGame } from "@/games/AnimalFarmBossGame";
 import { AmongUsWireGame } from "@/games/AmongUsWireGame";
 import { BrainAcademyBlockGame } from "@/games/BrainAcademyBlockGame";
 import { ChromeDinoSpaceGame } from "@/games/ChromeDinoSpaceGame";
+import { CookieRunGame } from "@/games/CookieRunGame";
 import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGame";
 import { DefaultMicrogameCanvas } from "@/games/DefaultMicrogameCanvas";
 import { GeometryDashGame } from "@/games/GeometryDashGame";
@@ -83,6 +84,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "chromeDinoSpace") {
     return <ChromeDinoSpaceGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "cookieRun") {
+    return <CookieRunGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "geometryDashSpikes") {
