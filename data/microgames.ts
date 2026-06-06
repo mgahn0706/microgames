@@ -23,6 +23,7 @@ export type MicrogameCanvas =
   | "crazyArcade"
   | "default"
   | "geometryDashSpikes"
+  | "gomokuWhiteStone"
   | "halliGalliBoss"
   | "hancomTyping"
   | "kartriderCourse"
@@ -241,6 +242,22 @@ export const MICROGAMES = [
     id: "crazy-arcade-water-bomb",
     startPrompt: "물폭탄을 설치해라!",
     title: "크레이지 아케이드",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "gomokuWhiteStone",
+    microscope: {
+      description:
+        "오목은 한 수만 잘 놓아도 바로 끝납니다. 흰돌 차례예요. 어디에 둬야 다섯 개가 이어질까요?",
+      imageAlt: "오목판",
+      imageSrc: "/games/gomoku/images/board.png",
+    },
+    control: "mouseClick",
+    id: "gomoku-white-five",
+    startPrompt: "흰돌을 놓아 이겨라!",
+    title: "오목",
     type: "normal",
   },
 

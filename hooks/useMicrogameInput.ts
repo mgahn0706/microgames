@@ -90,6 +90,7 @@ export function useMicrogameInput({
         microgame.control === "mouseClick" &&
         microgame.canvas !== "animalCrossingStamps" &&
         microgame.canvas !== "amongUsWires" &&
+        microgame.canvas !== "gomokuWhiteStone" &&
         microgame.canvas !== "halliGalliBoss" &&
         microgame.canvas !== "leagueChampionBan" &&
         microgame.canvas !== "minecraftMining" &&

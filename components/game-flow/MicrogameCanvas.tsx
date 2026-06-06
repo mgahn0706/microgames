@@ -10,6 +10,7 @@ import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGa
 import { CrazyArcadeGame } from "@/games/CrazyArcadeGame";
 import { DefaultMicrogameCanvas } from "@/games/DefaultMicrogameCanvas";
 import { GeometryDashGame } from "@/games/GeometryDashGame";
+import { GomokuGame } from "@/games/GomokuGame";
 import { HalliGalliBossGame } from "@/games/HalliGalliBossGame";
 import { HancomTypingGame } from "@/games/HancomTypingGame";
 import { KartriderBossGame } from "@/games/KartriderBossGame";
@@ -102,6 +103,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "geometryDashSpikes") {
     return <GeometryDashGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "gomokuWhiteStone") {
+    return <GomokuGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "hancomTyping") {
