@@ -26,7 +26,8 @@ export type BgmTrack =
   | "superMario"
   | "success"
   | "tetris"
-  | "undertale";
+  | "undertale"
+  | "zelda";
 
 export type SoundEffectTrack =
   | "clear1"
@@ -65,6 +66,7 @@ const BGM_TRACK_PATHS = {
   success: "/games/game-flow/sounds/success.mp3",
   tetris: "/games/tetris/sounds/tetris-bgm.mp3",
   undertale: "/games/undertale/sounds/undertale-bgm.mp3",
+  zelda: "/games/zelda/sounds/zelda-bgm.mp3",
 } satisfies Record<BgmTrack, string>;
 
 const SOUND_EFFECT_TRACK_PATHS = {
@@ -123,6 +125,7 @@ const BGM_TRACK_BEATS = {
   success: 4,
   tetris: 12,
   undertale: 8,
+  zelda: 12,
 } satisfies Record<Exclude<BgmTrack, "gameOver">, number>;
 
 export const GAME_OVER_DURATION_MS = 5208;

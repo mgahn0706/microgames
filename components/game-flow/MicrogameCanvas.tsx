@@ -21,6 +21,7 @@ import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { SuperMarioCoinGame } from "@/games/SuperMarioCoinGame";
 import { TetrisLineClearGame } from "@/games/TetrisLineClearGame";
 import { UndertaleMouseGame } from "@/games/UndertaleMouseGame";
+import { ZeldaCircleDrawGame } from "@/games/ZeldaCircleDrawGame";
 
 type GameCanvasProps = Readonly<{
   microgame: Microgame;
@@ -101,6 +102,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "courseRegistrationNumber") {
     return <CourseRegistrationNumberGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "zeldaCircleDraw") {
+    return <ZeldaCircleDrawGame microgame={microgame} />;
   }
 
   return <DefaultMicrogameCanvas microgame={microgame} />;

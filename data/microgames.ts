@@ -32,7 +32,8 @@ export type MicrogameCanvas =
   | "pokemonTyping"
   | "superMarioCoins"
   | "tetrisLineClear"
-  | "undertaleMouse";
+  | "undertaleMouse"
+  | "zeldaCircleDraw";
 
 export type Microgame = Readonly<{
   beatCount: number;
@@ -123,6 +124,16 @@ export const MICROGAMES = [
     id: "hancom-word-typing",
     startPrompt: "단어를 입력해라!",
     title: "한컴",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "zeldaCircleDraw",
+    control: "mouseDrag",
+    id: "zelda-circle-draw",
+    startPrompt: "동그라미를 그려라!",
+    title: "Zelda",
     type: "normal",
   },
 
