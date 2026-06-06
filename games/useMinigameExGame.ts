@@ -15,7 +15,9 @@ const BEAR_EAT_SOUND_SRC = "/games/minigame-ex/sounds/bear-eat-meat.mp3";
 const DEFAULT_BEAT_DURATION_MS = 500;
 const EATING_EVENT_COUNT = 4;
 const EATING_PHASE_BEATS = 8;
+const EATING_START_OFFSET_BEATS = 0.75;
 const EATING_STEP_BEATS = EATING_PHASE_BEATS / EATING_EVENT_COUNT;
+const EATING_VISIBLE_BEATS = 1.05;
 const BEAR_NUMBERS = [1, 2, 3] as const;
 
 function dispatchClear() {
@@ -204,13 +206,17 @@ export function useMinigameExGame(): Readonly<{
           setActiveEatingBears(bearNumbers);
           playEatSound();
         },
-        (index * EATING_STEP_BEATS + 0.25) * beatDurationMs,
+        (index * EATING_STEP_BEATS + EATING_START_OFFSET_BEATS) *
+          beatDurationMs,
       );
       const stopTimer = window.setTimeout(
         () => {
           setActiveEatingBears([]);
         },
-        (index * EATING_STEP_BEATS + 1.15) * beatDurationMs,
+        (index * EATING_STEP_BEATS +
+          EATING_START_OFFSET_BEATS +
+          EATING_VISIBLE_BEATS) *
+          beatDurationMs,
       );
 
       return [startTimer, stopTimer];

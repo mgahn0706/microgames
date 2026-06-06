@@ -9,9 +9,9 @@ const BACKGROUND_SRC = "/games/minigame-ex/images/background.png";
 const EATING_BEAR_SRC = "/games/minigame-ex/images/eating-bear.png";
 const IDLE_BEAR_SRC = "/games/minigame-ex/images/idle-bear.png";
 const BEAR_LAYOUT = [
-  { number: 1, x: "24%", y: "64%" },
+  { number: 1, x: "42%", y: "64%" },
   { number: 2, x: "50%", y: "64%" },
-  { number: 3, x: "76%", y: "64%" },
+  { number: 3, x: "58%", y: "64%" },
 ] satisfies ReadonlyArray<{
   number: BearNumber;
   x: string;
@@ -23,14 +23,8 @@ export function MinigameExGame({
 }: Readonly<{ microgame: Microgame }>) {
   void microgame;
 
-  const {
-    activeEatingBears,
-    chooseBear,
-    containerRef,
-    hasFailed,
-    isChoosing,
-    wrongBear,
-  } = useMinigameExGame();
+  const { activeEatingBears, containerRef, hasFailed, isChoosing, wrongBear } =
+    useMinigameExGame();
 
   return (
     <div
@@ -49,7 +43,7 @@ export function MinigameExGame({
       <div className="absolute inset-0 bg-black/10" />
       {isChoosing ? (
         <div className="pointer-events-none absolute left-1/2 top-[12%] z-20 -translate-x-1/2 rounded-md border border-amber-100/50 bg-black/55 px-5 py-3 text-center text-lg font-black text-amber-50 shadow-[0_0_24px_rgba(251,191,36,0.24)] sm:text-2xl">
-          가장 고기를 많이 먹은 곰을 선택해라!
+          가장 많은 고기를 먹은 곰을 선택해라
         </div>
       ) : null}
       {BEAR_LAYOUT.map((bear) => {
@@ -57,26 +51,18 @@ export function MinigameExGame({
         const isWrong = wrongBear === bear.number;
 
         return (
-          <button
+          <div
             aria-label={`${bear.number}번 곰 선택`}
-            className={`absolute z-10 aspect-[3/2] w-[clamp(9rem,22vw,18rem)] -translate-x-1/2 -translate-y-1/2 outline-none transition duration-150 ${
-              isChoosing
-                ? "cursor-pointer hover:scale-105 focus-visible:scale-105"
-                : "cursor-default"
+            className={`pointer-events-none absolute z-10 aspect-[3/2] w-[clamp(12rem,27vw,22rem)] -translate-x-1/2 -translate-y-1/2 transition duration-150 ${
+              isChoosing ? "scale-105" : ""
             } ${hasFailed ? "opacity-55 grayscale" : ""} ${
               isWrong ? "scale-95" : ""
             }`}
-            disabled={!isChoosing || hasFailed}
             key={bear.number}
-            onPointerDown={(event) => {
-              event.preventDefault();
-              chooseBear(bear.number);
-            }}
             style={{
               left: bear.x,
               top: bear.y,
             }}
-            type="button"
           >
             <Image
               alt=""
@@ -97,7 +83,7 @@ export function MinigameExGame({
             >
               {bear.number}
             </span>
-          </button>
+          </div>
         );
       })}
     </div>
