@@ -5,9 +5,9 @@ export type MicrogameControl =
   | "arrowAndSpace"
   | "arrowKeys"
   | "koreanKeyboard"
-  | "microphone"
   | "mouseClick"
   | "mouseDrag"
+  | "mouseHold"
   | "numberKeys"
   | "scroll"
   | "space";
@@ -48,9 +48,9 @@ const FORM_INSTRUCTIONS_BY_CONTROL = {
   arrowAndSpace: getFormInstructionByControl("arrowAndSpace"),
   arrowKeys: getFormInstructionByControl("arrowKeys"),
   koreanKeyboard: getFormInstructionByControl("koreanKeyboard"),
-  microphone: getFormInstructionByControl("microphone"),
   mouseClick: getFormInstructionByControl("mouseClick"),
   mouseDrag: getFormInstructionByControl("mouseDrag"),
+  mouseHold: getFormInstructionByControl("mouseHold"),
   numberKeys: getFormInstructionByControl("numberKeys"),
   scroll: getFormInstructionByControl("scroll"),
   space: getFormInstructionByControl("space"),
@@ -130,7 +130,7 @@ export const MICROGAMES = [
   {
     beatCount: 8,
     canvas: "minecraftMining",
-    control: "mouseDrag",
+    control: "mouseHold",
     id: "minecraft-diamond-mining",
     startPrompt: "다이아몬드를 캐라!",
     title: "Minecraft",
@@ -307,10 +307,6 @@ export function isMicrogameClearKey(
 
   if (control === "koreanKeyboard") {
     return /^[ㄱ-ㅎㅏ-ㅣ가-힣]$/.test(event.key);
-  }
-
-  if (control === "microphone") {
-    return event.key.length > 0;
   }
 
   return false;

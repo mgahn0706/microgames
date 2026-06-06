@@ -60,7 +60,7 @@
 | Jump              | `점프해라!`             | 스페이스바          | 8    | 일반 |
 | Geometry Dash     | `가시를 피해라!`        | 스페이스바          | 12   | 일반 |
 | Tetris            | `4줄 없애라!`           | 방향키 + 스페이스바 | 12   | 일반 |
-| Minecraft         | `다이아몬드를 캐라!`    | 마우스 hold/drag    | 8    | 일반 |
+| Minecraft         | `다이아몬드를 캐라!`    | 마우스 hold         | 8    | 일반 |
 | Piano             | `멜로디를 연주해라!`    | 숫자키 1~9          | 10   | 일반 |
 | 말랑말랑 두뇌교실 | `블록은 몇 개?`         | 숫자키              | 12   | 일반 |
 | Undertale         | `피해라!`               | 방향키              | 8    | 일반 |
@@ -82,9 +82,10 @@
   <img src="./public/games/forms/images/arrow-and-space.png" alt="방향키와 스페이스바 조작 안내" width="23%" />
   <img src="./public/games/forms/images/click.png" alt="마우스 클릭 조작 안내" width="23%" />
   <img src="./public/games/forms/images/drag.png" alt="마우스 드래그 조작 안내" width="23%" />
+  <img src="./public/games/forms/images/hold.png" alt="마우스 홀드 조작 안내" width="23%" />
 </p>
 
-지원 control type은 `space`, `arrowKeys`, `arrowAndSpace`, `mouseClick`, `mouseDrag`, `koreanKeyboard`, `numberKeys`, `scroll`, `microphone`입니다. 현재 등록된 마이크로게임은 이 중 일부를 사용합니다.
+지원 control type은 `space`, `arrowKeys`, `arrowAndSpace`, `mouseClick`, `mouseDrag`, `mouseHold`, `koreanKeyboard`, `numberKeys`, `scroll`입니다. 현재 등록된 마이크로게임은 이 중 일부를 사용합니다.
 
 ## 기술 스택
 

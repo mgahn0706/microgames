@@ -43,6 +43,13 @@ export const FORM_INSTRUCTIONS = [
     title: "마우스 드래그",
   },
   {
+    alt: "Mouse hold control form",
+    control: "mouseHold",
+    description: "마우스를 누른 채 유지해 제한 시간 안에 목표를 완료하세요.",
+    imageSrc: "/games/forms/images/hold.png",
+    title: "마우스 홀드",
+  },
+  {
     alt: "Scroll control form",
     control: "scroll",
     description: "스크롤 조작을 제한 시간 안에 정확히 완료하세요.",
@@ -62,12 +69,5 @@ export const FORM_INSTRUCTIONS = [
     description: "한글 키 입력을 리듬에 맞춰 처리하세요.",
     imageSrc: "/games/forms/images/korean-keyboard.png",
     title: "한글 타자",
-  },
-  {
-    alt: "Microphone control form",
-    control: "microphone",
-    description: "마이크 입력을 필요한 순간에 맞춰 사용하세요.",
-    imageSrc: "/games/forms/images/microphone.png",
-    title: "마이크",
   },
 ] satisfies FormInstruction[];
