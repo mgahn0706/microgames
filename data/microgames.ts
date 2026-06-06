@@ -76,258 +76,34 @@ const FORM_INSTRUCTIONS_BY_CONTROL = {
 
 export const MICROGAMES = [
   {
-    beatCount: 12,
-    canvas: "pokemonTyping",
-    microscope: {
-      description:
-        "피카츄, 라이츄, 파이리, 꼬부기... 다들 포켓몬 아시나요? 빠르게 포켓몬 이름을 맞춰야 해요. 아, 얘 이름이 뭐였더라?",
-      imageAlt: "포켓몬 도감 배경",
-      imageSrc: "/games/pokemon/images/pokedex-background.png",
-    },
-    control: "koreanKeyboard",
-    id: "pokemon-name-typing",
-    startPrompt: "이 포켓몬의 이름은?",
-    title: "포켓몬",
-    type: "normal",
-  },
-
-  {
-    beatCount: 14,
-    canvas: "amongUsWires",
-    microscope: {
-      description:
-        "어몽어스, 코로나 시절 때 많이 했는데 말이죠. 전선 색깔 맞춰 쭉 연결하면 되는데, 급하면 꼭 손이 꼬입니다.",
-      imageAlt: "어몽어스 전선 작업 배경",
-      imageSrc: "/games/among-us/images/background.png",
-    },
-    control: "mouseDrag",
-    id: "among-us-wire-task",
-    startPrompt: "연결해라!",
-    title: "어몽어스",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "appleNumberSum",
-    microscope: {
-      description:
-        "사과게임, 한때 시간 순삭이었죠. 숫자가 적힌 사과들을 드래그해서 딱 10을 만들면 되는데, 급하면 꼭 하나를 더 잡습니다.",
-      imageAlt: "사과게임 보드",
-      imageSrc: "/games/apple-game/images/apple.png",
-    },
-    control: "mouseDrag",
-    id: "apple-game-number-sum",
-    startPrompt: "10을 만들어라!",
-    title: "사과게임",
-    type: "normal",
-  },
-
-  {
     beatCount: 8,
-    canvas: "animalCrossingStamps",
+    canvas: "laytonShapeMatch",
     microscope: {
       description:
-        "동물의 숲 박물관의 스탬프를 보고 빠르게 쾅쾅 찍어야 합니다. 아, 잘못 찍으면 실패예요!",
-      imageAlt: "동물의 숲 스탬프",
-      imageSrc: "/games/animal-crossing/images/stamp.png",
+        "레이튼 교수식 문제는 단순해 보여도 꼭 한 번 더 보게 됩니다. 같은 모양을 찾아 번호를 눌러보세요.",
+      imageAlt: "레이튼 모양 문제",
+      imageSrc: "/games/layton/images/one-A.png",
+    },
+    control: "numberKeys",
+    id: "layton-shape-match",
+    startPrompt: "같은 모양을 찾아라!",
+    title: "레이튼 교수와 이상한 마을",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "leagueChampionBan",
+    microscope: {
+      description:
+        "롤 챔피언 선택창은 늘 시간이 부족하죠. 밴해야 할 챔피언을 찾고, 망설이지 말고 눌러야 합니다.",
+      imageAlt: "리그 오브 레전드 챔피언 선택 배경",
+      imageSrc: "/games/league-of-legend/images/background.png",
     },
     control: "mouseClick",
-    id: "animal-crossing-stamp-card",
-    startPrompt: "찍어라!",
-    title: "모여봐요 동물의 숲",
-    type: "normal",
-  },
-
-  {
-    beatCount: 8,
-    canvas: "superMarioCoins",
-    microscope: {
-      description:
-        "마리오 하면 역시 점프와 코인이죠. 블록을 치고 코인을 모으는데, 너무 많이 먹어도 안 됩니다.",
-      imageAlt: "슈퍼 마리오 코인",
-      imageSrc: "/games/supermario/images/coin.png",
-    },
-    control: "space",
-    id: "super-mario-coin-count",
-    startPrompt: "코인을 정확히 모아라!",
-    title: "슈퍼 마리오",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "superMarioGalaxyStarBits",
-    microscope: {
-      description:
-        "슈퍼마리오 갤럭시에서 반짝이는 스타구슬 보이면 그냥 지나칠 수 없죠. 손을 떼지 말고 쭉 끌어서 여섯 개를 모아야 해요.",
-      imageAlt: "슈퍼마리오 갤럭시 스타구슬",
-      imageSrc: "/games/super-mario-galaxy/images/blue-bits.png",
-    },
-    control: "mouseDrag",
-    id: "super-mario-galaxy-star-bits",
-    startPrompt: "스타구슬을 모아라!",
-    title: "슈퍼마리오 갤럭시",
-    type: "normal",
-  },
-
-  {
-    beatCount: 8,
-    canvas: "chromeDinoSpace",
-    microscope: {
-      description:
-        "인터넷 안 될 때 나타나는 그 공룡, 다들 한 번쯤 뛰어봤죠? 선인장이 오면 생각보다 빨리 스페이스를 눌러야 해요.",
-      imageAlt: "크롬 공룡게임",
-      imageSrc: "/games/chrome-dino/images/dinosaur.png",
-    },
-    control: "space",
-    id: "jump-gap",
-    startPrompt: "점프해라!",
-    title: "크롬 공룡게임",
-    type: "normal",
-  },
-
-  {
-    beatCount: 8,
-    canvas: "flappyBird",
-    microscope: {
-      description:
-        "플래피버드, 스페이스 한 번에 목숨이 걸린 게임입니다. 파이프 사이를 통과하려고 누르다 보면 손이 자꾸 급해져요.",
-      imageAlt: "플래피버드",
-      imageSrc: "/games/flappy-bird/images/bird.png",
-    },
-    control: "space",
-    id: "flappy-bird-pipe-dodge",
-    startPrompt: "파이프를 피해라!",
-    title: "플래피버드",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "cookieRun",
-    microscope: {
-      description:
-        "쿠키런은 달리기만 하면 끝이 아니죠. 뛰고, 숙이고, 또 뛰고... 쿠키들의 반란이 시작된다!",
-      imageAlt: "쿠키런 배경",
-      imageSrc: "/games/cookie-run/images/background.png",
-    },
-    control: "arrowAndSpace",
-    id: "cookie-run-obstacle-dodge",
-    startPrompt: "달려라!",
-    title: "쿠키런",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "geometryDashSpikes",
-    microscope: {
-      description:
-        "지오메트리 대시는 보기엔 단순한데 한 번 삐끗하면 바로 끝입니다. Stereo Madness, 다들 아시나요?",
-      imageAlt: "지오메트리 대시 플레이어",
-      imageSrc: "/games/geometry-dash/images/player.png",
-    },
-    control: "space",
-    id: "geometry-dash-spike-dodge",
-    startPrompt: "가시를 피해라!",
-    title: "지오메트리 대시",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "hancomTyping",
-    microscope: {
-      description:
-        "한컴 타자 연습하던 시절 기억나나요? 단어가 내려오기 전에 빠르게 치면 되는데, 오타 하나가 꽤 아픕니다.",
-      imageAlt: "한컴 타자 배경",
-      imageSrc: "/games/hancom/images/background.png",
-    },
-    control: "koreanKeyboard",
-    id: "hancom-word-typing",
-    startPrompt: "단어를 입력해라!",
-    title: "한컴 타자연습",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "zeldaCircleDraw",
-    microscope: {
-      description:
-        "젤다의 전설: 스카이워드 소드입니다. 마스터소드로 여신의 벽에 문양을 그리면 폭탄이 나와요.",
-      imageAlt: "젤다 원 그리기 배경",
-      imageSrc: "/games/zelda/images/background.png",
-    },
-    control: "mouseDrag",
-    id: "zelda-circle-draw",
-    startPrompt: "동그라미를 그려라!",
-    title: "젤다의 전설: 스카이워드 소드",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "tetrisLineClear",
-    microscope: {
-      description:
-        "테트리스에서 긴 막대 기다린 적 있나요? 드디어 왔습니다. 이제 제대로 꽂아서 네 줄을 지워야 해요.",
-      imageAlt: "테트리스 썸네일",
-      imageSrc: "/games/tetris/images/thumbnail.svg",
-    },
-    control: "arrowAndSpace",
-    id: "tetris-four-line-clear",
-    startPrompt: "4줄 없애라!",
-    title: "테트리스",
-    type: "normal",
-  },
-
-  {
-    beatCount: 12,
-    canvas: "crazyArcade",
-    microscope: {
-      description:
-        "크레이지 아케이드 하면 물풍선이죠. 추억이네요. 다들 드림서버였나요, 해피서버였나요?",
-      imageAlt: "크레이지 아케이드 배경",
-      imageSrc: "/games/crazy-arcade/images/background.png",
-    },
-    control: "arrowAndSpace",
-    id: "crazy-arcade-water-bomb",
-    startPrompt: "물폭탄을 설치해라!",
-    title: "크레이지 아케이드",
-    type: "normal",
-  },
-
-  {
-    beatCount: 8,
-    canvas: "gomokuWhiteStone",
-    microscope: {
-      description:
-        "오목은 한 수만 잘 놓아도 바로 끝납니다. 흰돌 차례예요. 어디에 둬야 다섯 개가 이어질까요?",
-      imageAlt: "오목판",
-      imageSrc: "/games/gomoku/images/board.png",
-    },
-    control: "mouseClick",
-    id: "gomoku-white-five",
-    startPrompt: "흰돌을 놓아 이겨라!",
-    title: "오목",
-    type: "normal",
-  },
-
-  {
-    beatCount: 8,
-    canvas: "pongSurvival",
-    microscope: {
-      description:
-        "퐁은 공 하나가 전부인 게임인데, 놓치는 순간 바로 끝입니다. 위아래로 패들을 움직여 짧은 랠리를 버텨보세요.",
-      imageAlt: "퐁 게임 화면",
-      imageSrc: "/games/pong/images/thumbnail.svg",
-    },
-    control: "arrowKeys",
-    id: "pong-survival",
-    startPrompt: "버텨라!",
-    title: "퐁",
+    id: "league-of-legend-champion-ban",
+    startPrompt: "챔피언을 밴해라!",
+    title: "리그 오브 레전드",
     type: "normal",
   },
 
@@ -344,38 +120,6 @@ export const MICROGAMES = [
     id: "minecraft-diamond-mining",
     startPrompt: "다이아몬드를 캐라!",
     title: "마인크래프트",
-    type: "normal",
-  },
-
-  {
-    beatCount: 8,
-    canvas: "modooMarble",
-    microscope: {
-      description:
-        "모두의 마블의 주사위 컨트롤을 아시나요? 꾹 눌러 12를 띄워보세요.",
-      imageAlt: "모두의마블 배경",
-      imageSrc: "/games/modoo-marble/images/background.png",
-    },
-    control: "mouseHold",
-    id: "modoo-marble-big-number",
-    startPrompt: "큰 수를 굴려라!",
-    title: "모두의 마블",
-    type: "normal",
-  },
-
-  {
-    beatCount: 10,
-    canvas: "pianoMelody",
-    microscope: {
-      description:
-        "피아노는 쉬운 음도 순서가 꼬이면 바로 헷갈립니다. 방금 들은 멜로디를 기억해서 숫자키로 다시 눌러보세요.",
-      imageAlt: "피아노 배경",
-      imageSrc: "/games/piano/images/background.png",
-    },
-    control: "numberKeys",
-    id: "piano-melody-repeat",
-    startPrompt: "연주해라!",
-    title: "피아노",
     type: "normal",
   },
 
@@ -428,50 +172,114 @@ export const MICROGAMES = [
   },
 
   {
-    beatCount: 16,
-    canvas: "minigameExBearMeat",
+    beatCount: 8,
+    canvas: "modooMarble",
     microscope: {
       description:
-        "미니게임EX에서는 잠깐 본 걸 바로 기억해야 합니다. 곰 셋이 고기를 먹는데, 누가 제일 많이 먹었는지 놓치면 끝이에요.",
-      imageAlt: "미니게임EX 곰",
-      imageSrc: "/games/minigame-ex/images/idle-bear.png",
+        "모두의 마블의 주사위 컨트롤을 아시나요? 꾹 눌러 12를 띄워보세요.",
+      imageAlt: "모두의마블 배경",
+      imageSrc: "/games/modoo-marble/images/background.png",
     },
-    control: "numberKeys",
-    id: "minigame-ex-bear-meat",
-    startPrompt: "가장 고기를 많이 먹은 곰을 선택해라!",
-    title: "미니게임EX",
+    control: "mouseHold",
+    id: "modoo-marble-big-number",
+    startPrompt: "큰 수를 굴려라!",
+    title: "모두의 마블",
     type: "normal",
   },
 
   {
     beatCount: 8,
-    canvas: "laytonShapeMatch",
+    canvas: "animalCrossingStamps",
     microscope: {
       description:
-        "레이튼 교수식 문제는 단순해 보여도 꼭 한 번 더 보게 됩니다. 같은 모양을 찾아 번호를 눌러보세요.",
-      imageAlt: "레이튼 모양 문제",
-      imageSrc: "/games/layton/images/one-A.png",
+        "동물의 숲 박물관의 스탬프를 보고 빠르게 쾅쾅 찍어야 합니다. 아, 잘못 찍으면 실패예요!",
+      imageAlt: "동물의 숲 스탬프",
+      imageSrc: "/games/animal-crossing/images/stamp.png",
+    },
+    control: "mouseClick",
+    id: "animal-crossing-stamp-card",
+    startPrompt: "찍어라!",
+    title: "모여봐요 동물의 숲",
+    type: "normal",
+  },
+
+  {
+    beatCount: 16,
+    canvas: "minigameExBearMeat",
+    microscope: {
+      description:
+        "미니게임EX를 아는 사람이 있으려나 모르겠네요. 세 곰 중 누가 제일 많이 먹었는지 보셨나요?.",
+      imageAlt: "미니게임EX 곰",
+      imageSrc: "/games/minigame-ex/images/idle-bear.png",
     },
     control: "numberKeys",
-    id: "layton-shape-match",
-    startPrompt: "같은 모양을 찾아라!",
-    title: "레이튼 교수와 이상한 마을",
+    id: "minigame-ex-bear-meat",
+    startPrompt: "곰을 잘봐라!",
+    title: "미니게임EX",
     type: "normal",
   },
 
   {
     beatCount: 12,
-    canvas: "leagueChampionBan",
+    canvas: "appleNumberSum",
     microscope: {
       description:
-        "롤 챔피언 선택창은 늘 시간이 부족하죠. 밴해야 할 챔피언을 찾고, 망설이지 말고 눌러야 합니다.",
-      imageAlt: "리그 오브 레전드 챔피언 선택 배경",
-      imageSrc: "/games/league-of-legend/images/background.png",
+        "사과게임, 한때 시간 순삭이었죠. 숫자가 적힌 사과들을 드래그해서 딱 10을 만들면 되는데, 급하면 꼭 하나를 더 잡습니다.",
+      imageAlt: "사과게임 보드",
+      imageSrc: "/games/apple-game/images/apple.png",
     },
-    control: "mouseClick",
-    id: "league-of-legend-champion-ban",
-    startPrompt: "챔피언을 밴해라!",
-    title: "리그 오브 레전드",
+    control: "mouseDrag",
+    id: "apple-game-number-sum",
+    startPrompt: "10을 만들어라!",
+    title: "사과게임",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "superMarioCoins",
+    microscope: {
+      description:
+        "마리오 하면 역시 점프와 코인이죠. 블록을 치고 코인을 모으는데, 너무 많이 먹어도 안 됩니다.",
+      imageAlt: "슈퍼 마리오 코인",
+      imageSrc: "/games/supermario/images/coin.png",
+    },
+    control: "space",
+    id: "super-mario-coin-count",
+    startPrompt: "코인을 정확히 모아라!",
+    title: "슈퍼 마리오",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "superMarioGalaxyStarBits",
+    microscope: {
+      description:
+        "슈퍼마리오 갤럭시에서는 이 스타구슬이 재화에요. 손을 떼지 말고 쭉 끌어서 여섯 개를 모아야 해요.",
+      imageAlt: "슈퍼마리오 갤럭시 스타구슬",
+      imageSrc: "/games/super-mario-galaxy/images/blue-bits.png",
+    },
+    control: "mouseDrag",
+    id: "super-mario-galaxy-star-bits",
+    startPrompt: "스타구슬을 모아라!",
+    title: "슈퍼마리오 갤럭시",
+    type: "normal",
+  },
+
+  {
+    beatCount: 14,
+    canvas: "amongUsWires",
+    microscope: {
+      description:
+        "어몽어스, 코로나 시절 때 많이 했는데 말이죠. 전선 색깔 맞춰 쭉 연결하면 되는데, 급하면 꼭 손이 꼬입니다.",
+      imageAlt: "어몽어스 전선 작업 배경",
+      imageSrc: "/games/among-us/images/background.png",
+    },
+    control: "mouseDrag",
+    id: "among-us-wire-task",
+    startPrompt: "연결해라!",
+    title: "어몽어스",
     type: "normal",
   },
 
@@ -491,19 +299,195 @@ export const MICROGAMES = [
   },
 
   {
-    beatCount: 36,
-    canvas: "halliGalliBoss",
+    beatCount: 8,
+    canvas: "gomokuWhiteStone",
     microscope: {
       description:
-        "할리갈리는 종 치는 손이 빠른 사람이 이깁니다. 과일이 다섯 개가 되는 순간, 고민하지 말고 눌러야 해요.",
-      imageAlt: "할리갈리 종",
-      imageSrc: "/games/halli-galli/images/bell.png",
+        "오목은 한 수만 잘 놓아도 바로 끝납니다. 흰돌 차례예요. 어디에 둬야 다섯 개가 이어질까요?",
+      imageAlt: "오목판",
+      imageSrc: "/games/gomoku/images/board.png",
     },
     control: "mouseClick",
-    id: "halli-galli-bell-boss",
-    startPrompt: "과일이 5개일 때 종을 쳐라!",
-    title: "할리갈리",
-    type: "boss",
+    id: "gomoku-white-five",
+    startPrompt: "흰돌을 놓아 이겨라!",
+    title: "오목",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "zeldaCircleDraw",
+    microscope: {
+      description:
+        "젤다의 전설: 스카이워드 소드입니다. 마스터소드로 여신의 벽에 문양을 그리면 폭탄이 나와요.",
+      imageAlt: "젤다 원 그리기 배경",
+      imageSrc: "/games/zelda/images/background.png",
+    },
+    control: "mouseDrag",
+    id: "zelda-circle-draw",
+    startPrompt: "동그라미를 그려라!",
+    title: "젤다의 전설: 스카이워드 소드",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "geometryDashSpikes",
+    microscope: {
+      description:
+        "지오메트리 대시는 보기엔 단순한데 한 번 삐끗하면 바로 끝입니다. Stereo Madness, 다들 아시나요?",
+      imageAlt: "지오메트리 대시 플레이어",
+      imageSrc: "/games/geometry-dash/images/player.png",
+    },
+    control: "space",
+    id: "geometry-dash-spike-dodge",
+    startPrompt: "가시를 피해라!",
+    title: "지오메트리 대시",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "cookieRun",
+    microscope: {
+      description:
+        "쿠키런은 달리기만 하면 끝이 아니죠. 뛰고, 숙이고, 또 뛰고... 쿠키들의 반란이 시작된다!",
+      imageAlt: "쿠키런 배경",
+      imageSrc: "/games/cookie-run/images/background.png",
+    },
+    control: "arrowAndSpace",
+    id: "cookie-run-obstacle-dodge",
+    startPrompt: "달려라!",
+    title: "쿠키런",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "crazyArcade",
+    microscope: {
+      description:
+        "크레이지 아케이드 하면 물풍선이죠. 추억이네요. 다들 드림서버였나요, 해피서버였나요?",
+      imageAlt: "크레이지 아케이드 배경",
+      imageSrc: "/games/crazy-arcade/images/background.png",
+    },
+    control: "arrowAndSpace",
+    id: "crazy-arcade-water-bomb",
+    startPrompt: "물폭탄을 설치해라!",
+    title: "크레이지 아케이드",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "chromeDinoSpace",
+    microscope: {
+      description:
+        "인터넷 안 될 때 나타나는 그 공룡, 다들 한 번쯤 뛰어봤죠? 선인장이 오면 생각보다 빨리 스페이스를 눌러야 해요.",
+      imageAlt: "크롬 공룡게임",
+      imageSrc: "/games/chrome-dino/images/dinosaur.png",
+    },
+    control: "space",
+    id: "jump-gap",
+    startPrompt: "점프해라!",
+    title: "크롬 공룡게임",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "tetrisLineClear",
+    microscope: {
+      description:
+        "테트리스에서 긴 막대 기다린 적 있나요? 드디어 왔습니다. 이제 제대로 꽂아서 네 줄을 지워야 해요.",
+      imageAlt: "테트리스 썸네일",
+      imageSrc: "/games/tetris/images/thumbnail.svg",
+    },
+    control: "arrowAndSpace",
+    id: "tetris-four-line-clear",
+    startPrompt: "4줄 없애라!",
+    title: "테트리스",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "pokemonTyping",
+    microscope: {
+      description:
+        "피카츄, 라이츄, 파이리, 꼬부기... 다들 포켓몬 아시나요? 빠르게 포켓몬 이름을 맞춰야 해요. 아, 얘 이름이 뭐였더라?",
+      imageAlt: "포켓몬 도감 배경",
+      imageSrc: "/games/pokemon/images/pokedex-background.png",
+    },
+    control: "koreanKeyboard",
+    id: "pokemon-name-typing",
+    startPrompt: "이 포켓몬의 이름은?",
+    title: "포켓몬",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "pongSurvival",
+    microscope: {
+      description:
+        "퐁은 공 하나가 전부인 게임인데, 놓치는 순간 바로 끝입니다. 위아래로 패들을 움직여 짧은 랠리를 버텨보세요.",
+      imageAlt: "퐁 게임 화면",
+      imageSrc: "/games/pong/images/thumbnail.svg",
+    },
+    control: "arrowKeys",
+    id: "pong-survival",
+    startPrompt: "버텨라!",
+    title: "퐁",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "flappyBird",
+    microscope: {
+      description:
+        "플래피버드, 스페이스 한 번에 목숨이 걸린 게임입니다. 파이프 사이를 통과하려고 누르다 보면 손이 자꾸 급해져요.",
+      imageAlt: "플래피버드",
+      imageSrc: "/games/flappy-bird/images/bird.png",
+    },
+    control: "space",
+    id: "flappy-bird-pipe-dodge",
+    startPrompt: "파이프를 피해라!",
+    title: "플래피버드",
+    type: "normal",
+  },
+
+  {
+    beatCount: 10,
+    canvas: "pianoMelody",
+    microscope: {
+      description:
+        "피아노는 쉬운 음도 순서가 꼬이면 바로 헷갈립니다. 방금 들은 멜로디를 기억해서 숫자키로 다시 눌러보세요.",
+      imageAlt: "피아노 배경",
+      imageSrc: "/games/piano/images/background.png",
+    },
+    control: "numberKeys",
+    id: "piano-melody-repeat",
+    startPrompt: "연주해라!",
+    title: "피아노",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "hancomTyping",
+    microscope: {
+      description:
+        "한컴 타자 연습하던 시절 기억나나요? 단어가 내려오기 전에 빠르게 치면 되는데, 오타 하나가 꽤 아픕니다.",
+      imageAlt: "한컴 타자 배경",
+      imageSrc: "/games/hancom/images/background.png",
+    },
+    control: "koreanKeyboard",
+    id: "hancom-word-typing",
+    startPrompt: "단어를 입력해라!",
+    title: "한컴 타자연습",
+    type: "normal",
   },
 
   {
@@ -527,7 +511,7 @@ export const MICROGAMES = [
     canvas: "animalFarmReverseTyping",
     microscope: {
       description:
-        "다들 동물농장을 아시나요? 샤르릉 뿌뿡 뿍짝 뿍짝 사람이 되라 얍~!",
+        "다들 동물농장을 아시나요? 샤르릉 뿌뿡 뿍짝뿍짝 사람이 되어라 얍~!",
       imageAlt: "동물농장 배경",
       imageSrc: "/games/animal-farm/images/background.png",
     },
@@ -551,6 +535,22 @@ export const MICROGAMES = [
     id: "kartrider-village-canal-course",
     startPrompt: "완주해라!",
     title: "카트라이더",
+    type: "boss",
+  },
+
+  {
+    beatCount: 36,
+    canvas: "halliGalliBoss",
+    microscope: {
+      description:
+        "할리갈리는 종 치는 손이 빠른 사람이 이깁니다. 과일이 다섯 개가 되는 순간, 고민하지 말고 눌러야 해요.",
+      imageAlt: "할리갈리 종",
+      imageSrc: "/games/halli-galli/images/bell.png",
+    },
+    control: "mouseClick",
+    id: "halli-galli-bell-boss",
+    startPrompt: "과일이 5개일 때 종을 쳐라!",
+    title: "할리갈리",
     type: "boss",
   },
 ] satisfies Microgame[];
