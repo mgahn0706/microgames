@@ -37,12 +37,14 @@ export function NeonButton({
 }
 
 function ElevatorBackdrop({
+  animate = true,
   isVisible = true,
   transition = "none",
   shouldDim = true,
   roundResult = "idle",
   tone = "default",
 }: Readonly<{
+  animate?: boolean;
   isVisible?: boolean;
   roundResult?: GameRoundResult;
   shouldDim?: boolean;
@@ -76,9 +78,11 @@ function ElevatorBackdrop({
       />
       <Image
         className={`absolute inset-0 size-full object-cover object-center ${
-          tone === "warning"
-            ? "warning-elevator-overlay"
-            : "neon-elevator-flicker"
+          animate
+            ? tone === "warning"
+              ? "warning-elevator-overlay"
+              : "neon-elevator-flicker"
+            : "opacity-0"
         }`}
         src={elevatorImages[1]}
         alt=""
@@ -98,6 +102,7 @@ function ElevatorBackdrop({
 }
 
 export function NeonShell({
+  animateBackdrop = true,
   children,
   showBackdrop = true,
   roundResult = "idle",
@@ -106,6 +111,7 @@ export function NeonShell({
   backdropTone = "default",
   transition = "none",
 }: Readonly<{
+  animateBackdrop?: boolean;
   backdropTone?: ElevatorBackdropTone;
   children: ReactNode;
   rhythmStyle?: SynchronizedRhythmStyle;
@@ -120,6 +126,7 @@ export function NeonShell({
       style={rhythmStyle}
     >
       <ElevatorBackdrop
+        animate={animateBackdrop}
         isVisible={showBackdrop}
         tone={backdropTone}
         roundResult={roundResult}

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+  <title id="title">Tetris line clear thumbnail</title>
+  <desc id="desc">A Tetris board with a long cyan block clearing four rows.</desc>
+  <rect width="640" height="420" fill="#020617"/>
+  <rect x="154" y="34" width="328" height="352" rx="8" fill="#0f172a" stroke="#67e8f9" stroke-width="6"/>
+  <g opacity=".38">
+    <path d="M190 66v288M226 66v288M262 66v288M298 66v288M334 66v288M370 66v288M406 66v288M442 66v288" stroke="#334155" stroke-width="2"/>
+    <path d="M190 102h252M190 138h252M190 174h252M190 210h252M190 246h252M190 282h252M190 318h252" stroke="#334155" stroke-width="2"/>
+  </g>
+  <g stroke="#020617" stroke-width="4">
+    <rect x="190" y="282" width="36" height="36" fill="#f97316"/>
+    <rect x="226" y="282" width="36" height="36" fill="#a855f7"/>
+    <rect x="262" y="282" width="36" height="36" fill="#22c55e"/>
+    <rect x="298" y="282" width="36" height="36" fill="#eab308"/>
+    <rect x="370" y="282" width="36" height="36" fill="#ef4444"/>
+    <rect x="406" y="282" width="36" height="36" fill="#3b82f6"/>
+    <rect x="190" y="318" width="36" height="36" fill="#3b82f6"/>
+    <rect x="226" y="318" width="36" height="36" fill="#22c55e"/>
+    <rect x="262" y="318" width="36" height="36" fill="#eab308"/>
+    <rect x="298" y="318" width="36" height="36" fill="#ef4444"/>
+    <rect x="334" y="318" width="36" height="36" fill="#a855f7"/>
+    <rect x="370" y="318" width="36" height="36" fill="#f97316"/>
+    <rect x="406" y="318" width="36" height="36" fill="#22c55e"/>
+    <rect x="190" y="210" width="36" height="36" fill="#22d3ee"/>
+    <rect x="226" y="210" width="36" height="36" fill="#22d3ee"/>
+    <rect x="262" y="210" width="36" height="36" fill="#22d3ee"/>
+    <rect x="298" y="210" width="36" height="36" fill="#22d3ee"/>
+  </g>
+  <rect x="174" y="276" width="276" height="68" fill="none" stroke="#fef08a" stroke-width="5" stroke-dasharray="12 10"/>
+  <text x="320" y="392" fill="#e0f2fe" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" text-anchor="middle">4 LINE CLEAR</text>
+</svg>

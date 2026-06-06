@@ -1,6 +1,7 @@
 "use client";
 
 import { useGameScreenFlow } from "@/hooks/useGameScreenFlow";
+import { useSeenMicrogames } from "@/hooks/useSeenMicrogames";
 import { GameScreen } from "./GameScreen";
 import {
   type HomeView,
@@ -15,6 +16,7 @@ export function GameFlowExperience({
 }: Readonly<{
   homeView: HomeView;
 }>) {
+  const { recordSeenMicrogameId, seenMicrogameIds } = useSeenMicrogames();
   const {
     completeSetup,
     finalClearedRound,
@@ -58,6 +60,7 @@ export function GameFlowExperience({
         onGainLife={gainLife}
         onLoseLife={loseLife}
         onResetResult={resetRoundResult}
+        onSeenMicrogame={recordSeenMicrogameId}
         onSuccess={recordSuccess}
       />
     );
@@ -78,6 +81,7 @@ export function GameFlowExperience({
       highestClearedRound={highestClearedRound}
       homeView={homeView}
       onStart={startGame}
+      seenMicrogameIds={seenMicrogameIds}
     />
   );
 }

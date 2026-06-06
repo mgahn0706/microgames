@@ -128,6 +128,7 @@ export const ALL_GAME_PRELOAD_ASSETS = [
   "/games/supermario/images/block.png",
   "/games/supermario/images/coin.png",
   "/games/supermario/images/mario.png",
+  "/games/tetris/images/thumbnail.svg",
   "/games/zelda/images/background.png",
   "/games/zelda/images/cursor.png",
   ...FORM_INSTRUCTIONS.map(({ imageSrc }) => imageSrc),

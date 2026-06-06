@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { MICROGAMES, getMicrogameFormInstruction } from "@/data/microgames";
 import type { PreloadStatus } from "@/hooks/useGameScreenFlow";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
 import { useGameSetupTransition } from "@/hooks/useGameSetupTransition";
@@ -53,11 +54,12 @@ const LOADING_MESSAGES = [
   "결과 화면 준비 중...",
 ] as const;
 
-export type HomeView = "home" | "howToPlay";
+export type HomeView = "home" | "howToPlay" | "microscope";
 
 const HOME_NAV_ITEMS = [
   { href: "/", label: "홈", view: "home" },
   { href: "/how-to-play", label: "게임 방법", view: "howToPlay" },
+  { href: "/microscope", label: "도감", view: "microscope" },
 ] as const;
 
 function HomeHeader({
@@ -81,7 +83,7 @@ function HomeHeader({
           >
             캣타워 오르기
           </Link>
-          <div className="grid grid-cols-2 gap-1 rounded-md border border-white/10 bg-black/20 p-1">
+          <div className="grid grid-cols-3 gap-1 rounded-md border border-white/10 bg-black/20 p-1">
             {HOME_NAV_ITEMS.map((item) => {
               const isActive = homeView === item.view;
 
@@ -203,14 +205,114 @@ function HowToPlayPanel() {
   );
 }
 
+function MicroscopePanel({
+  seenMicrogameIds,
+}: Readonly<{
+  seenMicrogameIds: readonly string[];
+}>) {
+  const discoveredMicrogameCount = MICROGAMES.filter(({ id }) =>
+    seenMicrogameIds.includes(id),
+  ).length;
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-100">
+            Game Microscope
+          </p>
+          <h1 className="text-3xl font-black leading-none text-white drop-shadow-[0_0_14px_rgba(103,232,249,0.55)] sm:text-4xl">
+            게임 도감
+          </h1>
+        </div>
+        <p className="w-fit rounded-md border border-cyan-100/35 bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
+          발견 {discoveredMicrogameCount}/{MICROGAMES.length}
+        </p>
+      </div>
+      <div className="overflow-hidden rounded-md border border-cyan-100/25 bg-black/32">
+        {MICROGAMES.map((microgame) => {
+          const formInstruction = getMicrogameFormInstruction(microgame);
+          const isSeen = seenMicrogameIds.includes(microgame.id);
+
+          return (
+            <article
+              className={`grid min-h-24 grid-cols-[72px_1fr] gap-3 border-b border-white/10 p-3 last:border-b-0 sm:grid-cols-[84px_1fr_auto] sm:items-center sm:gap-4 ${
+                isSeen
+                  ? "bg-white/[0.03]"
+                  : "bg-black/24 text-white/62"
+              }`}
+              key={microgame.id}
+            >
+              <div className="relative size-[72px] overflow-hidden rounded border border-white/12 bg-slate-950 sm:size-[84px]">
+                <Image
+                  alt={microgame.microscope.imageAlt}
+                  className={`size-full object-cover ${
+                    isSeen ? "opacity-100" : "opacity-20"
+                  }`}
+                  decoding="async"
+                  height={84}
+                  sizes="84px"
+                  src={microgame.microscope.imageSrc}
+                  width={84}
+                />
+                {isSeen ? null : (
+                  <div className="absolute inset-0 grid place-items-center bg-black/45">
+                    <span className="rounded border border-white/30 bg-black/70 px-2 py-1 text-xs font-black text-white">
+                      잠금
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="min-w-0 text-lg font-black leading-tight text-white">
+                    {microgame.title}
+                  </h2>
+                  <span
+                    className={`rounded border px-2 py-0.5 text-[0.68rem] font-black ${
+                      isSeen
+                        ? "border-cyan-100/35 text-cyan-50"
+                        : "border-white/20 text-white/50"
+                    }`}
+                  >
+                    {isSeen ? "발견" : "미발견"}
+                  </span>
+                </div>
+                <p className="mt-1 truncate text-sm font-black text-cyan-50/82">
+                  {formInstruction.title}
+                </p>
+                <p className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-cyan-50/68">
+                  {microgame.microscope.description}
+                </p>
+              </div>
+              {microgame.type === "boss" ? (
+                <div className="col-start-2 flex items-center justify-end sm:col-start-auto sm:items-start">
+                  <span className="rounded border border-amber-200/45 px-2 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-amber-50">
+                    Boss
+                  </span>
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function renderHomeView(
   homeView: HomeView,
   highestClearedRound: number,
   isStarting: boolean,
   startGame: () => void,
+  seenMicrogameIds: readonly string[],
 ) {
   if (homeView === "howToPlay") {
     return <HowToPlayPanel />;
+  }
+
+  if (homeView === "microscope") {
+    return <MicroscopePanel seenMicrogameIds={seenMicrogameIds} />;
   }
 
   return (
@@ -226,10 +328,12 @@ export function MainScreen({
   highestClearedRound,
   homeView,
   onStart,
+  seenMicrogameIds,
 }: Readonly<{
   highestClearedRound: number;
   homeView: HomeView;
   onStart: () => void;
+  seenMicrogameIds: readonly string[];
 }>) {
   useBgmTrack("resultsAndMain", "loop", "now");
   const [isStarting, setIsStarting] = useState(false);
@@ -270,14 +374,27 @@ export function MainScreen({
   };
 
   return (
-    <NeonShell rhythmStyle={rhythmStyle}>
+    <NeonShell
+      animateBackdrop={homeView !== "microscope"}
+      rhythmStyle={rhythmStyle}
+    >
       <HomeHeader homeView={homeView} isStarting={isStarting} />
       <div
-        className={`mt-16 rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] backdrop-blur-sm sm:p-8 ${
+        className={`mt-16 rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] sm:p-8 ${
+          homeView === "microscope"
+            ? "max-h-[calc(100vh-6rem)] overflow-y-auto"
+            : "backdrop-blur-sm"
+        } ${
           isStarting ? "main-screen-exit-up" : ""
         }`}
       >
-        {renderHomeView(homeView, highestClearedRound, isStarting, startGame)}
+        {renderHomeView(
+          homeView,
+          highestClearedRound,
+          isStarting,
+          startGame,
+          seenMicrogameIds,
+        )}
       </div>
     </NeonShell>
   );
