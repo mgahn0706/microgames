@@ -63,18 +63,20 @@ function normalizeHancomInput(value: string) {
 function resolveTypedProgress(
   value: string,
   targetWords: readonly string[],
-  completedCount: number,
-): Readonly<{ completedCount: number; remainingValue: string }> {
-  const targetWord = targetWords[completedCount];
+  completedWords: readonly string[],
+): Readonly<{ completedWords: readonly string[]; remainingValue: string }> {
+  const targetWord = targetWords
+    .filter((word) => !completedWords.includes(word))
+    .find((word) => value.startsWith(word));
 
-  if (!targetWord || !value.startsWith(targetWord)) {
-    return { completedCount, remainingValue: value };
+  if (!targetWord) {
+    return { completedWords, remainingValue: value };
   }
 
   return resolveTypedProgress(
     value.slice(targetWord.length),
     targetWords,
-    completedCount + 1,
+    [...completedWords, targetWord],
   );
 }
 
@@ -97,7 +99,7 @@ export function useHancomTypingGame(): Readonly<{
   const hasClearedRef = useRef(false);
   const isComposingRef = useRef(false);
   const [targetWords] = useState(createTargetWords);
-  const [completedCount, setCompletedCount] = useState(0);
+  const [completedWords, setCompletedWords] = useState<readonly string[]>([]);
   const [fallStep, setFallStep] = useState(0);
 
   const updateTypedValue = (value: string) => {
@@ -109,28 +111,29 @@ export function useHancomTypingGame(): Readonly<{
     const nextProgress = resolveTypedProgress(
       normalizedValue,
       targetWords,
-      completedCount,
+      completedWords,
     );
-    const hasCompletedWord = nextProgress.completedCount > completedCount;
+    const hasCompletedWord =
+      nextProgress.completedWords.length > completedWords.length;
     const nextInputValue = hasCompletedWord ? "" : nextProgress.remainingValue;
 
     if (inputRef.current && inputRef.current.value !== nextInputValue) {
       inputRef.current.value = nextInputValue;
     }
 
-    if (nextProgress.completedCount === completedCount) {
+    if (nextProgress.completedWords.length === completedWords.length) {
       return;
     }
 
     const completedInput = inputRef.current;
 
-    setCompletedCount(nextProgress.completedCount);
+    setCompletedWords(nextProgress.completedWords);
     clearInput(completedInput);
     window.requestAnimationFrame(() => {
       clearInput(completedInput);
     });
 
-    if (nextProgress.completedCount < targetWords.length) {
+    if (nextProgress.completedWords.length < targetWords.length) {
       return;
     }
 
@@ -204,18 +207,18 @@ export function useHancomTypingGame(): Readonly<{
     if (!hasClearedRef.current) {
       inputRef.current?.focus({ preventScroll: true });
     }
-  }, [completedCount]);
+  }, [completedWords.length]);
 
   const fallingWords = targetWords.map((word, index) => ({
     id: `${word}-${index}`,
-    isCompleted: index < completedCount,
+    isCompleted: completedWords.includes(word),
     leftPercent: index === 0 ? 26 : 50,
     text: word,
     topPercent: 20 + Math.min(fallStep + index * 2, 10) * 5.4,
   }));
 
   return {
-    completedCount,
+    completedCount: completedWords.length,
     fallingWords,
     inputHandlers,
     inputRef,
