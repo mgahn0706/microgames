@@ -50,13 +50,6 @@ export const FORM_INSTRUCTIONS = [
     title: "마우스 홀드",
   },
   {
-    alt: "Scroll control form",
-    control: "scroll",
-    description: "스크롤 조작을 제한 시간 안에 정확히 완료하세요.",
-    imageSrc: "/games/forms/images/scroll.png",
-    title: "스크롤",
-  },
-  {
     alt: "Number keys control form",
     control: "numberKeys",
     description: "숫자키를 확인하고 제한 시간 안에 입력하세요.",

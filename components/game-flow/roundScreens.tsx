@@ -127,9 +127,9 @@ export function InstructionRoundScreen({
               }`}
               style={
                 {
-                  "--instruction-selected-column": selectedFormIndex % 3,
+                  "--instruction-selected-column": selectedFormIndex % 4,
                   "--instruction-selected-row": Math.floor(
-                    selectedFormIndex / 3,
+                    selectedFormIndex / 4,
                   ),
                 } as CSSProperties
               }

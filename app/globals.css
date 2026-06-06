@@ -651,14 +651,14 @@ body {
   --instruction-tile-width: calc(
     (
         var(--instruction-grid-width) - var(--instruction-grid-inset) * 2 -
-          var(--instruction-grid-gap) * 2
+          var(--instruction-grid-gap) * 3
       ) /
-      3
+      4
   );
   --instruction-tile-height: calc(var(--instruction-tile-width) * 0.75);
   --instruction-grid-height: calc(
-    var(--instruction-grid-inset) * 2 + var(--instruction-tile-height) * 3 +
-      var(--instruction-grid-gap) * 2
+    var(--instruction-grid-inset) * 2 + var(--instruction-tile-height) * 2 +
+      var(--instruction-grid-gap)
   );
   animation: instruction-form-arrive 420ms cubic-bezier(0.2, 0.72, 0.24, 1) both;
   display: grid;
@@ -698,8 +698,8 @@ body {
 .instruction-selection-grid {
   display: grid;
   gap: var(--instruction-grid-gap);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(3, var(--instruction-tile-height));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, var(--instruction-tile-height));
   inset: var(--instruction-grid-inset);
   position: absolute;
 }

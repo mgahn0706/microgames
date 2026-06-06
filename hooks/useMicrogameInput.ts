@@ -94,14 +94,6 @@ export function useMicrogameInput({
         recordClearOnce();
       }
     };
-    const recordWheelClear = (event: WheelEvent) => {
-      if (microgame.control !== "scroll") {
-        return;
-      }
-
-      event.preventDefault();
-      recordClearOnce();
-    };
     const recordCustomClear = () => {
       recordClearOnce();
     };
@@ -111,14 +103,12 @@ export function useMicrogameInput({
 
     window.addEventListener("keydown", recordKeyboardClear);
     window.addEventListener("pointerdown", recordPointerClear);
-    window.addEventListener("wheel", recordWheelClear, { passive: false });
     window.addEventListener(MICROGAME_CLEAR_EVENT, recordCustomClear);
     window.addEventListener(MICROGAME_FAILURE_EVENT, recordCustomFailure);
 
     return () => {
       window.removeEventListener("keydown", recordKeyboardClear);
       window.removeEventListener("pointerdown", recordPointerClear);
-      window.removeEventListener("wheel", recordWheelClear);
       window.removeEventListener(MICROGAME_CLEAR_EVENT, recordCustomClear);
       window.removeEventListener(MICROGAME_FAILURE_EVENT, recordCustomFailure);
     };

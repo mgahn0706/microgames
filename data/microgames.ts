@@ -9,7 +9,6 @@ export type MicrogameControl =
   | "mouseDrag"
   | "mouseHold"
   | "numberKeys"
-  | "scroll"
   | "space";
 
 export type MicrogameType = "boss" | "normal";
@@ -53,7 +52,6 @@ const FORM_INSTRUCTIONS_BY_CONTROL = {
   mouseDrag: getFormInstructionByControl("mouseDrag"),
   mouseHold: getFormInstructionByControl("mouseHold"),
   numberKeys: getFormInstructionByControl("numberKeys"),
-  scroll: getFormInstructionByControl("scroll"),
   space: getFormInstructionByControl("space"),
 } satisfies Record<MicrogameControl, FormInstruction>;
 
