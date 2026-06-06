@@ -19,15 +19,19 @@ export function GameFlowExperience() {
     lives,
     loseLife,
     maxLives,
+    preloadStatus,
     recordSuccess,
     resetRoundResult,
     returnToMain,
+    retryPreload,
     screen,
     startGame,
   } = useGameScreenFlow();
 
   if (screen === "loading") {
-    return <LoadingScreen />;
+    return (
+      <LoadingScreen onRetry={retryPreload} preloadStatus={preloadStatus} />
+    );
   }
 
   if (screen === "setup") {
@@ -65,9 +69,6 @@ export function GameFlowExperience() {
   }
 
   return (
-    <MainScreen
-      highestClearedRound={highestClearedRound}
-      onStart={startGame}
-    />
+    <MainScreen highestClearedRound={highestClearedRound} onStart={startGame} />
   );
 }

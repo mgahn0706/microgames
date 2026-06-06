@@ -8,10 +8,34 @@ import { bgmLibrary } from "@/lib/bgmLibrary";
 const MIN_LOADING_TIME_MS = 900;
 const MAX_LIVES = 4;
 
-let allGameAssetsPreloadPromise: Promise<unknown> | null = null;
+let allGameAssetsPreloadPromise: Promise<void> | null = null;
 
 export type GameScreen = "main" | "loading" | "setup" | "playing" | "gameOver";
 export type GameRoundResult = "idle" | "success" | "failure";
+export type PreloadStatus = Readonly<{
+  currentAsset: string;
+  errorMessage: string | null;
+  failedAsset: string | null;
+  loaded: number;
+  phase: "complete" | "failed" | "loading";
+  total: number;
+}>;
+
+const INITIAL_PRELOAD_STATUS = {
+  currentAsset: "",
+  errorMessage: null,
+  failedAsset: null,
+  loaded: 0,
+  phase: "loading",
+  total: ALL_GAME_PRELOAD_ASSETS.length + 2,
+} satisfies PreloadStatus;
+
+type PreloadTask = Readonly<{
+  label: string;
+  load: () => Promise<unknown>;
+}>;
+
+type PreloadProgressHandler = (status: PreloadStatus) => void;
 
 function waitForMinimumLoadingTime() {
   return new Promise((resolve) => {
@@ -58,17 +82,97 @@ function preloadAsset(assetPath: string) {
   return preloadFetchAsset(assetPath);
 }
 
-function preloadAllGameAssets() {
-  allGameAssetsPreloadPromise ??= Promise.all([
-    ...ALL_GAME_PRELOAD_ASSETS.map(preloadAsset),
-    bgmLibrary.preloadAll(),
-    waitForMinimumLoadingTime(),
-  ]);
+function createPreloadTasks() {
+  return [
+    ...ALL_GAME_PRELOAD_ASSETS.map((assetPath) => ({
+      label: assetPath,
+      load: () => preloadAsset(assetPath),
+    })),
+    {
+      label: "오디오 버퍼 준비",
+      load: () => bgmLibrary.preloadAll(),
+    },
+    {
+      label: "로딩 화면 준비",
+      load: waitForMinimumLoadingTime,
+    },
+  ] satisfies PreloadTask[];
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
+}
+
+async function runPreloadTasks(onProgress: PreloadProgressHandler | undefined) {
+  const tasks = createPreloadTasks();
+  let loaded = 0;
+
+  for (const task of tasks) {
+    onProgress?.({
+      currentAsset: task.label,
+      errorMessage: null,
+      failedAsset: null,
+      loaded,
+      phase: "loading",
+      total: tasks.length,
+    });
+
+    try {
+      await task.load();
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+
+      onProgress?.({
+        currentAsset: "",
+        errorMessage,
+        failedAsset: task.label,
+        loaded,
+        phase: "failed",
+        total: tasks.length,
+      });
+      throw error;
+    }
+
+    loaded += 1;
+    onProgress?.({
+      currentAsset: task.label,
+      errorMessage: null,
+      failedAsset: null,
+      loaded,
+      phase: "loading",
+      total: tasks.length,
+    });
+  }
+
+  onProgress?.({
+    currentAsset: "",
+    errorMessage: null,
+    failedAsset: null,
+    loaded,
+    phase: "complete",
+    total: tasks.length,
+  });
+}
+
+function preloadAllGameAssets(onProgress?: PreloadProgressHandler) {
+  allGameAssetsPreloadPromise ??= runPreloadTasks(onProgress);
 
   return allGameAssetsPreloadPromise;
 }
 
+function resetPreloadCache() {
+  allGameAssetsPreloadPromise = null;
+}
+
 export function useGameScreenFlow() {
+  const [preloadStatus, setPreloadStatus] = useState<PreloadStatus>(
+    INITIAL_PRELOAD_STATUS,
+  );
+  const [preloadAttempt, setPreloadAttempt] = useState(0);
   const [screen, setScreen] = useState<GameScreen>("loading");
   const [lives, setLives] = useState(MAX_LIVES);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
@@ -83,16 +187,31 @@ export function useGameScreenFlow() {
 
     let isCurrentLoadingScreen = true;
 
-    preloadAllGameAssets().then(() => {
+    preloadAllGameAssets((nextStatus) => {
       if (isCurrentLoadingScreen) {
-        setScreen("main");
+        setPreloadStatus(nextStatus);
       }
-    });
+    })
+      .then(() => {
+        if (isCurrentLoadingScreen) {
+          setScreen("main");
+        }
+      })
+      .catch((error: unknown) => {
+        console.error(error);
+      });
 
     return () => {
       isCurrentLoadingScreen = false;
     };
-  }, [screen]);
+  }, [preloadAttempt, screen]);
+
+  const retryPreload = useCallback(() => {
+    resetPreloadCache();
+    setPreloadStatus(INITIAL_PRELOAD_STATUS);
+    setPreloadAttempt((currentAttempt) => currentAttempt + 1);
+    setScreen("loading");
+  }, []);
 
   const startGame = useCallback(() => {
     setFinalClearedRound(0);
@@ -124,13 +243,16 @@ export function useGameScreenFlow() {
     setScreen("main");
   }, []);
 
-  const recordSuccess = useCallback((roundNumber: number) => {
-    recordHighestClearedRound(roundNumber);
-    setFinalClearedRound((currentFinalClearedRound) =>
-      Math.max(currentFinalClearedRound, roundNumber),
-    );
-    setRoundResult("success");
-  }, [recordHighestClearedRound]);
+  const recordSuccess = useCallback(
+    (roundNumber: number) => {
+      recordHighestClearedRound(roundNumber);
+      setFinalClearedRound((currentFinalClearedRound) =>
+        Math.max(currentFinalClearedRound, roundNumber),
+      );
+      setRoundResult("success");
+    },
+    [recordHighestClearedRound],
+  );
 
   const resetRoundResult = useCallback(() => {
     setRoundResult("idle");
@@ -162,9 +284,11 @@ export function useGameScreenFlow() {
     lives,
     loseLife,
     maxLives: MAX_LIVES,
+    preloadStatus,
     recordSuccess,
     resetRoundResult,
     restartGame,
+    retryPreload,
     returnToMain,
     roundResult,
     screen,

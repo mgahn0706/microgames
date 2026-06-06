@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import type { PreloadStatus } from "@/hooks/useGameScreenFlow";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
 import { useGameSetupTransition } from "@/hooks/useGameSetupTransition";
 import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
@@ -139,8 +140,27 @@ export function SetupScreen({
   );
 }
 
-export function LoadingScreen() {
+function getDisplayAssetPath(assetPath: string) {
+  if (!assetPath) {
+    return "";
+  }
+
+  return assetPath.length > 88 ? `...${assetPath.slice(-85)}` : assetPath;
+}
+
+export function LoadingScreen({
+  onRetry,
+  preloadStatus,
+}: Readonly<{
+  onRetry: () => void;
+  preloadStatus: PreloadStatus;
+}>) {
   useBgmTrack("resultsAndMain", "loop", "now");
+  const progress =
+    preloadStatus.total > 0
+      ? Math.round((preloadStatus.loaded / preloadStatus.total) * 100)
+      : 0;
+  const isFailed = preloadStatus.phase === "failed";
 
   return (
     <NeonShell>
@@ -164,6 +184,41 @@ export function LoadingScreen() {
         </div>
         <div className="mx-auto my-8 h-4 max-w-md overflow-hidden rounded-full border border-cyan-100/70 bg-black">
           <div className="neon-loading-bar h-full rounded-full bg-cyan-200" />
+        </div>
+        <div className="mx-auto max-w-xl rounded-md border border-cyan-100/25 bg-black/35 p-3 text-left text-xs leading-5 text-cyan-50/75">
+          <div className="flex items-center justify-between gap-3 font-black text-cyan-100">
+            <span>{isFailed ? "프리로딩 실패" : "프리로딩 중"}</span>
+            <span>
+              {preloadStatus.loaded}/{preloadStatus.total} · {progress}%
+            </span>
+          </div>
+          {isFailed ? (
+            <div className="mt-2 space-y-1 text-red-100">
+              <p>
+                실패 asset:{" "}
+                <span className="break-all font-black">
+                  {getDisplayAssetPath(preloadStatus.failedAsset ?? "")}
+                </span>
+              </p>
+              <p className="break-all text-red-100/75">
+                {preloadStatus.errorMessage}
+              </p>
+              <button
+                className="mt-2 rounded border border-red-100/45 px-3 py-1 text-xs font-black text-red-50 transition hover:bg-red-500/20"
+                onClick={onRetry}
+                type="button"
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : (
+            <p className="mt-2 break-all text-cyan-50/65">
+              현재 로드:{" "}
+              <span className="font-black">
+                {getDisplayAssetPath(preloadStatus.currentAsset)}
+              </span>
+            </p>
+          )}
         </div>
       </div>
     </NeonShell>
