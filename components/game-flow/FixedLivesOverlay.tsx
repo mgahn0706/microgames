@@ -6,6 +6,13 @@ import { useState } from "react";
 import type { SynchronizedRhythmStyle } from "@/hooks/useSynchronizedRhythm";
 import { LIFE_LABELS } from "./gameFlowConstants";
 
+type LifeAnimationState = Readonly<{
+  animationKey: number;
+  gainedLifeIndexes: readonly number[];
+  lives: number;
+  lostLifeIndexes: readonly number[];
+}>;
+
 export function FixedLivesOverlay({
   animateSetup = false,
   getStaggeredRhythmStyle,
@@ -17,21 +24,38 @@ export function FixedLivesOverlay({
   lives: number;
   maxLives: number;
 }>) {
-  const [lifeAnimationState, setLifeAnimationState] = useState({
-    lives,
-    lostLifeIndexes: [] as readonly number[],
-  });
+  const [lifeAnimationState, setLifeAnimationState] =
+    useState<LifeAnimationState>({
+      animationKey: 0,
+      gainedLifeIndexes: [],
+      lives,
+      lostLifeIndexes: [],
+    });
 
   if (lifeAnimationState.lives !== lives) {
+    const previousLives = lifeAnimationState.lives;
+
     const lostLifeIndexes =
-      !animateSetup && lives < lifeAnimationState.lives
+      !animateSetup && lives < previousLives
         ? Array.from(
-            { length: lifeAnimationState.lives - lives },
+            { length: previousLives - lives },
             (_, offset) => lives + offset,
           )
         : [];
+    const gainedLifeIndexes =
+      !animateSetup && lives > previousLives
+        ? Array.from(
+            { length: lives - previousLives },
+            (_, offset) => previousLives + offset,
+          )
+        : [];
 
-    setLifeAnimationState({ lives, lostLifeIndexes });
+    setLifeAnimationState({
+      animationKey: lifeAnimationState.animationKey + 1,
+      gainedLifeIndexes,
+      lives,
+      lostLifeIndexes,
+    });
   }
 
   return (
@@ -44,8 +68,11 @@ export function FixedLivesOverlay({
       >
         {LIFE_LABELS.map((label, index) => {
           const isActive = index < lives;
+          const shouldAnimateGainedLife =
+            lifeAnimationState.gainedLifeIndexes.includes(index);
           const shouldAnimateLostLife =
             lifeAnimationState.lostLifeIndexes.includes(index);
+          const lifeAnimationKey = `${label}-${lifeAnimationState.animationKey}`;
           const lifeSlotStyle = {
             "--setup-life-delay": animateSetup ? `${index * 140}ms` : "0ms",
             left: `${12.5 + index * 25}%`,
@@ -70,7 +97,10 @@ export function FixedLivesOverlay({
                   sizes="(min-width: 1024px) 176px, (min-width: 640px) 144px, 96px"
                   className={`object-contain transition-opacity duration-300 ${
                     isActive ? "opacity-0" : "opacity-100"
-                  } ${shouldAnimateLostLife ? "life-bone-enter" : ""}`}
+                  } ${shouldAnimateLostLife ? "life-bone-enter" : ""} ${
+                    shouldAnimateGainedLife ? "life-bone-exit" : ""
+                  }`}
+                  key={`inactive-${lifeAnimationKey}`}
                   unoptimized
                 />
                 <Image
@@ -82,7 +112,10 @@ export function FixedLivesOverlay({
                     isActive
                       ? "opacity-100 drop-shadow-[0_0_18px_#67e8f9]"
                       : "opacity-0"
-                  } ${shouldAnimateLostLife ? "life-active-exit" : ""}`}
+                  } ${shouldAnimateLostLife ? "life-active-exit" : ""} ${
+                    shouldAnimateGainedLife ? "life-active-enter" : ""
+                  }`}
+                  key={`active-${lifeAnimationKey}`}
                   unoptimized
                 />
               </div>

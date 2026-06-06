@@ -158,12 +158,14 @@ export function MicrogameRoundScreen({
   isTransitioning = false,
   microgame,
   onFinish,
+  roundNumber,
 }: Readonly<{
   beatsLeft: number;
   canRecordResult: boolean;
   isTransitioning?: boolean;
   microgame: Microgame;
   onFinish: () => void;
+  roundNumber: number;
 }>) {
   return (
     <div
@@ -171,7 +173,10 @@ export function MicrogameRoundScreen({
         isTransitioning ? "microgame-canvas-transition pointer-events-none" : ""
       }`}
     >
-      <MicrogameCanvas microgame={microgame} />
+      <MicrogameCanvas
+        key={`${roundNumber}-${microgame.id}`}
+        microgame={microgame}
+      />
       {isTransitioning ? null : (
         <>
           <div className="timer-beat-shell absolute left-4 top-4 size-28 sm:left-6 sm:top-6 sm:size-32">

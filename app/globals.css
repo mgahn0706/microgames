@@ -113,6 +113,47 @@ body {
   }
 }
 
+@keyframes life-active-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.58) rotate(12deg);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+
+  58% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.18) rotate(-6deg);
+    filter: drop-shadow(0 0 28px #67e8f9);
+  }
+
+  78% {
+    transform: translateY(4px) scale(0.96) rotate(3deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 18px #67e8f9);
+  }
+}
+
+@keyframes life-bone-exit {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  42% {
+    opacity: 1;
+    transform: scale(0.9) rotate(-8deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.55) rotate(16deg);
+  }
+}
+
 @keyframes game-over-comic-drop {
   0% {
     opacity: 0;
@@ -457,6 +498,16 @@ body {
 
 .life-bone-enter {
   animation: life-bone-enter 620ms cubic-bezier(0.18, 0.88, 0.22, 1.14) both;
+  transform-origin: center;
+}
+
+.life-active-enter {
+  animation: life-active-enter 620ms cubic-bezier(0.18, 0.88, 0.22, 1.14) both;
+  transform-origin: center;
+}
+
+.life-bone-exit {
+  animation: life-bone-exit 460ms cubic-bezier(0.34, 0.02, 0.36, 1) both;
   transform-origin: center;
 }
 

@@ -55,17 +55,129 @@ function FormInstructionImageCache() {
   );
 }
 
-function shuffleMicrogames(microgames: readonly Microgame[]) {
+function createSeededRandom(seed: number) {
+  let state = seed >>> 0;
+
+  return () => {
+    state += 0x6d2b79f5;
+
+    let value = state;
+
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function getStringHash(value: string) {
+  return Array.from(value).reduce(
+    (hash, character) => (Math.imul(hash, 31) + character.charCodeAt(0)) >>> 0,
+    0,
+  );
+}
+
+function shuffleMicrogames(microgames: readonly Microgame[], seed: number) {
   const nextMicrogames = [...microgames];
+  const random = createSeededRandom(seed);
 
   for (let index = nextMicrogames.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
+    const swapIndex = Math.floor(random() * (index + 1));
     const currentMicrogame = nextMicrogames[index];
     const swapMicrogame = nextMicrogames[swapIndex];
 
     nextMicrogames[index] = swapMicrogame;
     nextMicrogames[swapIndex] = currentMicrogame;
   }
+
+  return nextMicrogames;
+}
+
+function getRoundMicrogame(roundNumber: number, sessionSeed: number) {
+  const bagStates: Record<
+    string,
+    {
+      bag: Microgame[];
+      previousMicrogame: Microgame | undefined;
+      refillCount: number;
+    }
+  > = {};
+  let selectedMicrogame: Microgame | undefined;
+
+  for (
+    let currentRoundNumber = 1;
+    currentRoundNumber <= roundNumber;
+    currentRoundNumber += 1
+  ) {
+    const microgamePool = getMicrogamePoolForRound(currentRoundNumber);
+    const bagKey = microgamePool.map(({ id }) => id).join("|");
+    const bagState = bagStates[bagKey] ?? {
+      bag: [],
+      previousMicrogame: undefined,
+      refillCount: 0,
+    };
+    const shouldRefill = bagState.bag.length === 0;
+    const refillSeed =
+      (sessionSeed +
+        getStringHash(bagKey) +
+        bagState.refillCount * 2654435761) >>>
+      0;
+    const nextBag = shouldRefill
+      ? avoidImmediateMicrogameRepeat(
+          shuffleMicrogames(microgamePool, refillSeed),
+          bagState.previousMicrogame,
+        )
+      : bagState.bag;
+    const [nextMicrogame, ...remainingMicrogames] = nextBag;
+
+    if (!nextMicrogame) {
+      throw new Error("Microgame pool must include at least one game.");
+    }
+
+    selectedMicrogame = nextMicrogame;
+    bagStates[bagKey] = {
+      bag: remainingMicrogames,
+      previousMicrogame: nextMicrogame,
+      refillCount: shouldRefill
+        ? bagState.refillCount + 1
+        : bagState.refillCount,
+    };
+  }
+
+  if (!selectedMicrogame) {
+    throw new Error("Round number must be at least 1.");
+  }
+
+  return selectedMicrogame;
+}
+
+function avoidImmediateMicrogameRepeat(
+  microgames: readonly Microgame[],
+  previousMicrogame: Microgame | undefined,
+) {
+  const nextMicrogames = [...microgames];
+
+  if (
+    !previousMicrogame ||
+    nextMicrogames.length <= 1 ||
+    nextMicrogames[0]?.id !== previousMicrogame.id
+  ) {
+    return nextMicrogames;
+  }
+
+  const replacementIndex = nextMicrogames.findIndex(
+    (microgame) => microgame.id !== previousMicrogame.id,
+  );
+
+  if (replacementIndex <= 0) {
+    return nextMicrogames;
+  }
+
+  const repeatedMicrogame = nextMicrogames[0];
+  const replacementMicrogame = nextMicrogames[replacementIndex];
+
+  nextMicrogames[0] = replacementMicrogame;
+  nextMicrogames[replacementIndex] = repeatedMicrogame;
 
   return nextMicrogames;
 }
@@ -87,29 +199,16 @@ export function GameScreen({
   onResetResult: () => void;
   onSuccess: (roundNumber: number) => void;
 }>) {
-  const microgameBagsRef = useRef<Record<string, Microgame[]>>({});
-  const selectedMicrogamesRef = useRef<Record<number, Microgame>>({});
   const oneUpAppliedRoundRef = useRef<number | null>(null);
   const clearSoundPlayedRoundRef = useRef<number | null>(null);
-  const getRoundMicrogame = useCallback((nextRoundNumber: number) => {
-    const selectedMicrogame = selectedMicrogamesRef.current[nextRoundNumber];
-
-    if (selectedMicrogame) {
-      return selectedMicrogame;
-    }
-
-    const microgamePool = getMicrogamePoolForRound(nextRoundNumber);
-    const bagKey = microgamePool.map(({ id }) => id).join("|");
-    const currentBag = microgameBagsRef.current[bagKey] ?? [];
-    const nextBag =
-      currentBag.length > 0 ? currentBag : shuffleMicrogames(microgamePool);
-    const [nextMicrogame, ...remainingMicrogames] = nextBag;
-
-    microgameBagsRef.current[bagKey] = remainingMicrogames;
-    selectedMicrogamesRef.current[nextRoundNumber] = nextMicrogame;
-
-    return nextMicrogame;
-  }, []);
+  const [microgameSessionSeed] = useState(() =>
+    Math.floor(Math.random() * 4294967296),
+  );
+  const getMicrogameForRound = useCallback(
+    (nextRoundNumber: number) =>
+      getRoundMicrogame(nextRoundNumber, microgameSessionSeed),
+    [microgameSessionSeed],
+  );
 
   const {
     beatDurationMs,
@@ -117,12 +216,13 @@ export function GameScreen({
     gameBeatCount,
     instructionStep,
     phase,
+    recordFailure,
     recordSuccess,
     roundNumber,
     roundResult,
   } = useBeatGameRound({
     getGameBeatCount: (nextRoundNumber) =>
-      getRoundMicrogame(nextRoundNumber).beatCount,
+      getMicrogameForRound(nextRoundNumber).beatCount,
     onFailure: onLoseLife,
     onFinish,
     onResetResult,
@@ -133,9 +233,10 @@ export function GameScreen({
   const { getStaggeredRhythmStyle, rhythmStyle } =
     useSynchronizedRhythm(beatDurationMs);
   const microgame = useMemo(
-    () => getRoundMicrogame(roundNumber),
-    [getRoundMicrogame, roundNumber],
+    () => getMicrogameForRound(roundNumber),
+    [getMicrogameForRound, roundNumber],
   );
+
   const canRecordResult = phase === "game";
   const backdropTone =
     phase === "bossStage" || phase === "speedUp" ? "warning" : "default";
@@ -163,6 +264,7 @@ export function GameScreen({
     isActive: phase === "game",
     microgame,
     onClear: recordSuccessWithClearSound,
+    onFailure: recordFailure,
     roundNumber,
   });
 
@@ -177,8 +279,107 @@ export function GameScreen({
     }
 
     if (phase === "game") {
+      if (microgame.canvas === "animalCrossingStamps") {
+        bgmLibrary
+          .play("animalCrossing", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
+        return;
+      }
+
+      if (microgame.canvas === "brainAcademyBlocks") {
+        bgmLibrary
+          .play("brainAcademy", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
+        return;
+      }
+
+      if (microgame.canvas === "animalFarmReverseTyping") {
+        bgmLibrary.play("animalFarm", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "geometryDashSpikes") {
+        bgmLibrary
+          .play("geometryDash", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
+        return;
+      }
+
+      if (microgame.canvas === "pokemonTyping") {
+        bgmLibrary.play("pokemon", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "undertaleMouse") {
         bgmLibrary.play("undertale", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "superMarioCoins") {
+        bgmLibrary.play("superMario", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "tetrisLineClear") {
+        bgmLibrary.play("tetris", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "minecraftMining") {
+        bgmLibrary.play("minecraft", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "maplestoryLieDetector") {
+        bgmLibrary.play("maplestory", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "laytonShapeMatch") {
+        bgmLibrary.play("layton", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "leagueChampionBan") {
+        bgmLibrary
+          .play("leagueOfLegend", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
+        return;
+      }
+
+      if (microgame.canvas === "maplestoryRune") {
+        bgmLibrary.play("mapleRune", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "kartriderCourse") {
+        bgmLibrary.play("kartrider", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
         return;
@@ -285,6 +486,7 @@ export function GameScreen({
           isTransitioning={shouldShowCanvasTransition}
           microgame={microgame}
           onFinish={onFinish}
+          roundNumber={roundNumber}
         />
       ) : phase === "speedUp" ? (
         <SpeedUpScreen />

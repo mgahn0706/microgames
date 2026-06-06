@@ -15,6 +15,19 @@ const QUESTION_BLOCK_SIZE = 58;
 const TARGET_MIN = 3;
 const TARGET_MAX = 7;
 const SUCCESS_WINDOW_MS = 120;
+const MARIO_SOUND_EFFECT_VOLUME = 0.25;
+
+const SUPER_MARIO_ASSETS = {
+  background: "/games/supermario/images/background.png",
+  block: "/games/supermario/images/block.png",
+  coin: "/games/supermario/images/coin.png",
+  mario: "/games/supermario/images/mario.png",
+} as const;
+
+const SUPER_MARIO_SOUNDS = {
+  coin: "/games/supermario/sounds/coin-sound.mp3",
+  jump: "/games/supermario/sounds/jump-sound.mp3",
+} as const;
 
 type GameState = {
   collectedCoins: number;
@@ -24,6 +37,8 @@ type GameState = {
   lastTimestamp: number | null;
   targetCoins: number;
 };
+
+type LoadedImages = Record<keyof typeof SUPER_MARIO_ASSETS, HTMLImageElement>;
 
 function getBeatDurationMs(canvas: HTMLCanvasElement) {
   const rawDuration = window
@@ -53,127 +68,119 @@ function dispatchClear() {
   window.dispatchEvent(new CustomEvent(MICROGAME_CLEAR_EVENT));
 }
 
-function playTone(
-  frequency: number,
-  durationSeconds: number,
-  type: OscillatorType,
-  volume = 0.12,
-) {
-  const audioContext = new AudioContext();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  const startAt = audioContext.currentTime;
-  const stopAt = startAt + durationSeconds;
+function preloadImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
 
-  oscillator.frequency.setValueAtTime(frequency, startAt);
-  oscillator.type = type;
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  gainNode.gain.setValueAtTime(0, startAt);
-  gainNode.gain.linearRampToValueAtTime(volume, startAt + 0.012);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, stopAt);
-  oscillator.start(startAt);
-  oscillator.stop(stopAt);
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error(`Failed to preload ${src}`));
+    image.src = src;
+  });
 }
 
-function playJumpSound() {
-  playTone(330, 0.1, "square", 0.08);
-  window.setTimeout(() => playTone(494, 0.08, "square", 0.06), 36);
+async function preloadSuperMarioImages() {
+  const [background, block, coin, mario] = await Promise.all([
+    preloadImage(SUPER_MARIO_ASSETS.background),
+    preloadImage(SUPER_MARIO_ASSETS.block),
+    preloadImage(SUPER_MARIO_ASSETS.coin),
+    preloadImage(SUPER_MARIO_ASSETS.mario),
+  ]);
+
+  return { background, block, coin, mario } satisfies LoadedImages;
 }
 
-function playCoinSound() {
-  playTone(988, 0.08, "triangle", 0.11);
-  window.setTimeout(() => playTone(1319, 0.08, "triangle", 0.1), 58);
-}
-
-function playReadySound() {
-  playTone(1568, 0.12, "triangle", 0.12);
-}
-
-function drawBrickGround(
-  context: CanvasRenderingContext2D,
-  width: number,
-  groundY: number,
-) {
-  context.fillStyle = "#a9471d";
-  context.fillRect(0, groundY, width, 120);
-  context.strokeStyle = "#5f240f";
-  context.lineWidth = 2;
-
-  for (let x = 0; x < width; x += 42) {
-    context.strokeRect(x, groundY, 42, 30);
-    context.strokeRect(x - 21, groundY + 30, 42, 30);
-    context.strokeRect(x, groundY + 60, 42, 30);
+function playAudio(audio: HTMLAudioElement | null, volume = 1) {
+  if (!audio) {
+    return;
   }
+
+  audio.volume = volume;
+  audio.currentTime = 0;
+  audio.play().catch(() => {
+    // Audio can be blocked before a trusted input unlocks playback.
+  });
+}
+
+function drawCoverImage(
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  width: number,
+  height: number,
+) {
+  const scale = Math.max(
+    width / image.naturalWidth,
+    height / image.naturalHeight,
+  );
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+
+  context.drawImage(
+    image,
+    (width - drawWidth) / 2,
+    (height - drawHeight) / 2,
+    drawWidth,
+    drawHeight,
+  );
 }
 
 function drawCoin(
   context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
   x: number,
   y: number,
   isCollected: boolean,
 ) {
+  const size = 42;
+
   context.globalAlpha = isCollected ? 0.35 : 1;
-  context.fillStyle = "#facc15";
-  context.beginPath();
-  context.ellipse(x, y, 15, 20, 0, 0, Math.PI * 2);
-  context.fill();
-  context.strokeStyle = "#fef08a";
-  context.lineWidth = 4;
-  context.stroke();
+  context.drawImage(image, x - size / 2, y - size / 2, size, size);
   context.globalAlpha = 1;
 }
 
 function drawQuestionBlock(
   context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
   x: number,
   y: number,
   lift: number,
 ) {
   const blockY = y - lift;
 
-  context.fillStyle = "#f59e0b";
-  context.fillRect(x, blockY, QUESTION_BLOCK_SIZE, QUESTION_BLOCK_SIZE);
-  context.strokeStyle = "#92400e";
-  context.lineWidth = 4;
-  context.strokeRect(x, blockY, QUESTION_BLOCK_SIZE, QUESTION_BLOCK_SIZE);
-  context.fillStyle = "#fde68a";
-  context.fillRect(x + 8, blockY + 8, 10, 10);
-  context.fillRect(x + 40, blockY + 8, 10, 10);
-  drawCenteredText(
-    context,
-    "?",
-    x + QUESTION_BLOCK_SIZE / 2,
-    blockY + QUESTION_BLOCK_SIZE / 2 + 1,
-    34,
-    "#7c2d12",
-  );
+  context.drawImage(image, x, blockY, QUESTION_BLOCK_SIZE, QUESTION_BLOCK_SIZE);
 }
 
-function drawMario(context: CanvasRenderingContext2D, x: number, y: number) {
-  context.fillStyle = "#dc2626";
-  context.fillRect(x + 8, y, 38, 20);
-  context.fillStyle = "#f8b47a";
-  context.fillRect(x + 12, y + 18, 34, 22);
-  context.fillStyle = "#2563eb";
-  context.fillRect(x + 8, y + 38, 38, 28);
-  context.fillStyle = "#7f1d1d";
-  context.fillRect(x, y + 66, 22, 10);
-  context.fillRect(x + 32, y + 66, 22, 10);
+function drawMario(
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+) {
+  const aspectRatio =
+    image.naturalHeight > 0 ? image.naturalWidth / image.naturalHeight : 1;
+  const width = MARIO_HEIGHT * aspectRatio;
+
+  context.drawImage(
+    image,
+    x + (MARIO_WIDTH - width) / 2,
+    y,
+    width,
+    MARIO_HEIGHT,
+  );
 }
 
 function drawScene(
   context: CanvasRenderingContext2D,
   state: GameState,
+  images: LoadedImages,
   width: number,
   height: number,
   remainingMs: number,
 ) {
-  const groundY = height * 0.72;
+  const groundY = height * 0.89;
   const marioX = width / 2 - MARIO_WIDTH / 2;
   const blockX = width / 2 - QUESTION_BLOCK_SIZE / 2;
   const blockY =
-    groundY - MARIO_HEIGHT - JUMP_HEIGHT - QUESTION_BLOCK_SIZE + 16;
+    groundY - MARIO_HEIGHT - JUMP_HEIGHT - QUESTION_BLOCK_SIZE + 20;
   const jumpProgress = Math.min(state.jumpAgeMs / 360, 1);
   const jumpOffset =
     jumpProgress < 1 ? Math.sin(jumpProgress * Math.PI) * JUMP_HEIGHT : 0;
@@ -185,24 +192,16 @@ function drawScene(
       ? Math.sin((state.jumpAgeMs / 180) * Math.PI) * 10
       : 0;
 
-  context.fillStyle = "#60a5fa";
-  context.fillRect(0, 0, width, height);
+  drawCoverImage(context, images.background, width, height);
 
-  context.fillStyle = "#ffffff";
-  context.beginPath();
-  context.arc(width * 0.18, height * 0.18, 34, 0, Math.PI * 2);
-  context.arc(width * 0.22, height * 0.17, 42, 0, Math.PI * 2);
-  context.arc(width * 0.27, height * 0.19, 32, 0, Math.PI * 2);
-  context.fill();
-
-  drawBrickGround(context, width, groundY);
-  drawQuestionBlock(context, blockX, blockY, blockLift);
-  drawMario(context, marioX, marioY);
+  drawQuestionBlock(context, images.block, blockX, blockY, blockLift);
+  drawMario(context, images.mario, marioX, marioY);
 
   Array.from({ length: state.targetCoins }, (_, index) => {
-    const startX = width * 0.55 - (state.targetCoins - 1) * 21;
+    const startX = width / 2 - (state.targetCoins - 1) * 21;
     drawCoin(
       context,
+      images.coin,
       startX + index * 42,
       height * 0.27,
       index < state.collectedCoins,
@@ -210,7 +209,7 @@ function drawScene(
   });
 
   if (state.jumpAgeMs < 440) {
-    drawCoin(context, width / 2, activeCoinY, false);
+    drawCoin(context, images.coin, width / 2, activeCoinY, false);
   }
 
   context.fillStyle = "#111827";
@@ -220,7 +219,7 @@ function drawScene(
   context.strokeRect(width / 2 - 214, 20, 428, 118);
   drawCenteredText(
     context,
-    `TARGET ${state.targetCoins} COINS`,
+    `목표 코인 ${state.targetCoins}개`,
     width / 2,
     56,
     32,
@@ -238,22 +237,20 @@ function drawScene(
   if (state.collectedCoins > state.targetCoins) {
     drawCenteredText(
       context,
-      "TOO MANY!",
+      "너무 많아요!",
       width / 2,
       height * 0.5,
       44,
       "#ef4444",
     );
-  } else if (
-    state.collectedCoins === state.targetCoins &&
-    remainingMs > SUCCESS_WINDOW_MS
-  ) {
-    drawCenteredText(context, "STOP!", width / 2, height * 0.5, 44, "#22c55e");
   }
 }
 
 export function useSuperMarioCoinGameCanvas(gameBeatCount: number) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const coinAudioRef = useRef<HTMLAudioElement | null>(null);
+  const imagesRef = useRef<LoadedImages | null>(null);
+  const jumpAudioRef = useRef<HTMLAudioElement | null>(null);
   const stateRef = useRef<GameState>(createInitialState());
 
   useEffect(() => {
@@ -273,6 +270,7 @@ export function useSuperMarioCoinGameCanvas(gameBeatCount: number) {
     let beatDurationMs = getBeatDurationMs(canvas);
     let canvasHeight = MIN_CANVAS_HEIGHT;
     let canvasWidth = MIN_CANVAS_WIDTH;
+    let isDisposed = false;
     const pixelRatio = window.devicePixelRatio || 1;
 
     const resizeCanvas = () => {
@@ -297,11 +295,12 @@ export function useSuperMarioCoinGameCanvas(gameBeatCount: number) {
       event.stopImmediatePropagation();
       state.collectedCoins += 1;
       state.jumpAgeMs = 0;
-      playJumpSound();
-      playCoinSound();
+      playAudio(jumpAudioRef.current, MARIO_SOUND_EFFECT_VOLUME);
+      playAudio(coinAudioRef.current, MARIO_SOUND_EFFECT_VOLUME);
     };
 
     const render = (timestamp: number) => {
+      const images = imagesRef.current;
       const state = stateRef.current;
       const deltaSeconds =
         state.lastTimestamp === null
@@ -318,7 +317,22 @@ export function useSuperMarioCoinGameCanvas(gameBeatCount: number) {
 
       const remainingMs = Math.max(phaseDurationMs - state.elapsedMs, 0);
 
-      drawScene(context, state, canvasWidth, canvasHeight, remainingMs);
+      if (!images) {
+        context.fillStyle = "#60a5fa";
+        context.fillRect(0, 0, canvasWidth, canvasHeight);
+        drawCenteredText(
+          context,
+          "불러오는 중",
+          canvasWidth / 2,
+          canvasHeight / 2,
+          32,
+          "#ffffff",
+        );
+        animationFrame = window.requestAnimationFrame(render);
+        return;
+      }
+
+      drawScene(context, state, images, canvasWidth, canvasHeight, remainingMs);
 
       if (
         !state.hasCleared &&
@@ -327,7 +341,7 @@ export function useSuperMarioCoinGameCanvas(gameBeatCount: number) {
         state.collectedCoins === state.targetCoins
       ) {
         state.hasCleared = true;
-        playReadySound();
+        playAudio(coinAudioRef.current, MARIO_SOUND_EFFECT_VOLUME);
         dispatchClear();
       }
 
@@ -335,11 +349,23 @@ export function useSuperMarioCoinGameCanvas(gameBeatCount: number) {
     };
 
     resizeCanvas();
+    coinAudioRef.current = new Audio(SUPER_MARIO_SOUNDS.coin);
+    jumpAudioRef.current = new Audio(SUPER_MARIO_SOUNDS.jump);
+    preloadSuperMarioImages()
+      .then((images) => {
+        if (!isDisposed) {
+          imagesRef.current = images;
+        }
+      })
+      .catch((error: unknown) => {
+        console.error(error);
+      });
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("keydown", handleSpace, { capture: true });
     animationFrame = window.requestAnimationFrame(render);
 
     return () => {
+      isDisposed = true;
       window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("keydown", handleSpace, { capture: true });
