@@ -7,10 +7,10 @@ export type MicrogameControl =
   | "koreanKeyboard"
   | "microphone"
   | "mouseClick"
+  | "mouseDrag"
   | "numberKeys"
   | "scroll"
-  | "space"
-  | "wasd";
+  | "space";
 
 export type MicrogameType = "boss" | "normal";
 export type MicrogameCanvas =
@@ -45,15 +45,15 @@ export type Microgame = Readonly<{
 }>;
 
 const FORM_INSTRUCTIONS_BY_CONTROL = {
-  arrowAndSpace: FORM_INSTRUCTIONS[3],
-  arrowKeys: FORM_INSTRUCTIONS[1],
-  koreanKeyboard: FORM_INSTRUCTIONS[7],
-  microphone: FORM_INSTRUCTIONS[8],
-  mouseClick: FORM_INSTRUCTIONS[4],
-  numberKeys: FORM_INSTRUCTIONS[6],
-  scroll: FORM_INSTRUCTIONS[5],
-  space: FORM_INSTRUCTIONS[0],
-  wasd: FORM_INSTRUCTIONS[2],
+  arrowAndSpace: getFormInstructionByControl("arrowAndSpace"),
+  arrowKeys: getFormInstructionByControl("arrowKeys"),
+  koreanKeyboard: getFormInstructionByControl("koreanKeyboard"),
+  microphone: getFormInstructionByControl("microphone"),
+  mouseClick: getFormInstructionByControl("mouseClick"),
+  mouseDrag: getFormInstructionByControl("mouseDrag"),
+  numberKeys: getFormInstructionByControl("numberKeys"),
+  scroll: getFormInstructionByControl("scroll"),
+  space: getFormInstructionByControl("space"),
 } satisfies Record<MicrogameControl, FormInstruction>;
 
 export const MICROGAMES = [
@@ -70,7 +70,7 @@ export const MICROGAMES = [
   {
     beatCount: 14,
     canvas: "amongUsWires",
-    control: "mouseClick",
+    control: "mouseDrag",
     id: "among-us-wire-task",
     startPrompt: "전선을 연결해라!",
     title: "어몽어스",
@@ -130,7 +130,7 @@ export const MICROGAMES = [
   {
     beatCount: 8,
     canvas: "minecraftMining",
-    control: "mouseClick",
+    control: "mouseDrag",
     id: "minecraft-diamond-mining",
     startPrompt: "다이아몬드를 캐라!",
     title: "Minecraft",
@@ -268,6 +268,18 @@ export function getMicrogameFormInstruction(microgame: Microgame) {
   return FORM_INSTRUCTIONS_BY_CONTROL[microgame.control];
 }
 
+function getFormInstructionByControl(control: MicrogameControl) {
+  const formInstruction = FORM_INSTRUCTIONS.find(
+    (instruction) => instruction.control === control,
+  );
+
+  if (!formInstruction) {
+    throw new Error(`Missing form instruction for control: ${control}`);
+  }
+
+  return formInstruction;
+}
+
 export function isMicrogameClearKey(
   control: MicrogameControl,
   event: KeyboardEvent,
@@ -280,13 +292,6 @@ export function isMicrogameClearKey(
 
   if (control === "space") {
     return event.code === "Space";
-  }
-
-  if (control === "wasd") {
-    return (
-      ["KeyA", "KeyD", "KeyS", "KeyW"].includes(event.code) ||
-      ["a", "d", "s", "w"].includes(event.key.toLowerCase())
-    );
   }
 
   if (control === "arrowAndSpace") {

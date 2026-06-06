@@ -51,20 +51,20 @@
 
 ## 마이크로게임 목록
 
-| 게임              | 미션                        | 조작                | 박자 | 종류 |
-| ----------------- | --------------------------- | ------------------- | ---- | ---- |
-| Pokemon           | `이 포켓몬의 이름은?`       | 한글 키보드         | 12   | 일반 |
-| Among Us          | `전선을 연결해라!`          | 마우스              | 14   | 일반 |
-| 동물의 숲         | `도장을 세 번 찍어라!`      | 마우스              | 8    | 일반 |
-| Super Mario       | `코인을 정확히 모아라!`     | 스페이스바          | 8    | 일반 |
-| Jump              | `점프해라!`                 | 스페이스바          | 8    | 일반 |
-| Geometry Dash     | `가시를 피해라!`            | 스페이스바          | 12   | 일반 |
-| Tetris            | `4줄 없애라!`               | 방향키 + 스페이스바 | 12   | 일반 |
-| Minecraft         | `다이아몬드를 캐라!`        | 마우스 hold         | 8    | 일반 |
-| Piano             | `주어진 멜로디를 연주해라!` | 숫자키 1~9          | 10   | 일반 |
-| 말랑말랑 두뇌교실 | `블록은 몇 개?`             | 숫자키              | 12   | 일반 |
-| Undertale         | `피해라!`                   | 방향키              | 8    | 일반 |
-| AnimalFarm        | `단어를 거꾸로 써라!`       | 한글 키보드         | 36   | 보스 |
+| 게임              | 미션                    | 조작                | 박자 | 종류 |
+| ----------------- | ----------------------- | ------------------- | ---- | ---- |
+| Pokemon           | `이 포켓몬의 이름은?`   | 한글 키보드         | 12   | 일반 |
+| Among Us          | `전선을 연결해라!`      | 마우스 드래그       | 14   | 일반 |
+| 동물의 숲         | `도장을 세 번 찍어라!`  | 마우스 클릭         | 8    | 일반 |
+| Super Mario       | `코인을 정확히 모아라!` | 스페이스바          | 8    | 일반 |
+| Jump              | `점프해라!`             | 스페이스바          | 8    | 일반 |
+| Geometry Dash     | `가시를 피해라!`        | 스페이스바          | 12   | 일반 |
+| Tetris            | `4줄 없애라!`           | 방향키 + 스페이스바 | 12   | 일반 |
+| Minecraft         | `다이아몬드를 캐라!`    | 마우스 hold/drag    | 8    | 일반 |
+| Piano             | `멜로디를 연주해라!`    | 숫자키 1~9          | 10   | 일반 |
+| 말랑말랑 두뇌교실 | `블록은 몇 개?`         | 숫자키              | 12   | 일반 |
+| Undertale         | `피해라!`               | 방향키              | 8    | 일반 |
+| AnimalFarm        | `단어를 거꾸로 써라!`   | 한글 키보드         | 36   | 보스 |
 
 ## 플레이 감각
 
@@ -80,10 +80,11 @@
   <img src="./public/games/forms/images/space.png" alt="스페이스바 조작 안내" width="23%" />
   <img src="./public/games/forms/images/arrow-keys.png" alt="방향키 조작 안내" width="23%" />
   <img src="./public/games/forms/images/arrow-and-space.png" alt="방향키와 스페이스바 조작 안내" width="23%" />
-  <img src="./public/games/forms/images/mouse.png" alt="마우스 조작 안내" width="23%" />
+  <img src="./public/games/forms/images/click.png" alt="마우스 클릭 조작 안내" width="23%" />
+  <img src="./public/games/forms/images/drag.png" alt="마우스 드래그 조작 안내" width="23%" />
 </p>
 
-지원 control type은 `space`, `arrowKeys`, `arrowAndSpace`, `mouseClick`, `koreanKeyboard`, `numberKeys`, `scroll`, `wasd`, `microphone`입니다. 현재 등록된 마이크로게임은 이 중 일부를 사용합니다.
+지원 control type은 `space`, `arrowKeys`, `arrowAndSpace`, `mouseClick`, `mouseDrag`, `koreanKeyboard`, `numberKeys`, `scroll`, `microphone`입니다. 현재 등록된 마이크로게임은 이 중 일부를 사용합니다.
 
 ## 기술 스택
 
