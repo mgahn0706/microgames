@@ -10,10 +10,16 @@ const BACKGROUND_FRAME_STYLE = {
   width: "min(100vw, calc(100vh * 1672 / 941))",
 } as const;
 const CHECKBOX_OVERLAY_STYLE = {
-  height: "5.7%",
-  left: "26.1%",
-  top: "36.2%",
-  width: "3.2%",
+  height: "7.4%",
+  left: "25.5%",
+  top: "34.7%",
+  width: "4.7%",
+} as const;
+const SUBMIT_DISABLED_OVERLAY_STYLE = {
+  height: "11.4%",
+  left: "35.4%",
+  top: "45.7%",
+  width: "13.2%",
 } as const;
 
 function EmojiRain({ emoji }: Readonly<{ emoji: string }>) {
@@ -75,11 +81,17 @@ export function SubmitAssignmentGame({
       >
         {hasChecked ? (
           <div
-            className="absolute grid place-items-center text-[clamp(1.5rem,2.2vw,2.3rem)] font-black text-[#111827]"
+            className="absolute grid place-items-center text-[clamp(2.2rem,3.8vw,4rem)] font-black leading-none text-[#111827]"
             style={CHECKBOX_OVERLAY_STYLE}
           >
             ✓
           </div>
+        ) : null}
+        {!hasChecked ? (
+          <div
+            className="absolute rounded bg-white/54 shadow-[inset_0_0_0_2px_rgba(148,163,184,0.34)] backdrop-grayscale"
+            style={SUBMIT_DISABLED_OVERLAY_STYLE}
+          />
         ) : null}
       </div>
       {result === "success" ? <EmojiRain emoji="🎉" /> : null}

@@ -442,7 +442,7 @@ export const MICROGAMES = [
     },
     control: "arrowAndSpace",
     id: "crazy-arcade-water-bomb",
-    startPrompt: "물폭탄을 설치해라!",
+    startPrompt: "물풍선을 설치해라!",
     title: "크레이지 아케이드",
     type: "normal",
   },

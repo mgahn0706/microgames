@@ -1,22 +1,20 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Matter from "matter-js";
 import { MICROGAME_CLEAR_EVENT } from "@/hooks/useMicrogameInput";
-
-const { Bodies, Body, Composite, Engine, Vector } = Matter;
 
 const BOARD_IMAGE_SRC = "/games/flicking-game/images/board.png";
 const ENEMY_STONE_IMAGE_SRC = "/games/flicking-game/images/enemy-stone.png";
 const FLICK_SOUND_SRC = "/games/flicking-game/sounds/stone_flicking.mp3";
 const MY_STONE_IMAGE_SRC = "/games/flicking-game/images/my-stone.png";
+const MAX_CANVAS_PIXEL_RATIO = 1.5;
 const MAX_DELTA_MS = 34;
 const MAX_DRAG_DISTANCE = 190;
-const MAX_FLICK_SPEED = 21;
+const MAX_FLICK_SPEED = 1280;
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
-const STONE_DENSITY = 0.0032;
-const STONE_FRICTION_AIR = 0.018;
+const STOP_SPEED = 16;
+const STONE_DECELERATION = 780;
 const STONE_RESTITUTION = 0.94;
 
 type Point = Readonly<{
@@ -32,15 +30,24 @@ type BoardLayout = Readonly<{
   y: number;
 }>;
 
+type Stone = {
+  angle: number;
+  angularVelocity: number;
+  velocityX: number;
+  velocityY: number;
+  x: number;
+  y: number;
+};
+
 type GameState = {
   board: BoardLayout;
   dragPoint: Point | null;
-  engine: Matter.Engine;
-  enemyStone: Matter.Body;
+  enemyStone: Stone;
   hasCleared: boolean;
   isDragging: boolean;
   lastTimestamp: number | null;
-  myStone: Matter.Body;
+  myStone: Stone;
+  physicsActive: boolean;
 };
 
 function dispatchClear() {
@@ -80,47 +87,37 @@ function getBoardLayout(width: number, height: number) {
   } satisfies BoardLayout;
 }
 
-function createStone(x: number, y: number, radius: number) {
-  const stone = Bodies.circle(x, y, radius, {
-    density: STONE_DENSITY,
-    frictionAir: STONE_FRICTION_AIR,
-    frictionStatic: 0,
-    inertia: Infinity,
-    restitution: STONE_RESTITUTION,
-  });
-
-  Body.setMass(stone, 1);
-  return stone;
+function createStone(x: number, y: number) {
+  return {
+    angle: 0,
+    angularVelocity: 0,
+    velocityX: 0,
+    velocityY: 0,
+    x,
+    y,
+  } satisfies Stone;
 }
 
 function createInitialState(width: number, height: number) {
   const board = getBoardLayout(width, height);
-  const engine = Engine.create();
-
-  engine.gravity.y = 0;
-
   const myStone = createStone(
     board.x + board.width * 0.28,
     board.y + board.height * 0.5,
-    board.stoneRadius,
   );
   const enemyStone = createStone(
     board.x + board.width * 0.72,
     board.y + board.height * 0.5,
-    board.stoneRadius,
   );
-
-  Composite.add(engine.world, [myStone, enemyStone]);
 
   return {
     board,
     dragPoint: null,
-    engine,
     enemyStone,
     hasCleared: false,
     isDragging: false,
     lastTimestamp: null,
     myStone,
+    physicsActive: false,
   } satisfies GameState;
 }
 
@@ -129,12 +126,12 @@ function resetState(state: GameState, width: number, height: number) {
 
   state.board = nextState.board;
   state.dragPoint = null;
-  state.engine = nextState.engine;
   state.enemyStone = nextState.enemyStone;
   state.hasCleared = false;
   state.isDragging = false;
   state.lastTimestamp = null;
   state.myStone = nextState.myStone;
+  state.physicsActive = false;
 }
 
 function getPointerPoint(canvas: HTMLCanvasElement, event: PointerEvent) {
@@ -150,15 +147,23 @@ function getDistance(firstPoint: Point, secondPoint: Point) {
   return Math.hypot(firstPoint.x - secondPoint.x, firstPoint.y - secondPoint.y);
 }
 
-function getStonePoint(stone: Matter.Body) {
+function getStonePoint(stone: Stone) {
   return {
-    x: stone.position.x,
-    y: stone.position.y,
+    x: stone.x,
+    y: stone.y,
   } satisfies Point;
 }
 
-function isStoneSlow(stone: Matter.Body) {
-  return Vector.magnitude(stone.velocity) < 0.28;
+function getStoneSpeed(stone: Stone) {
+  return Math.hypot(stone.velocityX, stone.velocityY);
+}
+
+function isStoneSlow(stone: Stone) {
+  return getStoneSpeed(stone) < STOP_SPEED;
+}
+
+function isPhysicsSettled(state: GameState) {
+  return isStoneSlow(state.myStone) && isStoneSlow(state.enemyStone);
 }
 
 function isEnemyStoneOut(state: GameState) {
@@ -166,10 +171,10 @@ function isEnemyStoneOut(state: GameState) {
   const radius = board.stoneRadius;
 
   return (
-    enemyStone.position.x < board.x - radius ||
-    enemyStone.position.x > board.x + board.width + radius ||
-    enemyStone.position.y < board.y - radius ||
-    enemyStone.position.y > board.y + board.height + radius
+    enemyStone.x < board.x - radius ||
+    enemyStone.x > board.x + board.width + radius ||
+    enemyStone.y < board.y - radius ||
+    enemyStone.y > board.y + board.height + radius
   );
 }
 
@@ -188,7 +193,7 @@ function drawBoard(
   const { board } = state;
 
   context.save();
-  context.shadowBlur = 24;
+  context.shadowBlur = 12;
   context.shadowColor = "rgba(0, 0, 0, 0.36)";
 
   if (isImageReady(boardImage)) {
@@ -203,30 +208,49 @@ function drawBoard(
 
 function drawStone(
   context: CanvasRenderingContext2D,
-  stone: Matter.Body,
+  stone: Stone,
   radius: number,
   image: HTMLImageElement | null,
+  label: string,
+  accentColor: string,
 ) {
   const size = radius * 2.32;
-  const x = stone.position.x - size / 2;
-  const y = stone.position.y - size / 2;
+  const x = stone.x - size / 2;
+  const y = stone.y - size / 2;
 
   context.save();
-  context.translate(stone.position.x, stone.position.y);
+  context.translate(stone.x, stone.y);
   context.rotate(stone.angle);
-  context.translate(-stone.position.x, -stone.position.y);
-  context.shadowBlur = 18;
+  context.translate(-stone.x, -stone.y);
+  context.shadowBlur = 8;
   context.shadowColor = "rgba(0, 0, 0, 0.34)";
+
+  context.strokeStyle = accentColor;
+  context.lineWidth = Math.max(3, radius * 0.08);
+  context.beginPath();
+  context.arc(stone.x, stone.y, radius * 1.26, 0, Math.PI * 2);
+  context.stroke();
 
   if (isImageReady(image)) {
     context.drawImage(image, x, y, size, size);
   } else {
     context.beginPath();
     context.fillStyle = "#f8fafc";
-    context.arc(stone.position.x, stone.position.y, radius, 0, Math.PI * 2);
+    context.arc(stone.x, stone.y, radius, 0, Math.PI * 2);
     context.fill();
   }
 
+  context.restore();
+
+  context.save();
+  context.font = `800 ${Math.max(14, Math.floor(radius * 0.44))}px Arial, sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.lineWidth = 5;
+  context.strokeStyle = "rgba(0, 0, 0, 0.72)";
+  context.fillStyle = "#ffffff";
+  context.strokeText(label, stone.x, stone.y - radius * 1.72);
+  context.fillText(label, stone.x, stone.y - radius * 1.72);
   context.restore();
 }
 
@@ -277,7 +301,7 @@ function drawArrow(context: CanvasRenderingContext2D, state: GameState) {
   context.lineCap = "round";
   context.lineWidth = 8 + vector.power * 7;
   context.strokeStyle = `rgba(255, 245, 158, ${0.62 + vector.power * 0.32})`;
-  context.shadowBlur = 18;
+  context.shadowBlur = 10;
   context.shadowColor = "rgba(250, 204, 21, 0.82)";
   context.beginPath();
   context.moveTo(start.x, start.y);
@@ -322,21 +346,97 @@ function drawGauge(
   context.fill();
   context.stroke();
 
-  const gradient = context.createLinearGradient(
-    gaugeX,
-    gaugeY,
-    gaugeX + gaugeWidth,
-    gaugeY,
-  );
-
-  gradient.addColorStop(0, "#60a5fa");
-  gradient.addColorStop(0.62, "#facc15");
-  gradient.addColorStop(1, "#f97316");
-  context.fillStyle = gradient;
+  context.fillStyle =
+    power > 0.72 ? "#f97316" : power > 0.42 ? "#facc15" : "#60a5fa";
   context.beginPath();
   context.roundRect(gaugeX, gaugeY, gaugeWidth * power, gaugeHeight, 8);
   context.fill();
   context.restore();
+}
+
+function stopStone(stone: Stone) {
+  stone.angularVelocity = 0;
+  stone.velocityX = 0;
+  stone.velocityY = 0;
+}
+
+function applyDeceleration(stone: Stone, deltaSeconds: number) {
+  const speed = getStoneSpeed(stone);
+
+  if (speed <= 0) {
+    stopStone(stone);
+    return;
+  }
+
+  const nextSpeed = Math.max(speed - STONE_DECELERATION * deltaSeconds, 0);
+  const scale = nextSpeed / speed;
+
+  stone.velocityX *= scale;
+  stone.velocityY *= scale;
+
+  if (nextSpeed <= 0) {
+    stopStone(stone);
+  }
+}
+
+function moveStone(stone: Stone, radius: number, deltaSeconds: number) {
+  stone.x += stone.velocityX * deltaSeconds;
+  stone.y += stone.velocityY * deltaSeconds;
+  stone.angularVelocity = stone.velocityX / Math.max(radius, 1);
+  stone.angle += stone.angularVelocity * deltaSeconds;
+}
+
+function resolveStoneCollision(
+  firstStone: Stone,
+  secondStone: Stone,
+  radius: number,
+) {
+  const deltaX = secondStone.x - firstStone.x;
+  const deltaY = secondStone.y - firstStone.y;
+  const distance = Math.hypot(deltaX, deltaY);
+  const minimumDistance = radius * 2;
+
+  if (distance <= 0 || distance >= minimumDistance) {
+    return;
+  }
+
+  const normalX = deltaX / distance;
+  const normalY = deltaY / distance;
+  const overlap = minimumDistance - distance;
+
+  firstStone.x -= (normalX * overlap) / 2;
+  firstStone.y -= (normalY * overlap) / 2;
+  secondStone.x += (normalX * overlap) / 2;
+  secondStone.y += (normalY * overlap) / 2;
+
+  const relativeVelocityX = firstStone.velocityX - secondStone.velocityX;
+  const relativeVelocityY = firstStone.velocityY - secondStone.velocityY;
+  const closingSpeed =
+    relativeVelocityX * normalX + relativeVelocityY * normalY;
+
+  if (closingSpeed <= 0) {
+    return;
+  }
+
+  const impulse = ((1 + STONE_RESTITUTION) * closingSpeed) / 2;
+  const impulseX = impulse * normalX;
+  const impulseY = impulse * normalY;
+
+  firstStone.velocityX -= impulseX;
+  firstStone.velocityY -= impulseY;
+  secondStone.velocityX += impulseX;
+  secondStone.velocityY += impulseY;
+}
+
+function updatePhysics(state: GameState, deltaMs: number) {
+  const deltaSeconds = deltaMs / 1000;
+  const { enemyStone, myStone } = state;
+
+  moveStone(myStone, state.board.stoneRadius, deltaSeconds);
+  moveStone(enemyStone, state.board.stoneRadius, deltaSeconds);
+  resolveStoneCollision(myStone, enemyStone, state.board.stoneRadius);
+  applyDeceleration(myStone, deltaSeconds);
+  applyDeceleration(enemyStone, deltaSeconds);
 }
 
 function drawScene(
@@ -350,18 +450,7 @@ function drawScene(
   width: number,
   height: number,
 ) {
-  const gradient = context.createRadialGradient(
-    width * 0.5,
-    height * 0.5,
-    0,
-    width * 0.5,
-    height * 0.5,
-    Math.max(width, height) * 0.72,
-  );
-
-  gradient.addColorStop(0, "#3b2a15");
-  gradient.addColorStop(1, "#120c06");
-  context.fillStyle = gradient;
+  context.fillStyle = "#1b140b";
   context.fillRect(0, 0, width, height);
 
   drawBoard(context, state, images.board);
@@ -371,8 +460,17 @@ function drawScene(
     state.enemyStone,
     state.board.stoneRadius,
     images.enemyStone,
+    "상대",
+    "#ef4444",
   );
-  drawStone(context, state.myStone, state.board.stoneRadius, images.myStone);
+  drawStone(
+    context,
+    state.myStone,
+    state.board.stoneRadius,
+    images.myStone,
+    "내 돌",
+    "#38bdf8",
+  );
   drawGauge(context, state, width, height);
 }
 
@@ -409,7 +507,10 @@ export function useFlickingGameCanvas() {
     let animationFrame = 0;
     let canvasHeight = MIN_CANVAS_HEIGHT;
     let canvasWidth = MIN_CANVAS_WIDTH;
-    const pixelRatio = window.devicePixelRatio || 1;
+    const pixelRatio = Math.min(
+      window.devicePixelRatio || 1,
+      MAX_CANVAS_PIXEL_RATIO,
+    );
 
     const resizeCanvas = () => {
       const bounds = canvas.getBoundingClientRect();
@@ -462,13 +563,14 @@ export function useFlickingGameCanvas() {
         return;
       }
 
-      Body.setVelocity(state.myStone, {
-        x: (vector.x / MAX_DRAG_DISTANCE) * MAX_FLICK_SPEED,
-        y: (vector.y / MAX_DRAG_DISTANCE) * MAX_FLICK_SPEED,
-      });
+      state.myStone.velocityX =
+        (vector.x / MAX_DRAG_DISTANCE) * MAX_FLICK_SPEED;
+      state.myStone.velocityY =
+        (vector.y / MAX_DRAG_DISTANCE) * MAX_FLICK_SPEED;
       playFlickSound(flickSoundRef.current ?? createSound(FLICK_SOUND_SRC));
       state.isDragging = false;
       state.dragPoint = null;
+      state.physicsActive = true;
     };
 
     const render = (timestamp: number) => {
@@ -480,8 +582,14 @@ export function useFlickingGameCanvas() {
 
       state.lastTimestamp = timestamp;
 
-      if (!state.isDragging && !state.hasCleared) {
-        Engine.update(state.engine, deltaMs);
+      if (state.physicsActive && !state.isDragging && !state.hasCleared) {
+        updatePhysics(state, deltaMs);
+
+        if (isPhysicsSettled(state)) {
+          state.physicsActive = false;
+          stopStone(state.myStone);
+          stopStone(state.enemyStone);
+        }
       }
 
       if (!state.hasCleared && isEnemyStoneOut(state)) {

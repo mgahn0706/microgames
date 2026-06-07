@@ -18,11 +18,16 @@ const MAX_MOVE_SPEED = 720;
 const CHECKPOINT_RADIUS = 82;
 const CAR_COLLISION_RADIUS = 13;
 const COLLISION_EFFECT_SECONDS = 0.22;
+const LAP_TWO_BANNER_SECONDS = 1.15;
 const FINAL_LAP_BANNER_SECONDS = 1.35;
 const TOTAL_LAPS = 3;
 const KARTRIDER_ASSETS = {
   kart: "/games/kartrider/images/kart.png",
   track: "/games/kartrider/images/track.png",
+} as const;
+const KARTRIDER_SOUNDS = {
+  finalLap: "/games/kartrider/sounds/final-lap.mp3",
+  lapTwo: "/games/kartrider/sounds/lap-2.mp3",
 } as const;
 const START_POINT = { x: 0.54, y: 0.205 } as const;
 const CHECKPOINTS = [
@@ -74,6 +79,7 @@ type GameState = {
   finalLapBannerSeconds: number;
   hasCleared: boolean;
   lapCount: number;
+  lapTwoBannerSeconds: number;
   lastTimestamp: number | null;
   nextCheckpointIndex: number;
   velocityX: number;
@@ -82,8 +88,27 @@ type GameState = {
   y: number;
 };
 
+type LapCue = "finalLap" | "lapTwo";
+
 function dispatchClear() {
   window.dispatchEvent(new CustomEvent(MICROGAME_CLEAR_EVENT));
+}
+
+function createAudio(src: string) {
+  const audio = new Audio(src);
+
+  audio.preload = "auto";
+
+  return audio;
+}
+
+function playAudio(audio: HTMLAudioElement | null) {
+  if (!audio) {
+    return;
+  }
+
+  audio.currentTime = 0;
+  void audio.play().catch(() => {});
 }
 
 function toMapPoint(point: Point) {
@@ -105,6 +130,7 @@ function createInitialState() {
     finalLapBannerSeconds: 0,
     hasCleared: false,
     lapCount: 0,
+    lapTwoBannerSeconds: 0,
     lastTimestamp: null,
     nextCheckpointIndex: 0,
     velocityX: 0,
@@ -248,7 +274,10 @@ function getShortestAngleDelta(fromAngle: number, toAngle: number) {
   );
 }
 
-function updateCheckpoints(state: GameState) {
+function updateCheckpoints(
+  state: GameState,
+  playLapCue: (cue: LapCue) => void,
+) {
   const checkpoint = CHECKPOINTS[state.nextCheckpointIndex];
 
   if (!checkpoint) {
@@ -273,8 +302,12 @@ function updateCheckpoints(state: GameState) {
     state.lapCount = nextLapCount;
 
     if (nextLapCount < TOTAL_LAPS) {
-      if (nextLapCount === TOTAL_LAPS - 1) {
+      if (nextLapCount === 1) {
+        state.lapTwoBannerSeconds = LAP_TWO_BANNER_SECONDS;
+        playLapCue("lapTwo");
+      } else if (nextLapCount === TOTAL_LAPS - 1) {
         state.finalLapBannerSeconds = FINAL_LAP_BANNER_SECONDS;
+        playLapCue("finalLap");
       }
 
       state.nextCheckpointIndex = 0;
@@ -312,6 +345,8 @@ function updateDrivingState(
   pressedKeys: ReadonlySet<string>,
   mask: TrackMask | null,
   deltaSeconds: number,
+  speedScale: number,
+  playLapCue: (cue: LapCue) => void,
 ) {
   if (state.hasCleared) {
     return;
@@ -324,8 +359,9 @@ function updateDrivingState(
       ACCELERATION_SMOOTHING,
       deltaSeconds,
     );
-    const targetVelocityX = inputDirection.x * MAX_MOVE_SPEED;
-    const targetVelocityY = inputDirection.y * MAX_MOVE_SPEED;
+    const maxMoveSpeed = MAX_MOVE_SPEED * speedScale;
+    const targetVelocityX = inputDirection.x * maxMoveSpeed;
+    const targetVelocityY = inputDirection.y * maxMoveSpeed;
 
     state.velocityX += (targetVelocityX - state.velocityX) * smoothingRatio;
     state.velocityY += (targetVelocityY - state.velocityY) * smoothingRatio;
@@ -333,7 +369,7 @@ function updateDrivingState(
     const nextVelocity = applyFrictionToVelocity(
       state.velocityX,
       state.velocityY,
-      deltaSeconds,
+      deltaSeconds * speedScale,
     );
 
     state.velocityX = nextVelocity.x;
@@ -343,7 +379,7 @@ function updateDrivingState(
   const clampedVelocity = clampVectorLength(
     state.velocityX,
     state.velocityY,
-    MAX_MOVE_SPEED,
+    MAX_MOVE_SPEED * speedScale,
   );
 
   state.velocityX = clampedVelocity.x;
@@ -365,7 +401,7 @@ function updateDrivingState(
   if (canPlaceKart(mask, nextX, nextY)) {
     state.x = nextX;
     state.y = nextY;
-    updateCheckpoints(state);
+    updateCheckpoints(state, playLapCue);
     return;
   }
 
@@ -394,7 +430,7 @@ function updateDrivingState(
   }
 
   if (canMoveX || canMoveY) {
-    updateCheckpoints(state);
+    updateCheckpoints(state, playLapCue);
     return;
   }
 
@@ -551,6 +587,36 @@ function drawCollisionEffect(
   context.restore();
 }
 
+function drawLapTwoBanner(
+  context: CanvasRenderingContext2D,
+  state: GameState,
+  width: number,
+  height: number,
+) {
+  if (state.lapTwoBannerSeconds <= 0) {
+    return;
+  }
+
+  const effectRatio = state.lapTwoBannerSeconds / LAP_TWO_BANNER_SECONDS;
+  const scale = 0.9 + (1 - effectRatio) * 0.16;
+
+  context.save();
+  context.globalAlpha = Math.min(effectRatio * 1.35, 1);
+  context.translate(width / 2, height * 0.24);
+  context.scale(scale, scale);
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.font = `900 ${Math.min(68, width * 0.07)}px Arial, Helvetica, sans-serif`;
+  context.lineWidth = 8;
+  context.strokeStyle = "rgba(124, 45, 18, 0.95)";
+  context.strokeText("LAP 2", 0, 0);
+  context.fillStyle = "#fb923c";
+  context.shadowColor = "rgba(251, 146, 60, 0.9)";
+  context.shadowBlur = 24;
+  context.fillText("LAP 2", 0, 0);
+  context.restore();
+}
+
 function drawFinalLapBanner(
   context: CanvasRenderingContext2D,
   state: GameState,
@@ -585,7 +651,6 @@ function drawHud(
   context: CanvasRenderingContext2D,
   state: GameState,
   width: number,
-  remainingMs: number,
 ) {
   const progress =
     (state.lapCount + state.nextCheckpointIndex / CHECKPOINTS.length) /
@@ -616,11 +681,6 @@ function drawHud(
   context.strokeStyle = "rgba(255, 255, 255, 0.62)";
   context.lineWidth = 2;
   context.strokeRect(progressX, progressY, progressWidth, 20);
-  context.fillStyle = "#f8fafc";
-  context.font = "900 18px Arial, Helvetica, sans-serif";
-  context.textAlign = "right";
-  context.textBaseline = "top";
-  context.fillText(`${Math.ceil(remainingMs / 1000)}초`, width - 28, 62);
   context.restore();
 }
 
@@ -630,7 +690,6 @@ function drawScene(
   images: LoadedImages,
   width: number,
   height: number,
-  remainingMs: number,
 ) {
   const layout = getTrackLayout(width, height);
 
@@ -652,6 +711,7 @@ function drawScene(
   drawCheckpoint(context, state, layout);
   drawKart(context, images.kart, state, layout);
   drawCollisionEffect(context, state, layout);
+  drawLapTwoBanner(context, state, width, height);
   drawFinalLapBanner(context, state, width, height);
 
   if (state.hasCleared) {
@@ -659,12 +719,14 @@ function drawScene(
     context.fillRect(0, 0, width, height);
   }
 
-  drawHud(context, state, width, remainingMs);
+  drawHud(context, state, width);
 }
 
-export function useKartriderBossGameCanvas(gameBeatCount: number) {
+export function useKartriderBossGameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<LoadedImages>({});
+  const finalLapAudioRef = useRef<HTMLAudioElement | null>(null);
+  const lapTwoAudioRef = useRef<HTMLAudioElement | null>(null);
   const pressedKeysRef = useRef<Set<string>>(new Set());
   const stateRef = useRef<GameState>(createInitialState());
   const trackMaskRef = useRef<TrackMask | null>(null);
@@ -695,6 +757,16 @@ export function useKartriderBossGameCanvas(gameBeatCount: number) {
   }, []);
 
   useEffect(() => {
+    finalLapAudioRef.current = createAudio(KARTRIDER_SOUNDS.finalLap);
+    lapTwoAudioRef.current = createAudio(KARTRIDER_SOUNDS.lapTwo);
+
+    return () => {
+      finalLapAudioRef.current = null;
+      lapTwoAudioRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
 
     if (!canvas) {
@@ -713,6 +785,11 @@ export function useKartriderBossGameCanvas(gameBeatCount: number) {
     let canvasWidth = MIN_CANVAS_WIDTH;
     const pixelRatio = window.devicePixelRatio || 1;
     const pressedKeys = pressedKeysRef.current;
+    const playLapCue = (cue: LapCue) => {
+      playAudio(
+        cue === "finalLap" ? finalLapAudioRef.current : lapTwoAudioRef.current,
+      );
+    };
 
     const resizeCanvas = () => {
       const bounds = canvas.getBoundingClientRect();
@@ -758,7 +835,7 @@ export function useKartriderBossGameCanvas(gameBeatCount: number) {
               (timestamp - state.lastTimestamp) / 1000,
               MAX_DELTA_SECONDS,
             );
-      const phaseDurationMs = gameBeatCount * beatDurationMs;
+      const speedScale = DEFAULT_BEAT_DURATION_MS / beatDurationMs;
 
       state.lastTimestamp = timestamp;
 
@@ -769,6 +846,8 @@ export function useKartriderBossGameCanvas(gameBeatCount: number) {
           pressedKeys,
           trackMaskRef.current,
           deltaSeconds,
+          speedScale,
+          playLapCue,
         );
       }
 
@@ -776,19 +855,16 @@ export function useKartriderBossGameCanvas(gameBeatCount: number) {
         state.collisionEffectSeconds - deltaSeconds,
         0,
       );
+      state.lapTwoBannerSeconds = Math.max(
+        state.lapTwoBannerSeconds - deltaSeconds,
+        0,
+      );
       state.finalLapBannerSeconds = Math.max(
         state.finalLapBannerSeconds - deltaSeconds,
         0,
       );
 
-      drawScene(
-        context,
-        state,
-        imagesRef.current,
-        canvasWidth,
-        canvasHeight,
-        Math.max(phaseDurationMs - state.elapsedMs, 0),
-      );
+      drawScene(context, state, imagesRef.current, canvasWidth, canvasHeight);
       animationFrame = window.requestAnimationFrame(render);
     };
 
@@ -805,7 +881,7 @@ export function useKartriderBossGameCanvas(gameBeatCount: number) {
       window.removeEventListener("keyup", handleKeyUp, { capture: true });
       pressedKeys.clear();
     };
-  }, [gameBeatCount]);
+  }, []);
 
   return canvasRef;
 }

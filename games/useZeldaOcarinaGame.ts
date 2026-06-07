@@ -79,7 +79,7 @@ function parseOcarinaInput(event: KeyboardEvent): OcarinaInput | null {
     return "up";
   }
 
-  if (event.key === " ") {
+  if (event.code === "Space") {
     return "space";
   }
 

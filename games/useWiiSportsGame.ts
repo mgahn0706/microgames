@@ -12,15 +12,15 @@ const WII_SPORTS_BACKGROUNDS = {
 
 type WiiSportsButton = "a" | "b";
 
-type WiiSportsPressedButtons = Readonly<{
-  hasPressedA: boolean;
-  hasPressedB: boolean;
+type WiiSportsHeldButtons = Readonly<{
+  isHoldingA: boolean;
+  isHoldingB: boolean;
 }>;
 
-const INITIAL_PRESSED_BUTTONS = {
-  hasPressedA: false,
-  hasPressedB: false,
-} satisfies WiiSportsPressedButtons;
+const INITIAL_HELD_BUTTONS = {
+  isHoldingA: false,
+  isHoldingB: false,
+} satisfies WiiSportsHeldButtons;
 
 function dispatchClear() {
   window.dispatchEvent(new CustomEvent(MICROGAME_CLEAR_EVENT));
@@ -38,19 +38,16 @@ function getWiiSportsButton(event: KeyboardEvent): WiiSportsButton | null {
   return null;
 }
 
-function getBackgroundSrc({
-  hasPressedA,
-  hasPressedB,
-}: WiiSportsPressedButtons) {
-  if (hasPressedA && hasPressedB) {
+function getBackgroundSrc({ isHoldingA, isHoldingB }: WiiSportsHeldButtons) {
+  if (isHoldingA && isHoldingB) {
     return WII_SPORTS_BACKGROUNDS.both;
   }
 
-  if (hasPressedA) {
+  if (isHoldingA) {
     return WII_SPORTS_BACKGROUNDS.onlyA;
   }
 
-  if (hasPressedB) {
+  if (isHoldingB) {
     return WII_SPORTS_BACKGROUNDS.onlyB;
   }
 
@@ -61,14 +58,35 @@ export function useWiiSportsGame(): Readonly<{
   backgroundSrc: string;
 }> {
   const hasClearedRef = useRef(false);
-  const pressedButtonsRef = useRef<WiiSportsPressedButtons>(
-    INITIAL_PRESSED_BUTTONS,
-  );
-  const [pressedButtons, setPressedButtons] = useState<WiiSportsPressedButtons>(
-    INITIAL_PRESSED_BUTTONS,
-  );
+  const heldButtonsRef = useRef<WiiSportsHeldButtons>(INITIAL_HELD_BUTTONS);
+  const [heldButtons, setHeldButtons] =
+    useState<WiiSportsHeldButtons>(INITIAL_HELD_BUTTONS);
 
   useEffect(() => {
+    const syncHeldButtons = (nextButtons: WiiSportsHeldButtons) => {
+      const currentButtons = heldButtonsRef.current;
+
+      if (
+        nextButtons.isHoldingA === currentButtons.isHoldingA &&
+        nextButtons.isHoldingB === currentButtons.isHoldingB
+      ) {
+        return;
+      }
+
+      heldButtonsRef.current = nextButtons;
+      setHeldButtons(nextButtons);
+
+      if (
+        hasClearedRef.current ||
+        !nextButtons.isHoldingA ||
+        !nextButtons.isHoldingB
+      ) {
+        return;
+      }
+
+      hasClearedRef.current = true;
+      dispatchClear();
+    };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) {
         return;
@@ -82,42 +100,40 @@ export function useWiiSportsGame(): Readonly<{
 
       event.preventDefault();
 
-      const currentButtons = pressedButtonsRef.current;
-      const nextButtons = {
-        hasPressedA: currentButtons.hasPressedA || button === "a",
-        hasPressedB: currentButtons.hasPressedB || button === "b",
-      };
+      const currentButtons = heldButtonsRef.current;
 
-      if (
-        nextButtons.hasPressedA === currentButtons.hasPressedA &&
-        nextButtons.hasPressedB === currentButtons.hasPressedB
-      ) {
+      syncHeldButtons({
+        isHoldingA: currentButtons.isHoldingA || button === "a",
+        isHoldingB: currentButtons.isHoldingB || button === "b",
+      });
+    };
+    const handleKeyUp = (event: KeyboardEvent) => {
+      const button = getWiiSportsButton(event);
+
+      if (!button) {
         return;
       }
 
-      pressedButtonsRef.current = nextButtons;
-      setPressedButtons(nextButtons);
+      event.preventDefault();
 
-      if (
-        hasClearedRef.current ||
-        !nextButtons.hasPressedA ||
-        !nextButtons.hasPressedB
-      ) {
-        return;
-      }
+      const currentButtons = heldButtonsRef.current;
 
-      hasClearedRef.current = true;
-      dispatchClear();
+      syncHeldButtons({
+        isHoldingA: button === "a" ? false : currentButtons.isHoldingA,
+        isHoldingB: button === "b" ? false : currentButtons.isHoldingB,
+      });
     };
 
     window.addEventListener("keydown", handleKeyDown, { capture: true });
+    window.addEventListener("keyup", handleKeyUp, { capture: true });
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown, { capture: true });
+      window.removeEventListener("keyup", handleKeyUp, { capture: true });
     };
   }, []);
 
   return {
-    backgroundSrc: getBackgroundSrc(pressedButtons),
+    backgroundSrc: getBackgroundSrc(heldButtons),
   };
 }

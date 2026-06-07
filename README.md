@@ -75,7 +75,7 @@
 | 젤다의 전설: 시간의 오카리나  | `연주해라!`                  | 방향키 + 스페이스바 | 12   | 일반 |
 | 지오메트리 대시               | `가시를 피해라!`             | 스페이스바          | 12   | 일반 |
 | 쿠키런                        | `달려라!`                    | 방향키 + 스페이스바 | 12   | 일반 |
-| 크레이지 아케이드             | `물폭탄을 설치해라!`         | 방향키 + 스페이스바 | 12   | 일반 |
+| 크레이지 아케이드             | `물풍선을 설치해라!`         | 방향키 + 스페이스바 | 12   | 일반 |
 | 크롬 공룡게임                 | `점프해라!`                  | 스페이스바          | 8    | 일반 |
 | 테트리스                      | `4줄 없애라!`                | 방향키 + 스페이스바 | 12   | 일반 |
 | 포켓몬                        | `이 포켓몬의 이름은?`        | 한글 키보드         | 12   | 일반 |
@@ -95,7 +95,7 @@
 - 성공, 실패, 채굴, 전선 연결, 점프 같은 행동에 SFX가 붙습니다.
 - 목숨이 사라지거나 새로 생길 때 실제 값 변화에 맞춰 애니메이션이 재생됩니다.
 - 한글 IME 입력을 고려해 Pokemon, Maplestory, Hancom, AnimalFarm typing game이 동작합니다.
-- Matter.js 기반 물리 시뮬레이션으로 알까기 충돌을 처리합니다.
+- 전용 경량 물리 시뮬레이션으로 알까기 충돌을 처리합니다.
 - canvas 게임은 각 라운드마다 remount되어 이전 상태가 다음 라운드로 새지 않습니다.
 
 ## 조작 안내
@@ -118,7 +118,7 @@
 | App      | Next.js App Router, React 19                |
 | Language | TypeScript                                  |
 | Style    | Tailwind CSS 4                              |
-| Gameplay | Canvas 2D, Matter.js, custom React hooks    |
+| Gameplay | Canvas 2D, custom React hooks               |
 | Audio    | Web Audio API 기반 BGM/SFX library          |
 | Assets   | 정적 image/sound files under `public/`      |
 | State    | 라운드 진행 hook, 입력 hook, 기록 저장 hook |

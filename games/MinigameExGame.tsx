@@ -9,9 +9,9 @@ const BACKGROUND_SRC = "/games/minigame-ex/images/background.png";
 const EATING_BEAR_SRC = "/games/minigame-ex/images/eating-bear.png";
 const IDLE_BEAR_SRC = "/games/minigame-ex/images/idle-bear.png";
 const BEAR_LAYOUT = [
-  { number: 1, x: "39%", y: "64%" },
+  { number: 1, x: "37%", y: "64%" },
   { number: 2, x: "50%", y: "64%" },
-  { number: 3, x: "61%", y: "64%" },
+  { number: 3, x: "63%", y: "64%" },
 ] satisfies ReadonlyArray<{
   number: BearNumber;
   x: string;
@@ -42,7 +42,7 @@ export function MinigameExGame({
       />
       <div className="absolute inset-0 bg-black/10" />
       {isChoosing ? (
-        <div className="pointer-events-none absolute left-1/2 top-[12%] z-20 -translate-x-1/2 rounded-md border border-amber-100/50 bg-black/55 px-5 py-3 text-center text-lg font-black text-amber-50 shadow-[0_0_24px_rgba(251,191,36,0.24)] sm:text-2xl">
+        <div className="pointer-events-none absolute left-1/2 top-[10%] z-20 w-[min(58rem,86vw)] -translate-x-1/2 rounded-md border-2 border-amber-100/60 bg-black/62 px-7 py-5 text-center text-[clamp(1.45rem,3.2vw,3rem)] font-black text-amber-50 shadow-[0_0_30px_rgba(251,191,36,0.3)]">
           가장 많은 고기를 먹은 곰을 선택해라
         </div>
       ) : null}
@@ -53,7 +53,7 @@ export function MinigameExGame({
         return (
           <div
             aria-label={`${bear.number}번 곰 선택`}
-            className={`pointer-events-none absolute z-10 aspect-[3/2] w-[clamp(14rem,32vw,27rem)] -translate-x-1/2 -translate-y-1/2 transition duration-150 ${
+            className={`pointer-events-none absolute z-10 aspect-[3/2] w-[clamp(17rem,38vw,32rem)] -translate-x-1/2 -translate-y-1/2 transition duration-150 ${
               isChoosing ? "scale-105" : ""
             } ${hasFailed ? "opacity-55 grayscale" : ""} ${
               isWrong ? "scale-95" : ""

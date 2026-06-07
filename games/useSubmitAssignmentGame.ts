@@ -20,12 +20,13 @@ type HitArea = "cancel" | "checkbox" | "previous" | "submit";
 
 const BACKGROUND_HEIGHT = 941;
 const BACKGROUND_WIDTH = 1672;
+const CLICK_SOUND_SRC = "/games/submit-assignment/sounds/mouse-clock.mp3";
 const RESULT_DELAY_MS = 680;
 const HIT_AREAS = {
   cancel: { height: 104, width: 150, x: 445, y: 433 },
-  checkbox: { height: 54, width: 54, x: 437, y: 341 },
+  checkbox: { height: 86, width: 740, x: 430, y: 326 },
   previous: { height: 112, width: 190, x: 399, y: 695 },
-  submit: { height: 104, width: 225, x: 592, y: 433 },
+  submit: { height: 116, width: 230, x: 590, y: 426 },
 } satisfies Record<HitArea, ImageRect>;
 
 function dispatchClear() {
@@ -34,6 +35,26 @@ function dispatchClear() {
 
 function dispatchFailure() {
   window.dispatchEvent(new CustomEvent(MICROGAME_FAILURE_EVENT));
+}
+
+function createClickAudio() {
+  const audio = new Audio(CLICK_SOUND_SRC);
+
+  audio.preload = "auto";
+  audio.volume = 0.82;
+
+  return audio;
+}
+
+function playClickSound(audio: HTMLAudioElement | null) {
+  if (!audio) {
+    return;
+  }
+
+  audio.currentTime = 0;
+  audio.play().catch(() => {
+    // Browser audio can be blocked before a trusted input unlocks playback.
+  });
 }
 
 function getRenderedImageRect(container: HTMLDivElement) {
@@ -90,7 +111,9 @@ export function useSubmitAssignmentGame(): Readonly<{
   result: SubmitAssignmentResult | null;
 }> {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const clickAudioRef = useRef<HTMLAudioElement | null>(null);
   const resultTimerRef = useRef<number | null>(null);
+  const hasCheckedRef = useRef(false);
   const [hasChecked, setHasChecked] = useState(false);
   const [result, setResult] = useState<SubmitAssignmentResult | null>(null);
 
@@ -127,34 +150,39 @@ export function useSubmitAssignmentGame(): Readonly<{
       event.preventDefault();
 
       if (hitArea === "checkbox") {
+        playClickSound(clickAudioRef.current);
+        hasCheckedRef.current = true;
         setHasChecked(true);
         return;
       }
 
-      if (hitArea === "submit" && hasChecked) {
+      if (hitArea === "submit" && hasCheckedRef.current) {
+        playClickSound(clickAudioRef.current);
         resolveGame("success");
         return;
       }
 
-      if (
-        hitArea === "submit" ||
-        hitArea === "cancel" ||
-        hitArea === "previous"
-      ) {
+      if (hitArea === "submit") {
+        return;
+      }
+
+      if (hitArea === "cancel" || hitArea === "previous") {
+        playClickSound(clickAudioRef.current);
         resolveGame("failure");
       }
     },
-    [hasChecked, resolveGame, result],
+    [resolveGame, result],
   );
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    clickAudioRef.current = createClickAudio();
+
+    return () => {
       if (resultTimerRef.current !== null) {
         window.clearTimeout(resultTimerRef.current);
       }
-    },
-    [],
-  );
+    };
+  }, []);
 
   return {
     containerRef,

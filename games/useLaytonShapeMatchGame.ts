@@ -62,11 +62,15 @@ function getRandomPuzzle() {
 export function useLaytonShapeMatchGame(): Readonly<{
   chooseAnswer: (answer: LaytonAnswer) => void;
   hasFailed: boolean;
+  lastWrongAnswer: LaytonAnswer | null;
   puzzle: LaytonPuzzle;
 }> {
   const hasClearedRef = useRef(false);
   const hasFailedRef = useRef(false);
   const [hasFailed, setHasFailed] = useState(false);
+  const [lastWrongAnswer, setLastWrongAnswer] = useState<LaytonAnswer | null>(
+    null,
+  );
   const [puzzle] = useState(getRandomPuzzle);
 
   const chooseAnswer = useCallback(
@@ -82,6 +86,7 @@ export function useLaytonShapeMatchGame(): Readonly<{
       }
 
       hasFailedRef.current = true;
+      setLastWrongAnswer(answer);
       setHasFailed(true);
     },
     [puzzle.answer],
@@ -108,6 +113,7 @@ export function useLaytonShapeMatchGame(): Readonly<{
   return {
     chooseAnswer,
     hasFailed,
+    lastWrongAnswer,
     puzzle,
   };
 }
