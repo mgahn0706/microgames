@@ -23,6 +23,7 @@ export type MicrogameCanvas =
   | "courseRegistrationNumber"
   | "crazyArcade"
   | "default"
+  | "flickingGame"
   | "flappyBird"
   | "geometryDashSpikes"
   | "gomokuWhiteStone"
@@ -282,6 +283,22 @@ export const MICROGAMES = [
     id: "super-mario-galaxy-star-bits",
     startPrompt: "스타구슬을 모아라!",
     title: "슈퍼마리오 갤럭시",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "flickingGame",
+    microscope: {
+      description:
+        "알까기는 손끝 힘 조절이 전부입니다. 내 돌은 나가도 괜찮지만, 상대 돌은 반드시 판 밖으로 밀어내야 합니다.",
+      imageAlt: "알까기 판",
+      imageSrc: "/games/flicking-game/images/board.png",
+    },
+    control: "mouseDrag",
+    id: "flicking-game",
+    startPrompt: "적 돌을 밀어내라!",
+    title: "알까기",
     type: "normal",
   },
 
