@@ -35,6 +35,7 @@ export type BgmTrack =
   | "success"
   | "tetris"
   | "undertale"
+  | "wiiSports"
   | "zelda";
 
 export type SoundEffectTrack =
@@ -91,6 +92,7 @@ const BGM_TRACK_PATHS = {
   success: "/games/game-flow/sounds/success.mp3",
   tetris: "/games/tetris/sounds/tetris-bgm.mp3",
   undertale: "/games/undertale/sounds/undertale-bgm.mp3",
+  wiiSports: "/games/wii-sports/sounds/wii-sports-bgm.mp3",
   zelda: "/games/zelda/sounds/zelda-bgm.mp3",
 } satisfies Record<BgmTrack, string>;
 
@@ -167,6 +169,7 @@ const BGM_TRACK_BEATS = {
   success: 4,
   tetris: 12,
   undertale: 8,
+  wiiSports: 8,
   zelda: 12,
 } satisfies Record<Exclude<BgmTrack, "gameOver">, number>;
 

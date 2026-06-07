@@ -78,6 +78,7 @@ export function useMicrogameInput({
         microgame.canvas === "twoThousandFortyEightBoss" ||
         microgame.canvas === "undertaleMouse" ||
         microgame.canvas === "modooMarble" ||
+        microgame.canvas === "wiiSportsDualPress" ||
         microgame.canvas === "zeldaOcarinaOfTime"
       ) {
         return;

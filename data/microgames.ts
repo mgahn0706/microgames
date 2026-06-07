@@ -47,6 +47,7 @@ export type MicrogameCanvas =
   | "tetrisLineClear"
   | "twoThousandFortyEightBoss"
   | "undertaleMouse"
+  | "wiiSportsDualPress"
   | "zeldaCircleDraw"
   | "zeldaOcarinaOfTime";
 
@@ -515,7 +516,7 @@ export const MICROGAMES = [
     canvas: "flappyBird",
     microscope: {
       description:
-        "플래피버드, 스페이스 한 번에 목숨이 걸린 게임입니다. 파이프 사이를 통과하려고 누르다 보면 손이 자꾸 급해져요.",
+        "플래피버드, 너무 어려운 게임입니다. 파이프 사이를 통과하려고 누르다 보면 손이 자꾸 급해져요.",
       imageAlt: "플래피버드",
       imageSrc: "/games/flappy-bird/images/bird.png",
     },
@@ -555,6 +556,22 @@ export const MICROGAMES = [
     id: "hancom-word-typing",
     startPrompt: "단어를 입력해라!",
     title: "한컴 타자연습",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "wiiSportsDualPress",
+    microscope: {
+      description:
+        "Wii Sports를 해보셨나요? A와 B를 둘 다 눌러 게임을 시작하세요.",
+      imageAlt: "Wii Sports A와 B 버튼 안내",
+      imageSrc: "/games/wii-sports/images/backgroud-default.png",
+    },
+    control: "koreanKeyboard",
+    id: "wii-sports-dual-button",
+    startPrompt: "A와 B를 눌러라!",
+    title: "Wii Sports",
     type: "normal",
   },
 

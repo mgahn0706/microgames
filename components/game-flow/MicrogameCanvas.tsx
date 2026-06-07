@@ -35,6 +35,7 @@ import { SuperMarioCoinGame } from "@/games/SuperMarioCoinGame";
 import { TetrisLineClearGame } from "@/games/TetrisLineClearGame";
 import { TwoThousandFortyEightBossGame } from "@/games/TwoThousandFortyEightBossGame";
 import { UndertaleMouseGame } from "@/games/UndertaleMouseGame";
+import { WiiSportsGame } from "@/games/WiiSportsGame";
 import { ZeldaCircleDrawGame } from "@/games/ZeldaCircleDrawGame";
 import { ZeldaOcarinaGame } from "@/games/ZeldaOcarinaGame";
 
@@ -65,6 +66,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "undertaleMouse") {
     return <UndertaleMouseGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "wiiSportsDualPress") {
+    return <WiiSportsGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "superMarioCoins") {
