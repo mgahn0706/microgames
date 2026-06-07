@@ -9,7 +9,7 @@ import {
 
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
-const TURN_DURATION_MS = 2000;
+const TURN_BEATS = 4;
 const ROUND_END_SAFETY_MS = 32;
 const PLAYER_COUNT = 4;
 const FRUITS = ["banana", "lime", "plum", "strawberry"] as const;
@@ -83,6 +83,10 @@ function getBeatDurationMs(canvas: HTMLCanvasElement) {
   return Number.isFinite(parsedDuration) && parsedDuration > 0
     ? parsedDuration
     : RHYTHM_DURATION_MS;
+}
+
+function getTurnDurationMs(beatDurationMs: number) {
+  return TURN_BEATS * beatDurationMs;
 }
 
 function getCardImageSrc(card: Pick<Card, "count" | "fruit">) {
@@ -512,6 +516,7 @@ function drawScene(
   width: number,
   height: number,
   timestamp: number,
+  turnDurationMs: number,
 ) {
   drawBackground(context, images?.background ?? null, width, height);
 
@@ -519,7 +524,7 @@ function drawScene(
   const elapsedInTurn =
     state.startTimestamp === null
       ? 0
-      : Math.max(timestamp - state.startTimestamp, 0) % TURN_DURATION_MS;
+      : Math.max(timestamp - state.startTimestamp, 0) % turnDurationMs;
   const popProgress = Math.max(0, 1 - elapsedInTurn / 260);
   const cardPositions = [
     { angle: -0.12, x: width * 0.24, y: height * 0.27 },
@@ -585,10 +590,11 @@ export function useHalliGalliBossGameCanvas(gameBeatCount: number) {
     }
 
     const beatDurationMs = getBeatDurationMs(canvas);
+    const turnDurationMs = getTurnDurationMs(beatDurationMs);
     const roundDurationMs = gameBeatCount * beatDurationMs;
     const turnCount = Math.max(
       1,
-      Math.ceil(roundDurationMs / TURN_DURATION_MS),
+      Math.ceil(roundDurationMs / turnDurationMs),
     );
 
     stateRef.current = {
@@ -646,7 +652,7 @@ export function useHalliGalliBossGameCanvas(gameBeatCount: number) {
       const elapsedMs = timestamp - startTimestamp;
       const currentTurn = stateRef.current.turns[stateRef.current.turnIndex];
       const currentTurnDeadline = Math.min(
-        (stateRef.current.turnIndex + 1) * TURN_DURATION_MS,
+        (stateRef.current.turnIndex + 1) * turnDurationMs,
         roundDurationMs - ROUND_END_SAFETY_MS,
       );
       const isRoundEnding = elapsedMs >= roundDurationMs - ROUND_END_SAFETY_MS;
@@ -667,7 +673,7 @@ export function useHalliGalliBossGameCanvas(gameBeatCount: number) {
       }
 
       const nextTurnIndex = Math.min(
-        Math.floor(elapsedMs / TURN_DURATION_MS),
+        Math.floor(elapsedMs / turnDurationMs),
         stateRef.current.turns.length - 1,
       );
 
@@ -697,6 +703,7 @@ export function useHalliGalliBossGameCanvas(gameBeatCount: number) {
         width,
         height,
         timestamp,
+        turnDurationMs,
       );
       frameRef.current = window.requestAnimationFrame(render);
     };
