@@ -77,7 +77,9 @@ export function useMicrogameInput({
         microgame.canvas === "tetrisLineClear" ||
         microgame.canvas === "twoThousandFortyEightBoss" ||
         microgame.canvas === "undertaleMouse" ||
-        microgame.canvas === "modooMarble"
+        microgame.canvas === "modooMarble" ||
+        microgame.canvas === "wiiSportsDualPress" ||
+        microgame.canvas === "zeldaOcarinaOfTime"
       ) {
         return;
       }
@@ -98,6 +100,7 @@ export function useMicrogameInput({
         microgame.canvas !== "halliGalliBoss" &&
         microgame.canvas !== "leagueChampionBan" &&
         microgame.canvas !== "minecraftMining" &&
+        microgame.canvas !== "submitAssignment" &&
         microgame.canvas !== "undertaleMouse"
       ) {
         recordClearOnce();

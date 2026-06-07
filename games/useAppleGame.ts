@@ -20,6 +20,8 @@ const INNER_BOARD = {
 } as const;
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
+const APPLE_HIT_SCALE = 0.96;
+const SELECTION_PADDING_PX = 10;
 const TARGET_SUM = 10;
 const TARGET_PAIRS = [
   [1, 9],
@@ -213,12 +215,35 @@ function getAppleCenter(apple: AppleCell, layout: BoardLayout) {
   } satisfies Point;
 }
 
-function isPointInRect(point: Point, rect: SelectionRect) {
+function getAppleHitRect(apple: AppleCell, layout: BoardLayout) {
+  const cellWidth = layout.width / BOARD_COLUMNS;
+  const cellHeight = layout.height / BOARD_ROWS;
+  const size = Math.min(cellWidth, cellHeight) * APPLE_HIT_SCALE;
+  const center = getAppleCenter(apple, layout);
+
+  return {
+    height: size,
+    width: size,
+    x: center.x - size / 2,
+    y: center.y - size / 2,
+  } satisfies SelectionRect;
+}
+
+function getPaddedSelectionRect(rect: SelectionRect) {
+  return {
+    height: rect.height + SELECTION_PADDING_PX * 2,
+    width: rect.width + SELECTION_PADDING_PX * 2,
+    x: rect.x - SELECTION_PADDING_PX,
+    y: rect.y - SELECTION_PADDING_PX,
+  } satisfies SelectionRect;
+}
+
+function doRectsIntersect(first: SelectionRect, second: SelectionRect) {
   return (
-    point.x >= rect.x &&
-    point.x <= rect.x + rect.width &&
-    point.y >= rect.y &&
-    point.y <= rect.y + rect.height
+    first.x < second.x + second.width &&
+    first.x + first.width > second.x &&
+    first.y < second.y + second.height &&
+    first.y + first.height > second.y
   );
 }
 
@@ -227,9 +252,13 @@ function getSelectedApples(
   rect: SelectionRect,
   layout: BoardLayout,
 ) {
-  return apples.filter((apple) =>
-    isPointInRect(getAppleCenter(apple, layout), rect),
-  );
+  const paddedRect = getPaddedSelectionRect(rect);
+
+  return apples.filter((apple) => {
+    const appleHitRect = getAppleHitRect(apple, layout);
+
+    return doRectsIntersect(appleHitRect, paddedRect);
+  });
 }
 
 function getAppleSum(apples: readonly AppleCell[]) {

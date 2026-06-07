@@ -10,12 +10,14 @@ import { CookieRunGame } from "@/games/CookieRunGame";
 import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGame";
 import { CrazyArcadeGame } from "@/games/CrazyArcadeGame";
 import { DefaultMicrogameCanvas } from "@/games/DefaultMicrogameCanvas";
+import { FlickingGame } from "@/games/FlickingGame";
 import { FlappyBirdGame } from "@/games/FlappyBirdGame";
 import { GeometryDashGame } from "@/games/GeometryDashGame";
 import { GomokuGame } from "@/games/GomokuGame";
 import { HalliGalliBossGame } from "@/games/HalliGalliBossGame";
 import { HancomTypingGame } from "@/games/HancomTypingGame";
 import { KartriderBossGame } from "@/games/KartriderBossGame";
+import { KirbyInhaleGame } from "@/games/KirbyInhaleGame";
 import { LaytonShapeMatchGame } from "@/games/LaytonShapeMatchGame";
 import { LeagueChampionBanGame } from "@/games/LeagueChampionBanGame";
 import { MaplestoryLieDetectorGame } from "@/games/MaplestoryLieDetectorGame";
@@ -27,12 +29,15 @@ import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
 import { PongGame } from "@/games/PongGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
+import { SubmitAssignmentGame } from "@/games/SubmitAssignmentGame";
 import { SuperMarioGalaxyGame } from "@/games/SuperMarioGalaxyGame";
 import { SuperMarioCoinGame } from "@/games/SuperMarioCoinGame";
 import { TetrisLineClearGame } from "@/games/TetrisLineClearGame";
 import { TwoThousandFortyEightBossGame } from "@/games/TwoThousandFortyEightBossGame";
 import { UndertaleMouseGame } from "@/games/UndertaleMouseGame";
+import { WiiSportsGame } from "@/games/WiiSportsGame";
 import { ZeldaCircleDrawGame } from "@/games/ZeldaCircleDrawGame";
+import { ZeldaOcarinaGame } from "@/games/ZeldaOcarinaGame";
 
 type GameCanvasProps = Readonly<{
   microgame: Microgame;
@@ -61,6 +66,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "undertaleMouse") {
     return <UndertaleMouseGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "wiiSportsDualPress") {
+    return <WiiSportsGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "superMarioCoins") {
@@ -131,6 +140,10 @@ function renderGameCanvas(microgame: Microgame) {
     return <FlappyBirdGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "flickingGame") {
+    return <FlickingGame microgame={microgame} />;
+  }
+
   if (microgame.canvas === "gomokuWhiteStone") {
     return <GomokuGame microgame={microgame} />;
   }
@@ -147,6 +160,14 @@ function renderGameCanvas(microgame: Microgame) {
     return <KartriderBossGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "kirbyInhale") {
+    return <KirbyInhaleGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "submitAssignment") {
+    return <SubmitAssignmentGame microgame={microgame} />;
+  }
+
   if (microgame.canvas === "tetrisLineClear") {
     return <TetrisLineClearGame microgame={microgame} />;
   }
@@ -161,6 +182,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "zeldaCircleDraw") {
     return <ZeldaCircleDrawGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "zeldaOcarinaOfTime") {
+    return <ZeldaOcarinaGame microgame={microgame} />;
   }
 
   return <DefaultMicrogameCanvas microgame={microgame} />;

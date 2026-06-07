@@ -22,7 +22,7 @@ const FLOOR_Y = 332;
 const GRAVITY = 720;
 const MAX_DELTA_MS = 48;
 const PIPE_GAP_HEIGHT = 128;
-const PIPE_SPEED = 142;
+const PIPE_TRAVEL_PER_BEAT = 71;
 const PIPE_WIDTH = 72;
 
 type PipePair = Readonly<{
@@ -130,15 +130,20 @@ function hasCollision(state: GameState) {
   return state.pipes.some((pipe) => hasPipeCollision(birdX, state.birdY, pipe));
 }
 
-function stepState(state: GameState, deltaMs: number) {
+function getPipeSpeed(beatDurationMs: number) {
+  return PIPE_TRAVEL_PER_BEAT / (beatDurationMs / 1000);
+}
+
+function stepState(state: GameState, deltaMs: number, beatDurationMs: number) {
   const deltaSeconds = deltaMs / 1000;
+  const pipeSpeed = getPipeSpeed(beatDurationMs);
 
   state.elapsedMs += deltaMs;
   state.birdVelocityY += GRAVITY * deltaSeconds;
   state.birdY += state.birdVelocityY * deltaSeconds;
   state.pipes = state.pipes.map((pipe) => ({
     ...pipe,
-    x: pipe.x - PIPE_SPEED * deltaSeconds,
+    x: pipe.x - pipeSpeed * deltaSeconds,
   }));
 }
 
@@ -336,7 +341,7 @@ export function useFlappyBirdGameCanvas(gameBeatCount: number) {
       state.lastTimestamp = timestamp;
 
       if (!state.hasCleared && !state.hasFailed) {
-        stepState(state, deltaMs);
+        stepState(state, deltaMs, beatDurationMs);
 
         if (hasCollision(state)) {
           state.hasFailed = true;

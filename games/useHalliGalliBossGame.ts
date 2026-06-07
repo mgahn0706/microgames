@@ -224,11 +224,17 @@ function createNextTurn(
 }
 
 function createTurns(turnCount: number) {
-  const targetPattern = Array.from({ length: turnCount - 1 }, (_, index) => {
-    return index % 2 === 0;
-  });
+  const targetPattern = Array.from(
+    { length: Math.max(turnCount - 2, 0) },
+    (_, index) => {
+      return index % 2 === 0;
+    },
+  );
   const playerOffset = Math.floor(Math.random() * PLAYER_COUNT);
-  const shouldCreateFivePattern = [false, ...shuffle(targetPattern)];
+  const shouldCreateFivePattern =
+    turnCount <= 2
+      ? Array.from({ length: turnCount }, () => false)
+      : [false, ...shuffle(targetPattern), false];
 
   return shouldCreateFivePattern.reduce<readonly Turn[]>(
     (turns, shouldCreateFive, index) => {

@@ -5,6 +5,7 @@ import type { Microgame } from "@/data/microgames";
 import { useSuperMarioGalaxyGame } from "@/games/useSuperMarioGalaxyGame";
 
 const BACKGROUND_SRC = "/games/super-mario-galaxy/images/background.png";
+const CURSOR_SRC = "/games/super-mario-galaxy/images/cursor.png";
 
 export function SuperMarioGalaxyGame({
   microgame,
@@ -17,18 +18,23 @@ export function SuperMarioGalaxyGame({
     containerRef,
     handlePointerCancel,
     handlePointerDown,
+    handlePointerEnter,
+    handlePointerLeave,
     handlePointerMove,
     handlePointerUp,
+    pointerPosition,
   } = useSuperMarioGalaxyGame();
 
   return (
     <div
-      className="relative h-screen w-screen cursor-grab touch-none select-none overflow-hidden bg-[#050816] active:cursor-grabbing"
+      className="relative h-screen w-screen cursor-none touch-none select-none overflow-hidden bg-[#050816]"
       onDragStart={(event) => {
         event.preventDefault();
       }}
       onPointerCancel={handlePointerCancel}
       onPointerDown={handlePointerDown}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       ref={containerRef}
@@ -83,6 +89,25 @@ export function SuperMarioGalaxyGame({
           </div>
         );
       })}
+      {pointerPosition ? (
+        <Image
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute z-20 size-[clamp(3.25rem,5.8vw,4.9rem)] -translate-x-1/2 -translate-y-1/2 select-none object-contain drop-shadow-[0_0_18px_rgba(109,240,255,0.74)]"
+          draggable={false}
+          height={90}
+          onDragStart={(event) => {
+            event.preventDefault();
+          }}
+          src={CURSOR_SRC}
+          style={{
+            left: `${pointerPosition.x}px`,
+            top: `${pointerPosition.y}px`,
+          }}
+          unoptimized
+          width={90}
+        />
+      ) : null}
     </div>
   );
 }

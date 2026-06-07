@@ -16,11 +16,11 @@ const GROUND_Y_RATIO = 0.78;
 const JUMP_VELOCITY = -1060;
 const OBSTACLE_TRAVEL_PER_BEAT = 335;
 const OBSTACLE_GROUPS = [
-  { beatOffset: 2.15, type: "bottom" },
-  { beatOffset: 4.35, type: "top" },
-  { beatOffset: 6.65, type: "bottom" },
-  { beatOffset: 8.7, type: "top" },
-  { beatOffset: 10.15, type: "bottom" },
+  { beatOffset: 3.35, type: "bottom" },
+  { beatOffset: 5.2, type: "top" },
+  { beatOffset: 7.05, type: "bottom" },
+  { beatOffset: 8.9, type: "top" },
+  { beatOffset: 10.45, type: "bottom" },
 ] as const;
 const COOKIE_RUN_ASSETS = {
   background: "/games/cookie-run/images/background.png",

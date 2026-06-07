@@ -314,15 +314,11 @@ function MicroscopePanel({
                   <h2 className="min-w-0 text-lg font-black leading-tight text-white">
                     {displayTitle}
                   </h2>
-                  <span
-                    className={`rounded border px-2 py-0.5 text-[0.68rem] font-black ${
-                      isSeen
-                        ? "border-cyan-100/35 text-cyan-50"
-                        : "border-white/20 text-white/50"
-                    }`}
-                  >
-                    {isSeen ? "발견" : "미발견"}
-                  </span>
+                  {isSeen ? null : (
+                    <span className="rounded border border-white/20 px-2 py-0.5 text-[0.68rem] font-black text-white/50">
+                      미발견
+                    </span>
+                  )}
                 </div>
                 <p className="mt-1 truncate text-sm font-black text-cyan-50/82">
                   {displayControlTitle}

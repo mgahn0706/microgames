@@ -12,6 +12,11 @@ export type StarBit = Readonly<{
   y: number;
 }>;
 
+export type GalaxyCursorPosition = Readonly<{
+  x: number;
+  y: number;
+}>;
+
 const DRAGGED_SOUND_SRC =
   "/games/super-mario-galaxy/sounds/star-bits-dragged.mp3";
 const SUCCESS_SOUND_SRC =
@@ -104,14 +109,31 @@ export function useSuperMarioGalaxyGame(): Readonly<{
   containerRef: RefObject<HTMLDivElement | null>;
   handlePointerCancel: () => void;
   handlePointerDown: (event: PointerEvent<HTMLDivElement>) => void;
+  handlePointerEnter: (event: PointerEvent<HTMLDivElement>) => void;
+  handlePointerLeave: () => void;
   handlePointerMove: (event: PointerEvent<HTMLDivElement>) => void;
   handlePointerUp: () => void;
+  pointerPosition: GalaxyCursorPosition | null;
 }> {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hasClearedRef = useRef(false);
   const isDraggingRef = useRef(false);
   const [bits] = useState(createStarBits);
   const [collectedBitIds, setCollectedBitIds] = useState<readonly string[]>([]);
+  const [pointerPosition, setPointerPosition] =
+    useState<GalaxyCursorPosition | null>(null);
+
+  const updatePointerPosition = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      const bounds = event.currentTarget.getBoundingClientRect();
+
+      setPointerPosition({
+        x: event.clientX - bounds.left,
+        y: event.clientY - bounds.top,
+      });
+    },
+    [],
+  );
 
   const collectBit = useCallback(
     (bit: StarBit) => {
@@ -145,13 +167,16 @@ export function useSuperMarioGalaxyGame(): Readonly<{
   const handlePointerDown = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
       isDraggingRef.current = true;
+      updatePointerPosition(event);
       event.currentTarget.setPointerCapture(event.pointerId);
     },
-    [],
+    [updatePointerPosition],
   );
 
   const handlePointerMove = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
+      updatePointerPosition(event);
+
       const bounds = containerRef.current?.getBoundingClientRect();
 
       if (!bounds || !isDraggingRef.current) {
@@ -171,11 +196,23 @@ export function useSuperMarioGalaxyGame(): Readonly<{
 
       collectBit(touchedBit);
     },
-    [bits, collectBit, collectedBitIds],
+    [bits, collectBit, collectedBitIds, updatePointerPosition],
   );
 
   const stopDragging = useCallback(() => {
     isDraggingRef.current = false;
+  }, []);
+
+  const handlePointerEnter = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      updatePointerPosition(event);
+    },
+    [updatePointerPosition],
+  );
+
+  const handlePointerLeave = useCallback(() => {
+    isDraggingRef.current = false;
+    setPointerPosition(null);
   }, []);
 
   return {
@@ -184,7 +221,10 @@ export function useSuperMarioGalaxyGame(): Readonly<{
     containerRef,
     handlePointerCancel: stopDragging,
     handlePointerDown,
+    handlePointerEnter,
+    handlePointerLeave,
     handlePointerMove,
     handlePointerUp: stopDragging,
+    pointerPosition,
   };
 }

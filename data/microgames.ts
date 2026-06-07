@@ -23,12 +23,14 @@ export type MicrogameCanvas =
   | "courseRegistrationNumber"
   | "crazyArcade"
   | "default"
+  | "flickingGame"
   | "flappyBird"
   | "geometryDashSpikes"
   | "gomokuWhiteStone"
   | "halliGalliBoss"
   | "hancomTyping"
   | "kartriderCourse"
+  | "kirbyInhale"
   | "laytonShapeMatch"
   | "leagueChampionBan"
   | "maplestoryLieDetector"
@@ -41,10 +43,13 @@ export type MicrogameCanvas =
   | "pokemonTyping"
   | "superMarioGalaxyStarBits"
   | "superMarioCoins"
+  | "submitAssignment"
   | "tetrisLineClear"
   | "twoThousandFortyEightBoss"
   | "undertaleMouse"
-  | "zeldaCircleDraw";
+  | "wiiSportsDualPress"
+  | "zeldaCircleDraw"
+  | "zeldaOcarinaOfTime";
 
 export type MicrogameMicroscope = Readonly<{
   description: string;
@@ -75,6 +80,22 @@ const FORM_INSTRUCTIONS_BY_CONTROL = {
 } satisfies Record<MicrogameControl, FormInstruction>;
 
 export const MICROGAMES = [
+  {
+    beatCount: 8,
+    canvas: "submitAssignment",
+    microscope: {
+      description:
+        "과제 마감 직전에 제출해보신 적이 있으신가요? 체크박스 체크를 잊지 마세요.",
+      imageAlt: "과제 제출 화면",
+      imageSrc: "/games/submit-assignment/images/background.png",
+    },
+    control: "mouseClick",
+    id: "submit-assignment",
+    startPrompt: "과제를 제출해라!",
+    title: "과제 제출",
+    type: "normal",
+  },
+
   {
     beatCount: 8,
     canvas: "laytonShapeMatch",
@@ -220,6 +241,22 @@ export const MICROGAMES = [
   },
 
   {
+    beatCount: 8,
+    canvas: "kirbyInhale",
+    microscope: {
+      description:
+        "별의 커비에서는 숨을 크게 들이마시는 순간이 시작입니다. 마우스를 꾹 눌러 적을 끝까지 빨아들이세요.",
+      imageAlt: "별의 커비 흡입 자세",
+      imageSrc: "/games/kirby/images/kirby-ready.png",
+    },
+    control: "mouseHold",
+    id: "kirby-inhale",
+    startPrompt: "빨아들여라!",
+    title: "별의 커비: 울트라 슈퍼 디럭스",
+    type: "normal",
+  },
+
+  {
     beatCount: 12,
     canvas: "appleNumberSum",
     microscope: {
@@ -264,6 +301,22 @@ export const MICROGAMES = [
     id: "super-mario-galaxy-star-bits",
     startPrompt: "스타구슬을 모아라!",
     title: "슈퍼마리오 갤럭시",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "flickingGame",
+    microscope: {
+      description:
+        "알까기는 손끝 힘 조절이 전부입니다. 내 돌은 나가도 괜찮지만, 상대 돌은 반드시 판 밖으로 밀어내야 합니다.",
+      imageAlt: "알까기 판",
+      imageSrc: "/games/flicking-game/images/board.png",
+    },
+    control: "mouseDrag",
+    id: "flicking-game",
+    startPrompt: "적 돌을 밀어내라!",
+    title: "알까기",
     type: "normal",
   },
 
@@ -332,6 +385,22 @@ export const MICROGAMES = [
 
   {
     beatCount: 12,
+    canvas: "zeldaOcarinaOfTime",
+    microscope: {
+      description:
+        "시간의 오카리나에서는 짧은 멜로디 하나가 문을 열고 날씨도 바꿉니다. 악보를 보고 정확히 연주해보세요.",
+      imageAlt: "시간의 오카리나 악보",
+      imageSrc: "/games/zelda-ocarina-of-time/images/zeldas_lullaby.png",
+    },
+    control: "arrowAndSpace",
+    id: "zelda-ocarina-song",
+    startPrompt: "연주해라!",
+    title: "젤다의 전설: 시간의 오카리나",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
     canvas: "geometryDashSpikes",
     microscope: {
       description:
@@ -373,7 +442,7 @@ export const MICROGAMES = [
     },
     control: "arrowAndSpace",
     id: "crazy-arcade-water-bomb",
-    startPrompt: "물폭탄을 설치해라!",
+    startPrompt: "물풍선을 설치해라!",
     title: "크레이지 아케이드",
     type: "normal",
   },
@@ -447,7 +516,7 @@ export const MICROGAMES = [
     canvas: "flappyBird",
     microscope: {
       description:
-        "플래피버드, 스페이스 한 번에 목숨이 걸린 게임입니다. 파이프 사이를 통과하려고 누르다 보면 손이 자꾸 급해져요.",
+        "플래피버드, 너무 어려운 게임입니다. 파이프 사이를 통과하려고 누르다 보면 손이 자꾸 급해져요.",
       imageAlt: "플래피버드",
       imageSrc: "/games/flappy-bird/images/bird.png",
     },
@@ -487,6 +556,22 @@ export const MICROGAMES = [
     id: "hancom-word-typing",
     startPrompt: "단어를 입력해라!",
     title: "한컴 타자연습",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "wiiSportsDualPress",
+    microscope: {
+      description:
+        "Wii Sports를 해보셨나요? A와 B를 둘 다 눌러 게임을 시작하세요.",
+      imageAlt: "Wii Sports A와 B 버튼 안내",
+      imageSrc: "/games/wii-sports/images/backgroud-default.png",
+    },
+    control: "koreanKeyboard",
+    id: "wii-sports-dual-button",
+    startPrompt: "A와 B를 눌러라!",
+    title: "Wii Sports",
     type: "normal",
   },
 

@@ -17,6 +17,7 @@ export type BgmTrack =
   | "hancom"
   | "intermission"
   | "kartrider"
+  | "kirby"
   | "layton"
   | "leagueOfLegend"
   | "maplestory"
@@ -34,6 +35,7 @@ export type BgmTrack =
   | "success"
   | "tetris"
   | "undertale"
+  | "wiiSports"
   | "zelda";
 
 export type SoundEffectTrack =
@@ -71,6 +73,7 @@ const BGM_TRACK_PATHS = {
   hancom: "/games/hancom/sounds/hancom-bgm.mp3",
   intermission: "/games/game-flow/sounds/intermission.mp3",
   kartrider: "/games/kartrider/sounds/kartrider-bgm.mp3",
+  kirby: "/games/kirby/sounds/kirby-bgm.mp3",
   layton: "/games/layton/sounds/layton-bgm.mp3",
   leagueOfLegend: "/games/league-of-legend/sounds/league-of-legend-ban-bgm.mp3",
   maplestory: "/games/maplestory-lie-detector/sounds/maplestory-bgm.mp3",
@@ -89,6 +92,7 @@ const BGM_TRACK_PATHS = {
   success: "/games/game-flow/sounds/success.mp3",
   tetris: "/games/tetris/sounds/tetris-bgm.mp3",
   undertale: "/games/undertale/sounds/undertale-bgm.mp3",
+  wiiSports: "/games/wii-sports/sounds/wii-sports-bgm.mp3",
   zelda: "/games/zelda/sounds/zelda-bgm.mp3",
 } satisfies Record<BgmTrack, string>;
 
@@ -147,6 +151,7 @@ const BGM_TRACK_BEATS = {
   hancom: 12,
   intermission: 8,
   kartrider: 36,
+  kirby: 8,
   layton: 8,
   leagueOfLegend: 12,
   maplestory: 12,
@@ -164,6 +169,7 @@ const BGM_TRACK_BEATS = {
   success: 4,
   tetris: 12,
   undertale: 8,
+  wiiSports: 8,
   zelda: 12,
 } satisfies Record<Exclude<BgmTrack, "gameOver">, number>;
 

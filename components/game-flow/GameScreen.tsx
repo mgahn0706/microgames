@@ -341,6 +341,13 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "wiiSportsDualPress") {
+        bgmLibrary.play("wiiSports", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "superMarioCoins") {
         bgmLibrary.play("superMario", "once", "now").catch((error: unknown) => {
           console.error(error);
@@ -456,6 +463,13 @@ export function GameScreen({
 
       if (microgame.canvas === "kartriderCourse") {
         bgmLibrary.play("kartrider", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "kirbyInhale") {
+        bgmLibrary.play("kirby", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
         return;

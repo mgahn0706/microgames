@@ -23,5 +23,6 @@ Workflow rule for Codex:
 - Prefer `const` by default. Do not use `var`, and do not use `let` unless mutation is truly unavoidable.
 - In React code, preserve immutability of state, props, and derived data. Do not mutate arrays, objects, or nested structures in place.
 - Hook filenames must use camelCase. Do not add new hook files with kebab-case or snake_case names.
+- Keep `MICROGAMES` ordered with normal microgames first in Korean 가나다 title order, and boss microgames grouped at the bottom in Korean 가나다 title order.
 - Use `git add -A` before commit so the full tracked and untracked change set is staged in one step.
 - Determine the next feature list number incrementally from previous commit logs when possible, instead of asking the user each time.

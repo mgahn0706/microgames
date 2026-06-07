@@ -197,6 +197,13 @@ export function useBeatGameRound({
         return;
       }
 
+      if (phase === "result" && isBossGameRound(roundNumber)) {
+        setSpeedLevel((currentSpeedLevel) => currentSpeedLevel + 1);
+        setRoundNumber((currentRoundNumber) => currentRoundNumber + 1);
+        beginInstruction();
+        return;
+      }
+
       if (
         phase === "result" &&
         roundNumber % BOSS_STAGE_INTERVAL_ROUNDS === 0
