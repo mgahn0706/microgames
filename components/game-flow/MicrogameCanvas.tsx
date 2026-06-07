@@ -29,6 +29,7 @@ import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
 import { PongGame } from "@/games/PongGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
+import { SubmitAssignmentGame } from "@/games/SubmitAssignmentGame";
 import { SuperMarioGalaxyGame } from "@/games/SuperMarioGalaxyGame";
 import { SuperMarioCoinGame } from "@/games/SuperMarioCoinGame";
 import { TetrisLineClearGame } from "@/games/TetrisLineClearGame";
@@ -156,6 +157,10 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "kirbyInhale") {
     return <KirbyInhaleGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "submitAssignment") {
+    return <SubmitAssignmentGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "tetrisLineClear") {

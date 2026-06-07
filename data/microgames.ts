@@ -43,6 +43,7 @@ export type MicrogameCanvas =
   | "pokemonTyping"
   | "superMarioGalaxyStarBits"
   | "superMarioCoins"
+  | "submitAssignment"
   | "tetrisLineClear"
   | "twoThousandFortyEightBoss"
   | "undertaleMouse"
@@ -78,6 +79,22 @@ const FORM_INSTRUCTIONS_BY_CONTROL = {
 } satisfies Record<MicrogameControl, FormInstruction>;
 
 export const MICROGAMES = [
+  {
+    beatCount: 8,
+    canvas: "submitAssignment",
+    microscope: {
+      description:
+        "과제 마감 직전에 제출해보신 적이 있으신가요? 체크박스 체크를 잊지 마세요.",
+      imageAlt: "과제 제출 화면",
+      imageSrc: "/games/submit-assignment/images/background.png",
+    },
+    control: "mouseClick",
+    id: "submit-assignment",
+    startPrompt: "과제를 제출해라!",
+    title: "과제 제출",
+    type: "normal",
+  },
+
   {
     beatCount: 8,
     canvas: "laytonShapeMatch",

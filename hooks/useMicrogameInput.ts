@@ -99,6 +99,7 @@ export function useMicrogameInput({
         microgame.canvas !== "halliGalliBoss" &&
         microgame.canvas !== "leagueChampionBan" &&
         microgame.canvas !== "minecraftMining" &&
+        microgame.canvas !== "submitAssignment" &&
         microgame.canvas !== "undertaleMouse"
       ) {
         recordClearOnce();

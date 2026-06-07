@@ -157,6 +157,7 @@ export const ALL_GAME_PRELOAD_ASSETS = [
   "/games/supermario/images/block.png",
   "/games/supermario/images/coin.png",
   "/games/supermario/images/mario.png",
+  "/games/submit-assignment/images/background.png",
   "/games/tetris/images/thumbnail.svg",
   "/games/two-thousand-forty-eight/images/thumbnail.svg",
   "/games/zelda-ocarina-of-time/images/background.png",
