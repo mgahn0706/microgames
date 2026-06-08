@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  CHALLENGE_MODE_UNLOCK_ROUND,
+  THRILL_MODE_MAX_LIVES,
+  type ChallengeModeId,
+  hasChallengeMode,
+} from "@/data/challengeModes";
 import { ALL_GAME_PRELOAD_ASSETS } from "@/data/preloadAssets";
 import { useHighestClearedRound } from "@/hooks/useHighestClearedRound";
 import { bgmLibrary } from "@/lib/bgmLibrary";
@@ -170,6 +176,16 @@ function resetPreloadCache() {
   allGameAssetsPreloadPromise = null;
 }
 
+function getMaxLives(challengeModeIds: readonly ChallengeModeId[]) {
+  return hasChallengeMode(challengeModeIds, "thrill")
+    ? THRILL_MODE_MAX_LIVES
+    : MAX_LIVES;
+}
+
+function getInitialLives(challengeModeIds: readonly ChallengeModeId[]) {
+  return getMaxLives(challengeModeIds);
+}
+
 export function useGameScreenFlow() {
   const [preloadStatus, setPreloadStatus] = useState<PreloadStatus>(
     INITIAL_PRELOAD_STATUS,
@@ -179,6 +195,12 @@ export function useGameScreenFlow() {
     ENABLE_GAME_ASSET_PRELOADING ? "loading" : "main",
   );
   const [lives, setLives] = useState(MAX_LIVES);
+  const [selectedChallengeModeIds, setSelectedChallengeModeIds] = useState<
+    ChallengeModeId[]
+  >([]);
+  const [activeChallengeModeIds, setActiveChallengeModeIds] = useState<
+    ChallengeModeId[]
+  >([]);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
   const [finalClearedRound, setFinalClearedRound] = useState(0);
   const { highestClearedRound, recordHighestClearedRound } =
@@ -226,12 +248,35 @@ export function useGameScreenFlow() {
     setScreen("loading");
   }, []);
 
+  const toggleChallengeMode = useCallback((challengeModeId: ChallengeModeId) => {
+    setSelectedChallengeModeIds((currentChallengeModeIds) => {
+      if (highestClearedRound < CHALLENGE_MODE_UNLOCK_ROUND) {
+        return currentChallengeModeIds;
+      }
+
+      if (currentChallengeModeIds.includes(challengeModeId)) {
+        return currentChallengeModeIds.filter(
+          (currentChallengeModeId) =>
+            currentChallengeModeId !== challengeModeId,
+        );
+      }
+
+      return [...currentChallengeModeIds, challengeModeId];
+    });
+  }, [highestClearedRound]);
+
   const startGame = useCallback(() => {
+    const nextChallengeModeIds =
+      highestClearedRound >= CHALLENGE_MODE_UNLOCK_ROUND
+        ? selectedChallengeModeIds
+        : [];
+
+    setActiveChallengeModeIds(nextChallengeModeIds);
     setFinalClearedRound(0);
-    setLives(MAX_LIVES);
+    setLives(getInitialLives(nextChallengeModeIds));
     setRoundResult("idle");
     setScreen("setup");
-  }, []);
+  }, [highestClearedRound, selectedChallengeModeIds]);
 
   const completeSetup = useCallback(() => {
     setScreen("playing");
@@ -244,10 +289,10 @@ export function useGameScreenFlow() {
 
   const restartGame = useCallback(() => {
     setFinalClearedRound(0);
-    setLives(MAX_LIVES);
+    setLives(getInitialLives(activeChallengeModeIds));
     setRoundResult("idle");
     setScreen("setup");
-  }, []);
+  }, [activeChallengeModeIds]);
 
   const returnToMain = useCallback(() => {
     setFinalClearedRound(0);
@@ -280,23 +325,28 @@ export function useGameScreenFlow() {
 
   const gainLife = useCallback(() => {
     setLives((currentLives) => {
+      const currentMaxLives = getMaxLives(activeChallengeModeIds);
+
       if (currentLives <= 0) {
         return currentLives;
       }
 
-      return Math.min(currentLives + 1, MAX_LIVES);
+      return Math.min(currentLives + 1, currentMaxLives);
     });
-  }, []);
+  }, [activeChallengeModeIds]);
 
   return {
     completeSetup,
     finalClearedRound,
     finishGame,
     gainLife,
+    activeChallengeModeIds,
     highestClearedRound,
+    isChallengeModeUnlocked:
+      highestClearedRound >= CHALLENGE_MODE_UNLOCK_ROUND,
     lives,
     loseLife,
-    maxLives: MAX_LIVES,
+    maxLives: getMaxLives(activeChallengeModeIds),
     preloadStatus,
     recordSuccess,
     resetRoundResult,
@@ -305,6 +355,8 @@ export function useGameScreenFlow() {
     returnToMain,
     roundResult,
     screen,
+    selectedChallengeModeIds,
     startGame,
+    toggleChallengeMode,
   };
 }

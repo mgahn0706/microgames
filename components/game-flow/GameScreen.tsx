@@ -2,13 +2,19 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  DOUBLE_SPEED_BEAT_DURATION_MULTIPLIER,
+  type ChallengeModeId,
+  hasChallengeMode,
+} from "@/data/challengeModes";
 import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
 import { getMicrogamePoolForRound, type Microgame } from "@/data/microgames";
 import { useBeatGameRound } from "@/hooks/useBeatGameRound";
+import type { GameRoundResult } from "@/hooks/useGameScreenFlow";
 import { useMicrogameInput } from "@/hooks/useMicrogameInput";
 import { useRecordSeenMicrogame } from "@/hooks/useRecordSeenMicrogame";
 import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
-import { bgmLibrary, type SoundEffectTrack } from "@/lib/bgmLibrary";
+import { bgmLibrary, type BgmTrack, type SoundEffectTrack } from "@/lib/bgmLibrary";
 import { FixedLivesOverlay } from "./FixedLivesOverlay";
 import { RESULT_BGM_TRACKS } from "./gameFlowConstants";
 import { NeonShell } from "./NeonShell";
@@ -28,6 +34,21 @@ const CLEAR_SOUND_EFFECTS = [
   "clear4",
   "clear5",
 ] satisfies SoundEffectTrack[];
+
+const NO_CONTROL_RESULT_BGM_TRACKS = {
+  failure: "failNoControl",
+  idle: null,
+  success: "successNoControl",
+} satisfies Record<GameRoundResult, BgmTrack | null>;
+
+const PASS_ON_TIMEOUT_CANVASES = new Set<Microgame["canvas"]>([
+  "chromeDinoSpace",
+  "cookieRun",
+  "flappyBird",
+  "geometryDashSpikes",
+  "pongSurvival",
+  "undertaleMouse",
+]);
 
 function getRandomClearSoundEffect() {
   return CLEAR_SOUND_EFFECTS[
@@ -184,6 +205,7 @@ function avoidImmediateMicrogameRepeat(
 }
 
 export function GameScreen({
+  challengeModeIds,
   lives,
   maxLives,
   onFinish,
@@ -193,6 +215,7 @@ export function GameScreen({
   onSeenMicrogame,
   onSuccess,
 }: Readonly<{
+  challengeModeIds: readonly ChallengeModeId[];
   lives: number;
   maxLives: number;
   onFinish: () => void;
@@ -207,10 +230,17 @@ export function GameScreen({
   const [microgameSessionSeed] = useState(() =>
     Math.floor(Math.random() * 4294967296),
   );
+  const isDoubleSpeed = hasChallengeMode(challengeModeIds, "doubleSpeed");
+  const isNoControl = hasChallengeMode(challengeModeIds, "noControl");
   const getMicrogameForRound = useCallback(
     (nextRoundNumber: number) =>
       getRoundMicrogame(nextRoundNumber, microgameSessionSeed),
     [microgameSessionSeed],
+  );
+  const getShouldPassGameOnTimeout = useCallback(
+    (nextRoundNumber: number) =>
+      PASS_ON_TIMEOUT_CANVASES.has(getMicrogameForRound(nextRoundNumber).canvas),
+    [getMicrogameForRound],
   );
 
   const {
@@ -224,8 +254,13 @@ export function GameScreen({
     roundNumber,
     roundResult,
   } = useBeatGameRound({
+    beatDurationMultiplier: isDoubleSpeed
+      ? DOUBLE_SPEED_BEAT_DURATION_MULTIPLIER
+      : 1,
     getGameBeatCount: (nextRoundNumber) =>
       getMicrogameForRound(nextRoundNumber).beatCount,
+    getShouldPassGameOnTimeout,
+    isNoControlMode: isNoControl,
     onFailure: onLoseLife,
     onFinish,
     onResetResult,
@@ -279,9 +314,11 @@ export function GameScreen({
     bgmLibrary.setBeatDurationMs(beatDurationMs);
 
     if (phase === "instruction") {
-      bgmLibrary.play("intermission", "once").catch((error: unknown) => {
-        console.error(error);
-      });
+      bgmLibrary
+        .play(isNoControl ? "intermissionNoControl" : "intermission", "once")
+        .catch((error: unknown) => {
+          console.error(error);
+        });
       return;
     }
 
@@ -507,34 +544,47 @@ export function GameScreen({
     }
 
     const nextResultBgmTrack = RESULT_BGM_TRACKS[roundResult];
+    const nextChallengeResultBgmTrack = isNoControl
+      ? NO_CONTROL_RESULT_BGM_TRACKS[roundResult]
+      : nextResultBgmTrack;
     const shouldGoToGameOver = roundResult === "failure" && lives <= 0;
     const shouldSpeedUpAfterResult = roundNumber % 4 === 0;
 
-    if (!nextResultBgmTrack) {
+    if (!nextChallengeResultBgmTrack) {
       return;
     }
 
     if (shouldGoToGameOver) {
-      bgmLibrary.play(nextResultBgmTrack, "once").catch((error: unknown) => {
-        console.error(error);
-      });
+      bgmLibrary
+        .play(nextChallengeResultBgmTrack, "once")
+        .catch((error: unknown) => {
+          console.error(error);
+        });
       return;
     }
 
     if (shouldSpeedUpAfterResult) {
-      bgmLibrary.play(nextResultBgmTrack, "once").catch((error: unknown) => {
-        console.error(error);
-      });
+      bgmLibrary
+        .play(nextChallengeResultBgmTrack, "once")
+        .catch((error: unknown) => {
+          console.error(error);
+        });
       return;
     }
 
     bgmLibrary
-      .playSequence(nextResultBgmTrack, "once", "intermission", "once")
+      .playSequence(
+        nextChallengeResultBgmTrack,
+        "once",
+        isNoControl ? "intermissionNoControl" : "intermission",
+        "once",
+      )
       .catch((error: unknown) => {
         console.error(error);
       });
   }, [
     beatDurationMs,
+    isNoControl,
     lives,
     microgame.canvas,
     onGainLife,
@@ -564,6 +614,7 @@ export function GameScreen({
         <InstructionRoundScreen
           beatDurationMs={beatDurationMs}
           instructionStep={instructionStep}
+          isNoControlMode={isNoControl}
           microgame={microgame}
           rhythmStyle={rhythmStyle}
           roundNumber={roundNumber}

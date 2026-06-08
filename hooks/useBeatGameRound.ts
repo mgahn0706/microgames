@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { NO_CONTROL_INSTRUCTION_BEATS } from "@/data/challengeModes";
 import type { GameRoundResult } from "@/hooks/useGameScreenFlow";
 import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 
@@ -39,8 +40,12 @@ const PHASE_LABELS = {
 } satisfies Record<GameRoundPhase, string>;
 
 type UseBeatGameRoundParams = Readonly<{
+  beatDurationMultiplier?: number;
   gameBeatCount?: number;
   getGameBeatCount?: (roundNumber: number) => number;
+  getShouldPassGameOnTimeout?: (roundNumber: number) => boolean;
+  initialSpeedLevel?: number;
+  isNoControlMode?: boolean;
   shouldPlayOneUp: boolean;
   onFailure: () => void;
   onFinish: () => void;
@@ -49,9 +54,13 @@ type UseBeatGameRoundParams = Readonly<{
   shouldFinishAfterResult: boolean;
 }>;
 
-function getPhaseBeatCount(phase: GameRoundPhase, gameBeatCount: number) {
+function getPhaseBeatCount(
+  phase: GameRoundPhase,
+  gameBeatCount: number,
+  isNoControlMode: boolean,
+) {
   if (phase === "instruction") {
-    return INSTRUCTION_BEATS;
+    return isNoControlMode ? NO_CONTROL_INSTRUCTION_BEATS : INSTRUCTION_BEATS;
   }
 
   if (phase === "result") {
@@ -80,10 +89,13 @@ function getSpeedRate(speedLevel: number) {
   );
 }
 
-function getBeatDurationMs(speedLevel: number) {
+function getBeatDurationMs(
+  speedLevel: number,
+  beatDurationMultiplier: number,
+) {
   const speedRate = getSpeedRate(speedLevel);
 
-  return RHYTHM_DURATION_MS * speedRate;
+  return RHYTHM_DURATION_MS * speedRate * beatDurationMultiplier;
 }
 
 function getBossStageSpeedLevel(roundNumber: number) {
@@ -96,17 +108,25 @@ function isBossGameRound(roundNumber: number) {
   );
 }
 
-function getPhaseBeatDurationMs(phase: GameRoundPhase, speedLevel: number) {
+function getPhaseBeatDurationMs(
+  phase: GameRoundPhase,
+  speedLevel: number,
+  beatDurationMultiplier: number,
+) {
   if (phase === "oneUp") {
     return RHYTHM_DURATION_MS;
   }
 
-  return getBeatDurationMs(speedLevel);
+  return getBeatDurationMs(speedLevel, beatDurationMultiplier);
 }
 
 export function useBeatGameRound({
+  beatDurationMultiplier = 1,
   gameBeatCount = DEFAULT_GAME_BEATS,
   getGameBeatCount,
+  getShouldPassGameOnTimeout,
+  initialSpeedLevel = 0,
+  isNoControlMode = false,
   onFailure,
   onFinish,
   onResetResult,
@@ -115,30 +135,41 @@ export function useBeatGameRound({
   shouldFinishAfterResult,
 }: UseBeatGameRoundParams) {
   const [phase, setPhase] = useState<GameRoundPhase>("instruction");
-  const [instructionStep, setInstructionStep] =
-    useState<InstructionStep>("idle");
+  const [instructionStep, setInstructionStep] = useState<InstructionStep>(
+    isNoControlMode ? "floor" : "idle",
+  );
   const [roundNumber, setRoundNumber] = useState(1);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
   const [gameBeatProgress, setGameBeatProgress] = useState({
     beatsLeft: DEFAULT_GAME_BEATS,
     key: "instruction-1",
   });
-  const [speedLevel, setSpeedLevel] = useState(0);
+  const [speedLevel, setSpeedLevel] = useState(initialSpeedLevel);
   const hasClearedCurrentGameRef = useRef(false);
   const [shouldOneUpAfterResult, setShouldOneUpAfterResult] = useState(false);
   const currentGameBeatCount = getGameBeatCount?.(roundNumber) ?? gameBeatCount;
-  const phaseBeatCount = getPhaseBeatCount(phase, currentGameBeatCount);
-  const beatDurationMs = getPhaseBeatDurationMs(phase, speedLevel);
+  const shouldPassCurrentGameOnTimeout =
+    getShouldPassGameOnTimeout?.(roundNumber) ?? false;
+  const phaseBeatCount = getPhaseBeatCount(
+    phase,
+    currentGameBeatCount,
+    isNoControlMode,
+  );
+  const beatDurationMs = getPhaseBeatDurationMs(
+    phase,
+    speedLevel,
+    beatDurationMultiplier,
+  );
   const phaseDurationMs = phaseBeatCount * beatDurationMs;
   const beatProgressKey = `${phase}-${roundNumber}-${phaseBeatCount}`;
 
   const beginInstruction = useCallback(() => {
-    setInstructionStep("idle");
+    setInstructionStep(isNoControlMode ? "floor" : "idle");
     setPhase("instruction");
     setRoundResult("idle");
     hasClearedCurrentGameRef.current = false;
     onResetResult();
-  }, [onResetResult]);
+  }, [isNoControlMode, onResetResult]);
 
   const showResult = useCallback(
     (result: Exclude<GameRoundResult, "idle">) => {
@@ -174,7 +205,11 @@ export function useBeatGameRound({
       }
 
       if (phase === "game") {
-        showResult(hasClearedCurrentGameRef.current ? "success" : "failure");
+        showResult(
+          hasClearedCurrentGameRef.current || shouldPassCurrentGameOnTimeout
+            ? "success"
+            : "failure",
+        );
         return;
       }
 
@@ -255,12 +290,17 @@ export function useBeatGameRound({
     roundNumber,
     shouldOneUpAfterResult,
     shouldFinishAfterResult,
+    shouldPassCurrentGameOnTimeout,
     shouldPlayOneUp,
     showResult,
   ]);
 
   useEffect(() => {
     if (phase !== "instruction") {
+      return;
+    }
+
+    if (isNoControlMode) {
       return;
     }
 
@@ -282,7 +322,7 @@ export function useBeatGameRound({
       window.clearTimeout(floorTimer);
       window.clearTimeout(promptTransitionTimer);
     };
-  }, [beatDurationMs, phase, roundNumber]);
+  }, [beatDurationMs, isNoControlMode, phase, roundNumber]);
 
   useEffect(() => {
     if (phase !== "game") {

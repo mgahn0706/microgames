@@ -56,12 +56,14 @@ function CurrentFloorDisplay({
 export function InstructionRoundScreen({
   beatDurationMs,
   instructionStep,
+  isNoControlMode,
   microgame,
   rhythmStyle,
   roundNumber,
 }: Readonly<{
   beatDurationMs: number;
   instructionStep: InstructionStep;
+  isNoControlMode: boolean;
   microgame: Microgame;
   rhythmStyle: SynchronizedRhythmStyle;
   roundNumber: number;
@@ -73,6 +75,20 @@ export function InstructionRoundScreen({
   const shouldShowIdle = instructionStep === "idle";
   const shouldShowFloor = instructionStep === "floor";
   const shouldHideInstruction = instructionStep === "promptTransition";
+
+  if (isNoControlMode) {
+    return (
+      <div className="mx-auto w-full max-w-5xl space-y-8 text-center">
+        <div className="instruction-form-stage">
+          <CurrentFloorDisplay
+            beatDurationMs={beatDurationMs}
+            rhythmStyle={rhythmStyle}
+            roundNumber={roundNumber}
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (shouldHideInstruction) {
     return <div className="mx-auto min-h-screen w-full max-w-5xl" />;

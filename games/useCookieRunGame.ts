@@ -350,6 +350,23 @@ function collides(state: GameState, width: number, height: number) {
   });
 }
 
+function hasPassedAllObstacles(state: GameState, width: number, height: number) {
+  const groundY = getGroundY(height);
+  const playerX = width * 0.21;
+  const playerRect = getPlayerRect(
+    playerX,
+    groundY,
+    state.playerY,
+    state.isSlideHeld,
+  );
+
+  return state.obstacles.every((obstacle) => {
+    const obstacleRect = getObstacleRect(obstacle, groundY);
+
+    return obstacleRect.right < playerRect.left;
+  });
+}
+
 export function useCookieRunGameCanvas(gameBeatCount: number) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<LoadedImages | null>(null);
@@ -372,7 +389,6 @@ export function useCookieRunGameCanvas(gameBeatCount: number) {
     }
 
     const beatDurationMs = getBeatDurationMs(canvas);
-    const roundDurationMs = gameBeatCount * beatDurationMs;
     const obstacleSpeed = getObstacleSpeed(beatDurationMs);
 
     jumpAudioRef.current = createAudio(COOKIE_RUN_SOUNDS.jump);
@@ -514,7 +530,7 @@ export function useCookieRunGameCanvas(gameBeatCount: number) {
       if (
         !stateRef.current.hasResolved &&
         !stateRef.current.hasCrashed &&
-        stateRef.current.elapsedMs >= roundDurationMs
+        hasPassedAllObstacles(stateRef.current, width, height)
       ) {
         resolveClear();
       }

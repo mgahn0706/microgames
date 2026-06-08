@@ -3,6 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+  CHALLENGE_MODE_UNLOCK_ROUND,
+  CHALLENGE_MODES,
+  type ChallengeModeId,
+} from "@/data/challengeModes";
 import { MICROGAMES, getMicrogameFormInstruction } from "@/data/microgames";
 import type { PreloadStatus } from "@/hooks/useGameScreenFlow";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
@@ -142,14 +147,23 @@ function HomeHeader({
 }
 
 function HomePanel({
+  challengeModeIds,
   highestClearedRound,
+  isChallengeModeUnlocked,
   isStarting,
+  onToggleChallengeMode,
   startGame,
 }: Readonly<{
+  challengeModeIds: readonly ChallengeModeId[];
   highestClearedRound: number;
+  isChallengeModeUnlocked: boolean;
   isStarting: boolean;
+  onToggleChallengeMode: (challengeModeId: ChallengeModeId) => void;
   startGame: () => void;
 }>) {
+  const [isChallengeAccordionOpen, setIsChallengeAccordionOpen] =
+    useState(false);
+
   return (
     <div className="grid gap-7 lg:grid-cols-[1fr_260px] lg:items-center">
       <div className="space-y-7">
@@ -175,6 +189,123 @@ function HomePanel({
             </span>
             <span className="pb-1 text-lg font-black leading-none">층</span>
           </p>
+        </div>
+        <div className="relative z-20 max-w-2xl rounded-md border border-cyan-100/30 bg-black/38 shadow-[0_0_20px_rgba(103,232,249,0.1)]">
+          <button
+            aria-expanded={isChallengeAccordionOpen}
+            className="grid w-full grid-cols-[1fr_auto] items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/[0.04]"
+            onClick={() => {
+              setIsChallengeAccordionOpen(
+                (currentIsChallengeAccordionOpen) =>
+                  !currentIsChallengeAccordionOpen,
+              );
+            }}
+            type="button"
+          >
+            <span className="min-w-0">
+              <span className="block text-[0.66rem] font-black uppercase tracking-[0.2em] text-cyan-100/72">
+                Challenge Mode
+              </span>
+              <span className="mt-0.5 block text-base font-black leading-tight text-white">
+                챌린지 모드
+              </span>
+            </span>
+            <span className="flex shrink-0 items-center gap-2">
+              {isChallengeModeUnlocked ? null : (
+                <span className="rounded border border-white/18 px-2 py-0.5 text-[0.68rem] font-black text-white/45">
+                  {CHALLENGE_MODE_UNLOCK_ROUND}층 해금
+                </span>
+              )}
+              <span
+                aria-hidden="true"
+                className={`text-lg font-black leading-none text-cyan-100 transition duration-300 ${
+                  isChallengeAccordionOpen ? "rotate-180" : ""
+                }`}
+              >
+                ▾
+              </span>
+            </span>
+          </button>
+          <div
+            className={`transition-opacity duration-150 ease-out ${
+              isChallengeAccordionOpen
+                ? "overflow-visible opacity-100"
+                : "hidden overflow-hidden opacity-0"
+            }`}
+          >
+            <div className="min-h-0 overflow-visible">
+              <div
+                className={`border-t border-cyan-100/14 px-3 pb-3 pt-2 transition duration-150 ease-out ${
+                  isChallengeAccordionOpen
+                    ? "translate-y-0 opacity-100"
+                    : "-translate-y-1 opacity-0"
+                }`}
+              >
+                {isChallengeModeUnlocked ? null : (
+                  <p className="mb-2 rounded border border-white/12 bg-black/28 px-2.5 py-1.5 text-[0.68rem] font-black leading-4 text-cyan-50/58">
+                    최고 기록 {CHALLENGE_MODE_UNLOCK_ROUND}층 달성 후 선택 가능
+                  </p>
+                )}
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {CHALLENGE_MODES.map((challengeMode) => {
+                    const isSelected =
+                      isChallengeModeUnlocked &&
+                      challengeModeIds.includes(challengeMode.id);
+                    const isDisabled = isStarting || !isChallengeModeUnlocked;
+
+                    return (
+                      <label
+                        className={`relative grid min-h-11 grid-cols-[1fr_auto] items-center gap-2 rounded-md border px-3 py-2 transition ${
+                          isSelected
+                            ? "border-cyan-100 bg-cyan-100 text-black shadow-[0_0_18px_rgba(103,232,249,0.22)]"
+                            : "border-cyan-100/20 bg-black/22"
+                        } ${
+                          isDisabled
+                            ? "cursor-not-allowed opacity-50"
+                            : "cursor-pointer hover:border-cyan-100/48 hover:bg-white/[0.05]"
+                        }`}
+                        key={challengeMode.id}
+                      >
+                        <input
+                          checked={isSelected}
+                          className="peer sr-only"
+                          disabled={isDisabled}
+                          onChange={() => {
+                            onToggleChallengeMode(challengeMode.id);
+                          }}
+                          type="checkbox"
+                        />
+                        <span className="min-w-0">
+                          <span
+                            className={`block text-xs font-black leading-tight ${
+                              isSelected ? "text-black" : "text-cyan-50"
+                            }`}
+                          >
+                            {challengeMode.title}
+                          </span>
+                        </span>
+                        <span
+                          aria-label={challengeMode.description}
+                          className={`group relative grid size-6 place-items-center rounded border text-[0.65rem] font-black ${
+                            isSelected
+                              ? "border-black/20 bg-black/10 text-black/70"
+                              : "border-cyan-100/24 bg-black/36 text-cyan-100/72"
+                          }`}
+                          role="img"
+                          tabIndex={0}
+                        >
+                          i
+                          <span className="pointer-events-none absolute right-0 top-full z-50 mt-2 w-52 rounded border border-cyan-100/35 bg-black/95 px-3 py-2 text-left text-xs font-bold leading-5 text-cyan-50/82 opacity-0 shadow-[0_0_24px_rgba(103,232,249,0.28)] transition group-focus:opacity-100 group-hover:opacity-100">
+                            {challengeMode.description}
+                          </span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
           <NeonButton onClick={startGame}>
@@ -344,8 +475,11 @@ function MicroscopePanel({
 
 function renderHomeView(
   homeView: HomeView,
+  challengeModeIds: readonly ChallengeModeId[],
   highestClearedRound: number,
+  isChallengeModeUnlocked: boolean,
   isStarting: boolean,
+  onToggleChallengeMode: (challengeModeId: ChallengeModeId) => void,
   startGame: () => void,
   seenMicrogameIds: readonly string[],
 ) {
@@ -359,22 +493,31 @@ function renderHomeView(
 
   return (
     <HomePanel
+      challengeModeIds={challengeModeIds}
       highestClearedRound={highestClearedRound}
+      isChallengeModeUnlocked={isChallengeModeUnlocked}
       isStarting={isStarting}
+      onToggleChallengeMode={onToggleChallengeMode}
       startGame={startGame}
     />
   );
 }
 
 export function MainScreen({
+  challengeModeIds,
   highestClearedRound,
   homeView,
+  isChallengeModeUnlocked,
   onStart,
+  onToggleChallengeMode,
   seenMicrogameIds,
 }: Readonly<{
+  challengeModeIds: readonly ChallengeModeId[];
   highestClearedRound: number;
   homeView: HomeView;
+  isChallengeModeUnlocked: boolean;
   onStart: () => void;
+  onToggleChallengeMode: (challengeModeId: ChallengeModeId) => void;
   seenMicrogameIds: readonly string[];
 }>) {
   useBgmTrack("resultsAndMain", "loop", "now");
@@ -430,8 +573,11 @@ export function MainScreen({
       >
         {renderHomeView(
           homeView,
+          challengeModeIds,
           highestClearedRound,
+          isChallengeModeUnlocked,
           isStarting,
+          onToggleChallengeMode,
           startGame,
           seenMicrogameIds,
         )}

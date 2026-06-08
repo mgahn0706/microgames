@@ -66,7 +66,7 @@ export function FixedLivesOverlay({
       <div
         className={`${animateSetup ? "setup-screen" : ""} relative h-28 w-[min(92vw,720px)] sm:h-32`}
       >
-        {LIFE_LABELS.map((label, index) => {
+        {LIFE_LABELS.slice(0, maxLives).map((label, index) => {
           const isActive = index < lives;
           const shouldAnimateGainedLife =
             lifeAnimationState.gainedLifeIndexes.includes(index);
@@ -75,7 +75,10 @@ export function FixedLivesOverlay({
           const lifeAnimationKey = `${label}-${lifeAnimationState.animationKey}`;
           const lifeSlotStyle = {
             "--setup-life-delay": animateSetup ? `${index * 140}ms` : "0ms",
-            left: `${12.5 + index * 25}%`,
+            left:
+              maxLives === 1
+                ? "50%"
+                : `${12.5 + index * (100 / maxLives)}%`,
           } satisfies CSSProperties & {
             "--setup-life-delay": string;
           };

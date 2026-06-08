@@ -18,11 +18,13 @@ export function GameFlowExperience({
 }>) {
   const { recordSeenMicrogameId, seenMicrogameIds } = useSeenMicrogames();
   const {
+    activeChallengeModeIds,
     completeSetup,
     finalClearedRound,
     finishGame,
     gainLife,
     highestClearedRound,
+    isChallengeModeUnlocked,
     lives,
     loseLife,
     maxLives,
@@ -32,7 +34,9 @@ export function GameFlowExperience({
     returnToMain,
     retryPreload,
     screen,
+    selectedChallengeModeIds,
     startGame,
+    toggleChallengeMode,
   } = useGameScreenFlow();
 
   if (screen === "loading") {
@@ -54,6 +58,7 @@ export function GameFlowExperience({
   if (screen === "playing") {
     return (
       <GameScreen
+        challengeModeIds={activeChallengeModeIds}
         lives={lives}
         maxLives={maxLives}
         onFinish={finishGame}
@@ -78,9 +83,12 @@ export function GameFlowExperience({
 
   return (
     <MainScreen
+      challengeModeIds={selectedChallengeModeIds}
       highestClearedRound={highestClearedRound}
       homeView={homeView}
+      isChallengeModeUnlocked={isChallengeModeUnlocked}
       onStart={startGame}
+      onToggleChallengeMode={toggleChallengeMode}
       seenMicrogameIds={seenMicrogameIds}
     />
   );

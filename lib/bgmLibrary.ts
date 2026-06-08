@@ -11,11 +11,13 @@ export type BgmTrack =
   | "cookieRun"
   | "crazyArcade"
   | "fail"
+  | "failNoControl"
   | "gameOver"
   | "geometryDash"
   | "halliGalli"
   | "hancom"
   | "intermission"
+  | "intermissionNoControl"
   | "kartrider"
   | "kirby"
   | "layton"
@@ -33,6 +35,7 @@ export type BgmTrack =
   | "superMarioGalaxy"
   | "superMario"
   | "success"
+  | "successNoControl"
   | "tetris"
   | "undertale"
   | "wiiSports"
@@ -67,11 +70,14 @@ const BGM_TRACK_PATHS = {
   cookieRun: "/games/cookie-run/sounds/cookie-run-bgm.mp3",
   crazyArcade: "/games/crazy-arcade/sounds/crazy-arcade-bgm.mp3",
   fail: "/games/game-flow/sounds/fail.mp3",
+  failNoControl: "/games/game-flow/sounds/fail-no-control.mp3",
   gameOver: "/games/game-flow/sounds/game-over.mp3",
   geometryDash: "/games/geometry-dash/sounds/geometry-dash-bgm.mp3",
   halliGalli: "/games/halli-galli/sounds/halli-galli-bgm.mp3",
   hancom: "/games/hancom/sounds/hancom-bgm.mp3",
   intermission: "/games/game-flow/sounds/intermission.mp3",
+  intermissionNoControl:
+    "/games/game-flow/sounds/intermission-no-control.mp3",
   kartrider: "/games/kartrider/sounds/kartrider-bgm.mp3",
   kirby: "/games/kirby/sounds/kirby-bgm.mp3",
   layton: "/games/layton/sounds/layton-bgm.mp3",
@@ -90,6 +96,7 @@ const BGM_TRACK_PATHS = {
     "/games/super-mario-galaxy/sounds/super-mario-galaxy-bgm.mp3",
   superMario: "/games/supermario/sounds/overworld-theme.mp3",
   success: "/games/game-flow/sounds/success.mp3",
+  successNoControl: "/games/game-flow/sounds/success-no-control.mp3",
   tetris: "/games/tetris/sounds/tetris-bgm.mp3",
   undertale: "/games/undertale/sounds/undertale-bgm.mp3",
   wiiSports: "/games/wii-sports/sounds/wii-sports-bgm.mp3",
@@ -146,10 +153,12 @@ const BGM_TRACK_BEATS = {
   cookieRun: 12,
   crazyArcade: 12,
   fail: 4,
+  failNoControl: 4,
   geometryDash: 12,
   halliGalli: 36,
   hancom: 12,
   intermission: 8,
+  intermissionNoControl: 4,
   kartrider: 36,
   kirby: 8,
   layton: 8,
@@ -167,6 +176,7 @@ const BGM_TRACK_BEATS = {
   superMarioGalaxy: 12,
   superMario: 8,
   success: 4,
+  successNoControl: 4,
   tetris: 12,
   undertale: 8,
   wiiSports: 8,
