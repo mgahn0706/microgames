@@ -7,8 +7,8 @@ import { bgmLibrary } from "@/lib/bgmLibrary";
 
 const MIN_LOADING_TIME_MS = 900;
 const MAX_LIVES = 4;
-const ENABLE_GAME_ASSET_PRELOADING =
-  process.env.NEXT_PUBLIC_ENABLE_GAME_ASSET_PRELOADING !== "false";
+const ENABLE_GAME_ASSET_PRELOADING = false; // Preview test without preloading
+// process.env.NEXT_PUBLIC_ENABLE_GAME_ASSET_PRELOADING !== "false";
 
 let allGameAssetsPreloadPromise: Promise<void> | null = null;
 
