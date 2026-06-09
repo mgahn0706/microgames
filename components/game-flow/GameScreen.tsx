@@ -189,6 +189,7 @@ export function GameScreen({
   onFinish,
   onGainLife,
   onLoseLife,
+  onReachRound,
   onResetResult,
   onSeenMicrogame,
   onSuccess,
@@ -198,9 +199,10 @@ export function GameScreen({
   onFinish: (reachedRound: number) => void;
   onGainLife: () => void;
   onLoseLife: () => void;
+  onReachRound: (roundNumber: number) => void;
   onResetResult: () => void;
   onSeenMicrogame: (microgameId: string) => void;
-  onSuccess: (roundNumber: number) => void;
+  onSuccess: () => void;
 }>) {
   const oneUpAppliedRoundRef = useRef<number | null>(null);
   const clearSoundPlayedRoundRef = useRef<number | null>(null);
@@ -274,6 +276,14 @@ export function GameScreen({
     microgameId: microgame.id,
     onSeen: onSeenMicrogame,
   });
+
+  useEffect(() => {
+    if (phase !== "game") {
+      return;
+    }
+
+    onReachRound(roundNumber);
+  }, [onReachRound, phase, roundNumber]);
 
   useEffect(() => {
     bgmLibrary.setBeatDurationMs(beatDurationMs);

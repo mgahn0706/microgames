@@ -13,7 +13,6 @@ const ONE_UP_BEATS = 8;
 const SPEED_UP_INTERVAL_ROUNDS = 4;
 const BOSS_STAGE_INTERVAL_ROUNDS = 12;
 const SPEED_UP_BEAT_DURATION_MULTIPLIER = 0.94;
-const MIN_SPEED_RATE = 0.65;
 const BEAT_PROGRESS_INTERVAL_MS = 50;
 
 export type GameRoundPhase =
@@ -74,10 +73,7 @@ function getPhaseBeatCount(phase: GameRoundPhase, gameBeatCount: number) {
 }
 
 function getSpeedRate(speedLevel: number) {
-  return Math.max(
-    Math.pow(SPEED_UP_BEAT_DURATION_MULTIPLIER, speedLevel),
-    MIN_SPEED_RATE,
-  );
+  return Math.pow(SPEED_UP_BEAT_DURATION_MULTIPLIER, speedLevel);
 }
 
 function getBeatDurationMs(speedLevel: number) {

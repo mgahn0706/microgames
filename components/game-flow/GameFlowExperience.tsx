@@ -27,6 +27,7 @@ export function GameFlowExperience({
     loseLife,
     maxLives,
     preloadStatus,
+    recordReachedRound,
     recordSuccess,
     resetRoundResult,
     returnToMain,
@@ -59,6 +60,7 @@ export function GameFlowExperience({
         onFinish={finishGame}
         onGainLife={gainLife}
         onLoseLife={loseLife}
+        onReachRound={recordReachedRound}
         onResetResult={resetRoundResult}
         onSeenMicrogame={recordSeenMicrogameId}
         onSuccess={recordSuccess}

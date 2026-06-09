@@ -50,7 +50,7 @@ function OcarinaInputIcon({ input }: Readonly<{ input: OcarinaInput }>) {
     return (
       <span
         aria-hidden="true"
-        className="h-[clamp(0.58rem,1.1vw,0.86rem)] w-[clamp(1.65rem,3.1vw,2.45rem)] rounded border-[0.18rem] border-current shadow-[inset_0_-0.16rem_0_rgba(0,0,0,0.22)]"
+        className="h-[clamp(0.58rem,1.1vw,0.86rem)] w-[clamp(1.65rem,3.1vw,2.45rem)] rounded border-[0.18rem] border-sky-100 bg-sky-500 shadow-[inset_0_-0.16rem_0_rgba(0,0,0,0.22)]"
       />
     );
   }

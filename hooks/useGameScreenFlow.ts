@@ -323,6 +323,16 @@ export function useGameScreenFlow() {
     setScreen("main");
   }, []);
 
+  const recordReachedRound = useCallback(
+    (roundNumber: number) => {
+      recordHighestReachedRound(roundNumber);
+      setFinalReachedRound((currentFinalReachedRound) =>
+        Math.max(currentFinalReachedRound, roundNumber),
+      );
+    },
+    [recordHighestReachedRound],
+  );
+
   const recordSuccess = useCallback(() => {
     setRoundResult("success");
   }, []);
@@ -358,6 +368,7 @@ export function useGameScreenFlow() {
     loseLife,
     maxLives: MAX_LIVES,
     preloadStatus,
+    recordReachedRound,
     recordSuccess,
     resetRoundResult,
     restartGame,
