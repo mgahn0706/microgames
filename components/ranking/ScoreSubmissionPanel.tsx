@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { KeyboardEvent } from "react";
 import { useScoreSubmission } from "@/hooks/useScoreSubmission";
 import { MAX_USERNAME_LENGTH } from "@/lib/rankings";
@@ -28,6 +28,7 @@ export function ScoreSubmissionPanel({
 }: Readonly<{
   score: number;
 }>) {
+  const router = useRouter();
   const { errorMessage, isReady, setUsername, status, submitScore, username } =
     useScoreSubmission(score);
   const isSubmitting = status === "submitting";
@@ -39,6 +40,15 @@ export function ScoreSubmissionPanel({
   const finishUsernameInput = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.currentTarget.blur();
+    }
+  };
+
+  const showTopRankings = async () => {
+    const isSubmitted = await submitScore(username);
+
+    if (isSubmitted) {
+      router.push("/ranking");
+      router.refresh();
     }
   };
 
@@ -64,12 +74,15 @@ export function ScoreSubmissionPanel({
         <p className={errorMessage ? "text-red-100" : "text-cyan-50/68"}>
           {errorMessage ?? getStatusMessage(status)}
         </p>
-        <Link
-          className="shrink-0 font-black text-cyan-100 underline decoration-cyan-100/45 underline-offset-4 hover:text-white"
-          href="/ranking"
+        <button
+          className="shrink-0 font-black text-cyan-100 underline decoration-cyan-100/45 underline-offset-4 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={isSubmitting}
+          onClick={() => void showTopRankings()}
+          onMouseDown={(event) => event.preventDefault()}
+          type="button"
         >
           Top 10 보기
-        </Link>
+        </button>
       </div>
     </div>
   );

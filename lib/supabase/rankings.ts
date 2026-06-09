@@ -1,7 +1,12 @@
 import "server-only";
 
 import { unstable_cache } from "next/cache";
-import { RANKING_GAME_ID, RANKING_LIMIT, type Ranking } from "@/lib/rankings";
+import {
+  RANKING_CACHE_TAG,
+  RANKING_GAME_ID,
+  RANKING_LIMIT,
+  type Ranking,
+} from "@/lib/rankings";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 const RANKING_CACHE_SECONDS = 60;
@@ -36,6 +41,6 @@ export const getTopRankings = unstable_cache(
   ["main-top-rankings"],
   {
     revalidate: RANKING_CACHE_SECONDS,
-    tags: ["main-rankings"],
+    tags: [RANKING_CACHE_TAG],
   },
 );

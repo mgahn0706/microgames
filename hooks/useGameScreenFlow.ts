@@ -13,8 +13,33 @@ const GENERAL_PRELOAD_ASSETS = ALL_GAME_PRELOAD_ASSETS.filter(
   (assetPath) => !BGM_LIBRARY_PRELOAD_ASSET_PATHS.has(assetPath),
 );
 
-let allGameAssetsPreloadPromise: Promise<void> | null = null;
-let areAllGameAssetsPreloaded = false;
+type GlobalPreloadState = {
+  isComplete: boolean;
+  promise: Promise<void> | null;
+};
+
+const GLOBAL_PRELOAD_STATE_KEY = "__catTowerGameAssetsPreload";
+const serverPreloadState: GlobalPreloadState = {
+  isComplete: false,
+  promise: null,
+};
+
+function getGlobalPreloadState() {
+  if (typeof window === "undefined") {
+    return serverPreloadState;
+  }
+
+  const globalWindow = window as typeof window & {
+    [GLOBAL_PRELOAD_STATE_KEY]?: GlobalPreloadState;
+  };
+
+  globalWindow[GLOBAL_PRELOAD_STATE_KEY] ??= {
+    isComplete: false,
+    promise: null,
+  };
+
+  return globalWindow[GLOBAL_PRELOAD_STATE_KEY];
+}
 
 export type GameScreen = "main" | "loading" | "setup" | "playing" | "gameOver";
 export type GameRoundResult = "idle" | "success" | "failure";
@@ -196,27 +221,33 @@ async function runPreloadTasks(onProgress: PreloadProgressHandler | undefined) {
 }
 
 function preloadAllGameAssets(onProgress?: PreloadProgressHandler) {
-  allGameAssetsPreloadPromise ??= runPreloadTasks(onProgress).then(() => {
-    areAllGameAssetsPreloaded = true;
+  const preloadState = getGlobalPreloadState();
+  preloadState.promise ??= runPreloadTasks(onProgress).then(() => {
+    preloadState.isComplete = true;
   });
 
-  return allGameAssetsPreloadPromise;
+  return preloadState.promise;
 }
 
 function resetPreloadCache() {
-  allGameAssetsPreloadPromise = null;
-  areAllGameAssetsPreloaded = false;
+  const preloadState = getGlobalPreloadState();
+  preloadState.promise = null;
+  preloadState.isComplete = false;
+}
+
+function areAllGameAssetsPreloaded() {
+  return getGlobalPreloadState().isComplete;
 }
 
 export function useGameScreenFlow() {
   const [preloadStatus, setPreloadStatus] = useState<PreloadStatus>(
-    areAllGameAssetsPreloaded
+    areAllGameAssetsPreloaded()
       ? COMPLETE_PRELOAD_STATUS
       : INITIAL_PRELOAD_STATUS,
   );
   const [preloadAttempt, setPreloadAttempt] = useState(0);
   const [screen, setScreen] = useState<GameScreen>(
-    areAllGameAssetsPreloaded ? "main" : "loading",
+    areAllGameAssetsPreloaded() ? "main" : "loading",
   );
   const [lives, setLives] = useState(MAX_LIVES);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");

@@ -576,7 +576,7 @@ export const MICROGAMES = [
   },
 
   {
-    beatCount: 42,
+    beatCount: 36,
     canvas: "twoThousandFortyEightBoss",
     microscope: {
       description:

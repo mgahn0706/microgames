@@ -38,7 +38,7 @@ export function useScoreSubmission(score: number) {
       ) {
         setStatus("needsUsername");
         setErrorMessage(`닉네임을 1~${MAX_USERNAME_LENGTH}자로 입력해 주세요.`);
-        return;
+        return false;
       }
 
       saveUsername(normalizedUsername);
@@ -49,7 +49,7 @@ export function useScoreSubmission(score: number) {
       if (!playerId || (!isNewBestScore && !isUsernameChanged)) {
         setStatus("skipped");
         setErrorMessage(null);
-        return;
+        return true;
       }
 
       setStatus("submitting");
@@ -72,10 +72,19 @@ export function useScoreSubmission(score: number) {
         recordSubmittedUsername(normalizedUsername);
         setUsername(normalizedUsername);
         setStatus("submitted");
+
+        try {
+          await fetch("/api/rankings/revalidate", { method: "POST" });
+        } catch (error) {
+          console.error("Failed to revalidate rankings.", error);
+        }
+
+        return true;
       } catch (error) {
         console.error(error);
         setStatus("error");
         setErrorMessage("기록을 전송하지 못했습니다. 다시 시도해 주세요.");
+        return false;
       }
     },
     [
