@@ -2,9 +2,12 @@
 
 import type { Microgame } from "@/data/microgames";
 import { usePracticeMicrogame } from "@/hooks/usePracticeMicrogame";
-import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
+import {
+  RHYTHM_DURATION_MS,
+  useSynchronizedRhythm,
+} from "@/hooks/useSynchronizedRhythm";
 import { NeonButton, NeonShell } from "./NeonShell";
-import { MicrogameRoundScreen } from "./roundScreens";
+import { InstructionRoundScreen, MicrogameRoundScreen } from "./roundScreens";
 
 export function PracticeGameScreen({
   microgame,
@@ -12,22 +15,37 @@ export function PracticeGameScreen({
   microgame: Microgame;
 }>) {
   const { rhythmStyle } = useSynchronizedRhythm();
-  const { beatsLeft, phase, result, returnToMicroscope } =
+  const { beatsLeft, instructionStep, phase, result, returnToMicroscope } =
     usePracticeMicrogame(microgame);
 
-  if (phase === "playing") {
+  if (phase === "instruction" || phase === "playing") {
+    const isPromptTransition =
+      phase === "instruction" && instructionStep === "promptTransition";
+
     return (
       <NeonShell
         rhythmStyle={rhythmStyle}
         shouldDim={false}
-        showBackdrop={false}
+        showBackdrop={phase === "instruction"}
       >
-        <MicrogameRoundScreen
-          beatsLeft={beatsLeft}
-          microgame={microgame}
-          roundNumber={1}
-        />
-        {beatsLeft === microgame.beatCount ? (
+        {phase === "instruction" ? (
+          <InstructionRoundScreen
+            beatDurationMs={RHYTHM_DURATION_MS}
+            instructionStep={instructionStep}
+            microgame={microgame}
+            rhythmStyle={rhythmStyle}
+            roundNumber={1}
+          />
+        ) : null}
+        {phase === "playing" || isPromptTransition ? (
+          <MicrogameRoundScreen
+            beatsLeft={beatsLeft}
+            isTransitioning={isPromptTransition}
+            microgame={microgame}
+            roundNumber={1}
+          />
+        ) : null}
+        {isPromptTransition ? (
           <div className="microgame-start-prompt pointer-events-none fixed inset-0 z-30 grid place-items-center">
             <p>{microgame.startPrompt}</p>
           </div>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Microgame, MicrogameCanvas } from "@/data/microgames";
+import type { InstructionStep } from "@/hooks/useBeatGameRound";
 import { useMicrogameInput } from "@/hooks/useMicrogameInput";
 import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/lib/bgmLibrary";
 
 const RESULT_BEATS = 4;
+const INSTRUCTION_BEATS = 8;
 const BEAT_PROGRESS_INTERVAL_MS = 50;
 const CLEAR_SOUND_EFFECTS = [
   "clear1",
@@ -51,7 +53,7 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
 };
 
 export type PracticeResult = "failure" | "success";
-export type PracticePhase = "playing" | "result";
+export type PracticePhase = "instruction" | "playing" | "result";
 
 function getRandomClearSoundEffect() {
   return CLEAR_SOUND_EFFECTS[
@@ -62,7 +64,9 @@ function getRandomClearSoundEffect() {
 export function usePracticeMicrogame(microgame: Microgame) {
   const router = useRouter();
   const [beatsLeft, setBeatsLeft] = useState(microgame.beatCount);
-  const [phase, setPhase] = useState<PracticePhase>("playing");
+  const [instructionStep, setInstructionStep] =
+    useState<InstructionStep>("idle");
+  const [phase, setPhase] = useState<PracticePhase>("instruction");
   const [result, setResult] = useState<PracticeResult | null>(null);
   const hasClearedRef = useRef(false);
   const hasResolvedRef = useRef(false);
@@ -103,6 +107,35 @@ export function usePracticeMicrogame(microgame: Microgame) {
   });
 
   useEffect(() => {
+    if (phase !== "instruction") {
+      return;
+    }
+
+    const formPhotoTimer = window.setTimeout(() => {
+      setInstructionStep("formPhoto");
+    }, 2 * RHYTHM_DURATION_MS);
+    const floorTimer = window.setTimeout(() => {
+      setInstructionStep("floor");
+    }, 4 * RHYTHM_DURATION_MS);
+    const promptTransitionTimer = window.setTimeout(
+      () => {
+        setInstructionStep("promptTransition");
+      },
+      (INSTRUCTION_BEATS - 1) * RHYTHM_DURATION_MS,
+    );
+    const startTimer = window.setTimeout(() => {
+      setPhase("playing");
+    }, INSTRUCTION_BEATS * RHYTHM_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(formPhotoTimer);
+      window.clearTimeout(floorTimer);
+      window.clearTimeout(promptTransitionTimer);
+      window.clearTimeout(startTimer);
+    };
+  }, [phase]);
+
+  useEffect(() => {
     if (phase !== "playing") {
       return;
     }
@@ -133,6 +166,13 @@ export function usePracticeMicrogame(microgame: Microgame) {
 
   useEffect(() => {
     bgmLibrary.setBeatDurationMs(RHYTHM_DURATION_MS);
+
+    if (phase === "instruction") {
+      bgmLibrary.play("intermission", "once").catch((error: unknown) => {
+        console.error(error);
+      });
+      return;
+    }
 
     if (phase === "playing") {
       const track = PRACTICE_BGM_BY_CANVAS[microgame.canvas];
@@ -186,6 +226,7 @@ export function usePracticeMicrogame(microgame: Microgame) {
 
   return {
     beatsLeft,
+    instructionStep,
     phase,
     result,
     returnToMicroscope,
