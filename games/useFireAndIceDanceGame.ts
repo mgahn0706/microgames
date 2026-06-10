@@ -10,13 +10,13 @@ const BACKGROUND_IMAGE_SRC =
   "/games/a-dance-of-fire-and-ice/images/background.png";
 const COUNTDOWN_BEATS = 2;
 const DEFAULT_BEAT_DURATION_MS = 500;
-const INPUT_BEATS = 6;
-const INPUT_GRACE_BEATS = 0.34;
-const PERFECT_WINDOW_BEATS = 0.13;
+const REQUIRED_STEPS = 3;
+const HIT_WINDOW_BEATS = 0.2;
+const PIVOT_TRANSITION_BEATS = 0.18;
 const MAX_DELTA_MS = 50;
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
-const ORB_RADIUS = 24;
+const ORB_RADIUS = 27;
 
 type TimingFeedback = "early" | "great" | "late" | "none";
 
@@ -26,13 +26,22 @@ type GameState = {
   hasCleared: boolean;
   hasFailed: boolean;
   hitCount: number;
+  lastHitBeat: number;
   lastTimestamp: number | null;
+  pivotBeat: number;
+  pivotTransitionFrom: OrbPoints | null;
+  pivotTransitionStartedMs: number | null;
   startTimestamp: number | null;
 };
 
 type Point = Readonly<{
   x: number;
   y: number;
+}>;
+
+type OrbPoints = Readonly<{
+  blue: Point;
+  red: Point;
 }>;
 
 function dispatchClear() {
@@ -50,7 +59,11 @@ function createInitialState() {
     hasCleared: false,
     hasFailed: false,
     hitCount: 0,
+    lastHitBeat: -1,
     lastTimestamp: null,
+    pivotBeat: COUNTDOWN_BEATS - 1,
+    pivotTransitionFrom: null,
+    pivotTransitionStartedMs: null,
     startTimestamp: null,
   } satisfies GameState;
 }
@@ -96,16 +109,16 @@ function drawCoverImage(
 }
 
 function getTrackPoints(width: number, height: number) {
-  const trackWidth = Math.min(width * 0.72, 760);
+  const trackWidth = Math.min(width * 0.62, 680);
   const startX = (width - trackWidth) / 2;
-  const centerY = height * 0.56;
+  const centerY = height * 0.6;
 
-  return Array.from({ length: INPUT_BEATS + 1 }, (_, index) => {
-    const progress = index / INPUT_BEATS;
+  return Array.from({ length: REQUIRED_STEPS + 1 }, (_, index) => {
+    const progress = index / REQUIRED_STEPS;
 
     return {
       x: startX + trackWidth * progress,
-      y: centerY + Math.sin(progress * Math.PI * 2) * height * 0.095,
+      y: centerY,
     };
   });
 }
@@ -114,39 +127,54 @@ function drawTrack(
   context: CanvasRenderingContext2D,
   points: readonly Point[],
   hitCount: number,
-  pulse: number,
 ) {
-  context.save();
-  context.lineCap = "round";
-  context.lineJoin = "round";
-  context.shadowBlur = 22;
-  context.shadowColor = "rgba(196, 181, 253, 0.7)";
-  context.strokeStyle = "rgba(221, 214, 254, 0.42)";
-  context.lineWidth = 12;
-  context.beginPath();
-  points.forEach((point, index) => {
-    if (index === 0) {
-      context.moveTo(point.x, point.y);
-      return;
-    }
+  const tileGap = Math.max(8, Math.min(16, points[1].x - points[0].x) * 0.08);
+  const tileWidth = points[1].x - points[0].x - tileGap;
+  const tileHeight = Math.min(92, tileWidth * 0.46);
 
-    context.lineTo(point.x, point.y);
-  });
-  context.stroke();
+  context.save();
 
   points.forEach((point, index) => {
     const isReached = index <= hitCount;
-    const isCurrent = index === hitCount;
-    const radius = isCurrent ? 15 + pulse * 3 : 12;
+    const left = point.x - tileWidth / 2;
+    const top = point.y - tileHeight / 2;
+    const stoneGradient = context.createLinearGradient(
+      0,
+      top,
+      0,
+      top + tileHeight,
+    );
 
-    context.beginPath();
-    context.arc(point.x, point.y, radius, 0, Math.PI * 2);
-    context.fillStyle = isReached ? "#f8fafc" : "rgba(76, 29, 149, 0.9)";
-    context.shadowBlur = isReached ? 24 : 10;
-    context.shadowColor = isReached ? "#ffffff" : "#8b5cf6";
-    context.fill();
-    context.strokeStyle = isReached ? "#ddd6fe" : "#a78bfa";
+    stoneGradient.addColorStop(0, isReached ? "#8f929b" : "#777a84");
+    stoneGradient.addColorStop(0.18, isReached ? "#747781" : "#62656e");
+    stoneGradient.addColorStop(0.82, isReached ? "#555862" : "#464952");
+    stoneGradient.addColorStop(1, isReached ? "#3d4048" : "#343740");
+
+    context.shadowBlur = 0;
+    context.fillStyle = stoneGradient;
+    context.strokeStyle = "#292c33";
     context.lineWidth = 4;
+    context.beginPath();
+    context.roundRect(left, top, tileWidth, tileHeight, 5);
+    context.fill();
+    context.stroke();
+
+    context.strokeStyle = "rgba(224, 226, 232, 0.28)";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(left + 7, top + tileHeight - 7);
+    context.lineTo(left + 7, top + 7);
+    context.lineTo(left + tileWidth - 7, top + 7);
+    context.stroke();
+
+    context.strokeStyle = "rgba(22, 24, 29, 0.45)";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(left + tileWidth * 0.2, top + tileHeight * 0.58);
+    context.lineTo(left + tileWidth * 0.34, top + tileHeight * 0.48);
+    context.lineTo(left + tileWidth * 0.43, top + tileHeight * 0.62);
+    context.moveTo(left + tileWidth * 0.68, top + tileHeight * 0.29);
+    context.lineTo(left + tileWidth * 0.76, top + tileHeight * 0.4);
     context.stroke();
   });
   context.restore();
@@ -156,91 +184,150 @@ function drawOrb(
   context: CanvasRenderingContext2D,
   point: Point,
   color: string,
-  glowColor: string,
   radius: number,
+  beatPulse: number,
 ) {
-  const gradient = context.createRadialGradient(
-    point.x - radius * 0.3,
-    point.y - radius * 0.35,
-    radius * 0.12,
-    point.x,
-    point.y,
-    radius,
-  );
-
-  gradient.addColorStop(0, "#ffffff");
-  gradient.addColorStop(0.22, color);
-  gradient.addColorStop(1, glowColor);
-
   context.save();
   context.shadowBlur = 34;
   context.shadowColor = color;
-  context.fillStyle = gradient;
+  context.fillStyle = color;
   context.beginPath();
   context.arc(point.x, point.y, radius, 0, Math.PI * 2);
   context.fill();
-  context.strokeStyle = "rgba(255, 255, 255, 0.72)";
-  context.lineWidth = 3;
-  context.stroke();
+
+  if (beatPulse > 0) {
+    context.globalAlpha = beatPulse * 0.72;
+    context.shadowBlur = 0;
+    context.strokeStyle = color;
+    context.lineWidth = 3;
+    context.beginPath();
+    context.arc(
+      point.x,
+      point.y,
+      radius + 5 + (1 - beatPulse) * 13,
+      0,
+      Math.PI * 2,
+    );
+    context.stroke();
+  }
+
   context.restore();
 }
 
 function getOrbPoints(
   points: readonly Point[],
-  hitCount: number,
+  state: GameState,
   elapsedMs: number,
   beatDurationMs: number,
 ) {
   const elapsedBeats = elapsedMs / beatDurationMs;
-
-  if (elapsedBeats < 1) {
-    const anchor = points[0];
-    const countdownAngle = -Math.PI / 2 + elapsedBeats * Math.PI * 2;
-    const orbitRadius = ORB_RADIUS * 2.35;
-
-    return {
-      blue: {
-        x: anchor.x + Math.cos(countdownAngle) * orbitRadius,
-        y: anchor.y + Math.sin(countdownAngle) * orbitRadius,
-      },
-      red: anchor,
-    };
-  }
-
-  if (hitCount >= INPUT_BEATS) {
-    const anchor = points[INPUT_BEATS];
-
-    return {
-      blue: { x: anchor.x + ORB_RADIUS * 1.15, y: anchor.y },
-      red: { x: anchor.x - ORB_RADIUS * 1.15, y: anchor.y },
-    };
-  }
-
-  const anchor = points[Math.min(hitCount, INPUT_BEATS)];
-  const next = points[Math.min(hitCount + 1, INPUT_BEATS)];
-  const targetBeat = COUNTDOWN_BEATS + hitCount;
-  const previousBeat = targetBeat - 1;
-  const orbitProgress = Math.min(
-    Math.max(elapsedMs / beatDurationMs - previousBeat, 0),
-    1,
-  );
-  const angle = Math.PI * orbitProgress;
-  const midpoint = {
-    x: (anchor.x + next.x) / 2,
-    y: (anchor.y + next.y) / 2,
-  };
-  const halfDistance = Math.hypot(next.x - anchor.x, next.y - anchor.y) / 2;
-  const baseAngle = Math.atan2(next.y - anchor.y, next.x - anchor.x);
-  const orbitRadius = Math.max(halfDistance, ORB_RADIUS * 1.8);
-  const movingAngle = baseAngle + Math.PI + angle;
+  const anchorIndex = Math.min(state.hitCount, REQUIRED_STEPS);
+  const anchor = points[anchorIndex];
+  const next = points[Math.min(anchorIndex + 1, REQUIRED_STEPS)];
+  const orbitRadius =
+    anchorIndex >= REQUIRED_STEPS
+      ? ORB_RADIUS * 1.75
+      : Math.hypot(next.x - anchor.x, next.y - anchor.y);
+  const rotationBeats = elapsedBeats - state.pivotBeat;
+  const angle = Math.PI + rotationBeats * Math.PI;
   const moving = {
-    x: midpoint.x + Math.cos(movingAngle) * orbitRadius,
-    y: midpoint.y + Math.sin(movingAngle) * orbitRadius,
+    x: anchor.x + Math.cos(angle) * orbitRadius,
+    y: anchor.y + Math.sin(angle) * orbitRadius,
   };
+  const isRedAnchor = state.hitCount % 2 === 0;
 
-  return hitCount % 2 === 0
+  return isRedAnchor
     ? { blue: moving, red: anchor }
     : { blue: anchor, red: moving };
+}
+
+function easeOutCubic(progress: number) {
+  return 1 - Math.pow(1 - progress, 3);
+}
+
+function interpolatePoint(from: Point, to: Point, progress: number) {
+  return {
+    x: from.x + (to.x - from.x) * progress,
+    y: from.y + (to.y - from.y) * progress,
+  };
+}
+
+function getDisplayedOrbPoints(
+  points: readonly Point[],
+  state: GameState,
+  elapsedMs: number,
+  beatDurationMs: number,
+) {
+  const nextPoints = getOrbPoints(points, state, elapsedMs, beatDurationMs);
+
+  if (!state.pivotTransitionFrom || state.pivotTransitionStartedMs === null) {
+    return nextPoints;
+  }
+
+  const transitionDurationMs = PIVOT_TRANSITION_BEATS * beatDurationMs;
+  const progress = Math.min(
+    Math.max(
+      (elapsedMs - state.pivotTransitionStartedMs) / transitionDurationMs,
+      0,
+    ),
+    1,
+  );
+
+  if (progress >= 1) {
+    state.pivotTransitionFrom = null;
+    state.pivotTransitionStartedMs = null;
+    return nextPoints;
+  }
+
+  const easedProgress = easeOutCubic(progress);
+
+  return {
+    blue: interpolatePoint(
+      state.pivotTransitionFrom.blue,
+      nextPoints.blue,
+      easedProgress,
+    ),
+    red: interpolatePoint(
+      state.pivotTransitionFrom.red,
+      nextPoints.red,
+      easedProgress,
+    ),
+  };
+}
+
+function drawBeatIndicator(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  beatPulse: number,
+) {
+  const centerX = width / 2;
+  const centerY = height * 0.085;
+  const radius = 12 + beatPulse * 7;
+
+  context.save();
+  context.globalAlpha = 0.4 + beatPulse * 0.6;
+  context.shadowBlur = 12 + beatPulse * 18;
+  context.shadowColor = "#ffffff";
+  context.fillStyle = "#ffffff";
+  context.beginPath();
+  context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  context.fill();
+
+  context.globalAlpha = beatPulse * 0.72;
+  context.shadowBlur = 0;
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(
+    centerX,
+    centerY,
+    radius + 7 + (1 - beatPulse) * 18,
+    0,
+    Math.PI * 2,
+  );
+  context.stroke();
+  context.restore();
 }
 
 function getCueText(state: GameState, elapsedBeats: number) {
@@ -261,11 +348,11 @@ function getCueText(state: GameState, elapsedBeats: number) {
   }
 
   if (state.feedback === "early") {
-    return "조금 빨라!";
+    return "빠름";
   }
 
   if (state.feedback === "late") {
-    return "조금 늦어!";
+    return "느림";
   }
 
   if (state.feedback === "great") {
@@ -319,21 +406,22 @@ function drawScene(
   context.fillRect(0, 0, width, height);
 
   const elapsedBeats = elapsedMs / beatDurationMs;
-  const beatPulse = 1 - (elapsedBeats % 1);
+  const beatProgress = ((elapsedBeats % 1) + 1) % 1;
+  const rawBeatPulse = Math.max(1 - beatProgress / 0.38, 0);
+  const beatPulse = easeOutCubic(rawBeatPulse);
   const points = getTrackPoints(width, height);
-  const orbPoints = getOrbPoints(
+  const orbPoints = getDisplayedOrbPoints(
     points,
-    state.hitCount,
+    state,
     elapsedMs,
     beatDurationMs,
   );
 
-  drawTrack(context, points, state.hitCount, beatPulse);
+  drawTrack(context, points, state.hitCount);
 
-  const pulseRadius = ORB_RADIUS + beatPulse * 3;
-
-  drawOrb(context, orbPoints.red, "#fb7185", "#be123c", pulseRadius);
-  drawOrb(context, orbPoints.blue, "#67e8f9", "#0369a1", pulseRadius);
+  drawOrb(context, orbPoints.red, "#ff1744", ORB_RADIUS, beatPulse);
+  drawOrb(context, orbPoints.blue, "#1687ff", ORB_RADIUS, beatPulse);
+  drawBeatIndicator(context, width, height, beatPulse);
 
   const cueText = getCueText(state, elapsedBeats);
   const cueY = height * 0.22;
@@ -351,7 +439,7 @@ function drawScene(
   context.font = `800 ${Math.min(24, width * 0.029)}px Arial, sans-serif`;
   context.fillStyle = "rgba(255, 255, 255, 0.82)";
   context.fillText(
-    `${state.hitCount} / ${INPUT_BEATS}`,
+    `${state.hitCount} / ${REQUIRED_STEPS}`,
     width / 2,
     cueY + Math.min(72, height * 0.11),
   );
@@ -428,27 +516,41 @@ export function useFireAndIceDanceGameCanvas(gameBeatCount: number) {
       }
 
       const elapsedMs = performance.now() - state.startTimestamp;
-      const targetMs = (COUNTDOWN_BEATS + state.hitCount) * beatDurationMs;
-      const timingOffsetMs = elapsedMs - targetMs;
-      const graceMs = INPUT_GRACE_BEATS * beatDurationMs;
+      const elapsedBeats = elapsedMs / beatDurationMs;
+      const relativeBeat = elapsedBeats - state.pivotBeat;
+      const targetRotationBeat = Math.max(
+        Math.round((relativeBeat - 1) / 2) * 2 + 1,
+        1,
+      );
+      const targetBeat = state.pivotBeat + targetRotationBeat;
 
-      if (Math.abs(timingOffsetMs) > graceMs) {
-        failGame(state);
+      if (targetBeat < COUNTDOWN_BEATS) {
         return;
       }
 
-      const perfectWindowMs = PERFECT_WINDOW_BEATS * beatDurationMs;
+      const timingOffsetBeats = elapsedBeats - targetBeat;
+      const isOnBeat = Math.abs(timingOffsetBeats) <= HIT_WINDOW_BEATS;
 
-      state.feedback =
-        Math.abs(timingOffsetMs) <= perfectWindowMs
-          ? "great"
-          : timingOffsetMs < 0
-            ? "early"
-            : "late";
+      if (!isOnBeat || state.lastHitBeat === targetBeat) {
+        state.feedback = timingOffsetBeats < 0 ? "early" : "late";
+        state.feedbackMs = beatDurationMs * 0.72;
+        return;
+      }
+
+      state.feedback = "great";
       state.feedbackMs = beatDurationMs * 0.58;
+      state.lastHitBeat = targetBeat;
+      state.pivotTransitionFrom = getOrbPoints(
+        getTrackPoints(canvasWidth, canvasHeight),
+        state,
+        elapsedMs,
+        beatDurationMs,
+      );
+      state.pivotTransitionStartedMs = elapsedMs;
+      state.pivotBeat = targetBeat;
       state.hitCount += 1;
 
-      if (state.hitCount >= INPUT_BEATS) {
+      if (state.hitCount >= REQUIRED_STEPS) {
         state.hasCleared = true;
         dispatchClear();
       }
@@ -470,17 +572,6 @@ export function useFireAndIceDanceGameCanvas(gameBeatCount: number) {
       }
 
       const elapsedMs = timestamp - state.startTimestamp;
-      const graceMs = INPUT_GRACE_BEATS * beatDurationMs;
-      const nextTargetMs = (COUNTDOWN_BEATS + state.hitCount) * beatDurationMs;
-
-      if (
-        !state.hasCleared &&
-        !state.hasFailed &&
-        state.hitCount < INPUT_BEATS &&
-        elapsedMs > nextTargetMs + graceMs
-      ) {
-        failGame(state);
-      }
 
       if (
         !state.hasCleared &&

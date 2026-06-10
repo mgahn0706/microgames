@@ -262,7 +262,7 @@ export const MICROGAMES = [
     canvas: "fireAndIceDance",
     microscope: {
       description:
-        "불과 얼음의 춤은 두 행성이 박자마다 다음 칸으로 회전하는 리듬 게임입니다. 준비 신호를 듣고 여섯 박자를 이어가세요.",
+        "불과 얼음의 춤은 두 행성이 박자마다 다음 칸으로 회전하는 리듬 게임입니다. 박자를 맞춰 세 칸을 전진하세요.",
       imageAlt: "불과 얼음의 춤 별빛 배경",
       imageSrc: "/games/a-dance-of-fire-and-ice/images/background.png",
     },
@@ -575,7 +575,6 @@ export const MICROGAMES = [
     title: "한컴 타자연습",
     type: "normal",
   },
-
   {
     beatCount: 8,
     canvas: "wiiSportsDualPress",
