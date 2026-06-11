@@ -152,11 +152,13 @@ export function InstructionRoundScreen({
 }
 
 export function MicrogameRoundScreen({
+  beatDurationMs,
   beatsLeft,
   isTransitioning = false,
   microgame,
   roundNumber,
 }: Readonly<{
+  beatDurationMs: number;
   beatsLeft: number;
   isTransitioning?: boolean;
   microgame: Microgame;
@@ -169,6 +171,8 @@ export function MicrogameRoundScreen({
       }`}
     >
       <MicrogameCanvas
+        beatDurationMs={beatDurationMs}
+        isActive={!isTransitioning}
         key={`${roundNumber}-${microgame.id}`}
         microgame={microgame}
       />

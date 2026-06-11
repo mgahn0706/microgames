@@ -12,6 +12,7 @@ export type BgmTrack =
   | "cookieRun"
   | "cookieRunKingdom"
   | "crazyArcade"
+  | "dobble"
   | "fail"
   | "fireAndIce"
   | "gameOver"
@@ -75,6 +76,7 @@ const BGM_TRACK_PATHS = {
   cookieRunKingdom:
     "/games/cookie-run-kingdom/sounds/cookie-run-kingdom-bgm.mp3",
   crazyArcade: "/games/crazy-arcade/sounds/crazy-arcade-bgm.mp3",
+  dobble: "/games/dobble/sounds/dobble-bgm.mp3",
   fail: "/games/game-flow/sounds/fail.mp3",
   fireAndIce: "/games/a-dance-of-fire-and-ice/sounds/fire-and-ice-bgm.mp3",
   gameOver: "/games/game-flow/sounds/game-over.mp3",
@@ -165,6 +167,7 @@ const BGM_TRACK_BEATS = {
   cookieRun: 12,
   cookieRunKingdom: 8,
   crazyArcade: 12,
+  dobble: 12,
   fail: 4,
   fireAndIce: 8,
   geometryDash: 12,

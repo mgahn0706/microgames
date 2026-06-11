@@ -12,6 +12,7 @@ import { CookieRunKingdomGame } from "@/games/CookieRunKingdomGame";
 import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGame";
 import { CrazyArcadeGame } from "@/games/CrazyArcadeGame";
 import { DefaultMicrogameCanvas } from "@/games/DefaultMicrogameCanvas";
+import { DobbleGame } from "@/games/DobbleGame";
 import { FireAndIceDanceGame } from "@/games/FireAndIceDanceGame";
 import { FireBoyWaterGirlGame } from "@/games/FireBoyWaterGirlGame";
 import { FlickingGame } from "@/games/FlickingGame";
@@ -35,6 +36,7 @@ import { PongGame } from "@/games/PongGame";
 import { PokemonTcgPocketGame } from "@/games/PokemonTcgPocketGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { RhythmHeavenChorusGame } from "@/games/RhythmHeavenChorusGame";
+import { SquidGameBossGame } from "@/games/SquidGameBossGame";
 import { SubmitAssignmentGame } from "@/games/SubmitAssignmentGame";
 import { SudokuGame } from "@/games/SudokuGame";
 import { SuperMarioGalaxyGame } from "@/games/SuperMarioGalaxyGame";
@@ -48,10 +50,16 @@ import { ZeldaCircleDrawGame } from "@/games/ZeldaCircleDrawGame";
 import { ZeldaOcarinaGame } from "@/games/ZeldaOcarinaGame";
 
 type GameCanvasProps = Readonly<{
+  beatDurationMs: number;
+  isActive: boolean;
   microgame: Microgame;
 }>;
 
-function renderGameCanvas(microgame: Microgame) {
+function renderGameCanvas(
+  microgame: Microgame,
+  beatDurationMs: number,
+  isActive: boolean,
+) {
   if (microgame.canvas === "animalCrossingStamps") {
     return <AnimalCrossingStampGame microgame={microgame} />;
   }
@@ -156,6 +164,16 @@ function renderGameCanvas(microgame: Microgame) {
     return <CrazyArcadeGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "dobble") {
+    return (
+      <DobbleGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
+  }
+
   if (microgame.canvas === "geometryDashSpikes") {
     return <GeometryDashGame microgame={microgame} />;
   }
@@ -186,6 +204,16 @@ function renderGameCanvas(microgame: Microgame) {
 
   if (microgame.canvas === "halliGalliBoss") {
     return <HalliGalliBossGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "squidGameRedLight") {
+    return (
+      <SquidGameBossGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
   }
 
   if (microgame.canvas === "kartriderCourse") {
@@ -231,6 +259,10 @@ function renderGameCanvas(microgame: Microgame) {
   return <DefaultMicrogameCanvas microgame={microgame} />;
 }
 
-export function MicrogameCanvas({ microgame }: GameCanvasProps) {
-  return renderGameCanvas(microgame);
+export function MicrogameCanvas({
+  beatDurationMs,
+  isActive,
+  microgame,
+}: GameCanvasProps) {
+  return renderGameCanvas(microgame, beatDurationMs, isActive);
 }

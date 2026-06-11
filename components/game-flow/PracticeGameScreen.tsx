@@ -39,6 +39,7 @@ export function PracticeGameScreen({
         ) : null}
         {phase === "playing" || isPromptTransition ? (
           <MicrogameRoundScreen
+            beatDurationMs={RHYTHM_DURATION_MS}
             beatsLeft={beatsLeft}
             isTransitioning={isPromptTransition}
             microgame={microgame}

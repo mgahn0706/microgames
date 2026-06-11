@@ -459,6 +459,13 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "dobble") {
+        bgmLibrary.play("dobble", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "maplestoryLieDetector") {
         bgmLibrary.play("maplestory", "once", "now").catch((error: unknown) => {
           console.error(error);
@@ -634,6 +641,7 @@ export function GameScreen({
       </div>
       {phase === "game" || shouldShowCanvasTransition ? (
         <MicrogameRoundScreen
+          beatDurationMs={beatDurationMs}
           beatsLeft={beatsLeft}
           isTransitioning={shouldShowCanvasTransition}
           microgame={microgame}

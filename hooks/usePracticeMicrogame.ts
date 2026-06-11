@@ -32,6 +32,7 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
   cookieRun: "cookieRun",
   cookieRunKingdom: "cookieRunKingdom",
   crazyArcade: "crazyArcade",
+  dobble: "dobble",
   fireAndIceDance: "fireAndIce",
   geometryDashSpikes: "geometryDash",
   halliGalliBoss: "halliGalli",

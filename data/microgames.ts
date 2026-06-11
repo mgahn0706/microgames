@@ -25,6 +25,7 @@ export type MicrogameCanvas =
   | "courseRegistrationNumber"
   | "crazyArcade"
   | "default"
+  | "dobble"
   | "fireAndIceDance"
   | "fireBoyWaterGirl"
   | "flickingGame"
@@ -51,6 +52,7 @@ export type MicrogameCanvas =
   | "superMarioCoins"
   | "submitAssignment"
   | "sudokuMissingNumber"
+  | "squidGameRedLight"
   | "suikaGame"
   | "tetrisLineClear"
   | "twoThousandFortyEightBoss"
@@ -101,6 +103,22 @@ export const MICROGAMES = [
     id: "submit-assignment",
     startPrompt: "과제를 제출해라!",
     title: "과제 제출",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "dobble",
+    microscope: {
+      description:
+        "도블은 두 카드에서 똑같은 그림 하나를 누구보다 빨리 찾는 게임입니다. 무조건 하나만 존재해요.",
+      imageAlt: "도블 물음표 아이콘",
+      imageSrc: "/games/dobble/images/question_mark.png",
+    },
+    control: "mouseClick",
+    id: "dobble-symbol-match",
+    startPrompt: "같은 그림을 찾아라!",
+    title: "도블",
     type: "normal",
   },
 
@@ -227,7 +245,7 @@ export const MICROGAMES = [
     },
     control: "mouseHold",
     id: "modoo-marble-big-number",
-    startPrompt: "큰 수를 굴려라!",
+    startPrompt: "12를 굴려라!",
     title: "모두의 마블",
     type: "normal",
   },
@@ -259,7 +277,7 @@ export const MICROGAMES = [
     },
     control: "numberKeys",
     id: "minigame-ex-bear-meat",
-    startPrompt: "곰을 잘봐라!",
+    startPrompt: "곰을 잘 봐라!",
     title: "미니게임EX",
     type: "normal",
   },
@@ -386,7 +404,7 @@ export const MICROGAMES = [
     },
     control: "mouseDrag",
     id: "flicking-game",
-    startPrompt: "적 돌을 밀어내라!",
+    startPrompt: "밀어내라!",
     title: "알까기",
     type: "normal",
   },
@@ -625,7 +643,7 @@ export const MICROGAMES = [
     },
     control: "space",
     id: "flappy-bird-pipe-dodge",
-    startPrompt: "파이프를 피해라!",
+    startPrompt: "피해라!",
     title: "플래피버드",
     type: "normal",
   },
@@ -657,7 +675,7 @@ export const MICROGAMES = [
     },
     control: "koreanKeyboard",
     id: "hancom-word-typing",
-    startPrompt: "단어를 입력해라!",
+    startPrompt: "입력해라!",
     title: "한컴 타자연습",
     type: "normal",
   },
@@ -739,6 +757,22 @@ export const MICROGAMES = [
     id: "animal-farm-reverse-typing",
     startPrompt: "단어를 거꾸로 써라!",
     title: "동물농장",
+    type: "boss",
+  },
+
+  {
+    beatCount: 36,
+    canvas: "squidGameRedLight",
+    microscope: {
+      description:
+        "무궁화 꽃이 피었습니다! 인형이 뒤를 볼 때는 마우스를 꾹 눌러 달리고, 인형이 돌아보면 즉시 손을 떼야 합니다.",
+      imageAlt: "무궁화 꽃이 피었습니다 인형",
+      imageSrc: "/games/squid-game/images/doll-red-light.png",
+    },
+    control: "mouseHold",
+    id: "squid-game-red-light-green-light",
+    startPrompt: "결승선을 통과해라!",
+    title: "오징어 게임",
     type: "boss",
   },
 
