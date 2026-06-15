@@ -18,6 +18,7 @@ export type MicrogameCanvas =
   | "appleNumberSum"
   | "amongUsWires"
   | "babaIsYou"
+  | "bounceBall"
   | "brainAcademyBlocks"
   | "chromeDinoSpace"
   | "cookieRun"
@@ -279,6 +280,22 @@ export const MICROGAMES = [
     id: "minigame-ex-bear-meat",
     startPrompt: "곰을 잘 봐라!",
     title: "미니게임EX",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "bounceBall",
+    microscope: {
+      description:
+        "바운스볼은 공이 쉬지 않고 튀어 오르는 고전 플랫포머입니다. 화살표로 방향을 조절해 별까지 올라가세요.",
+      imageAlt: "바운스볼 노란 공",
+      imageSrc: "/games/bounce-ball/images/ball.png",
+    },
+    control: "arrowKeys",
+    id: "bounce-ball-star",
+    startPrompt: "별을 먹어라!",
+    title: "바운스볼",
     type: "normal",
   },
 

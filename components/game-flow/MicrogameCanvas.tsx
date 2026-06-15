@@ -5,6 +5,7 @@ import { AnimalFarmBossGame } from "@/games/AnimalFarmBossGame";
 import { AppleGame } from "@/games/AppleGame";
 import { AmongUsWireGame } from "@/games/AmongUsWireGame";
 import { BabaIsYouGame } from "@/games/BabaIsYouGame";
+import { BounceBallGame } from "@/games/BounceBallGame";
 import { BrainAcademyBlockGame } from "@/games/BrainAcademyBlockGame";
 import { ChromeDinoSpaceGame } from "@/games/ChromeDinoSpaceGame";
 import { CookieRunGame } from "@/games/CookieRunGame";
@@ -78,6 +79,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "babaIsYou") {
     return <BabaIsYouGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "bounceBall") {
+    return <BounceBallGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "brainAcademyBlocks") {
