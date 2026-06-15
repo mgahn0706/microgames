@@ -20,6 +20,7 @@ export type MicrogameCanvas =
   | "babaIsYou"
   | "bounceBall"
   | "brainAcademyBlocks"
+  | "chessCapture"
   | "chromeDinoSpace"
   | "cookieRun"
   | "cookieRunKingdom"
@@ -518,6 +519,22 @@ export const MICROGAMES = [
     id: "geometry-dash-spike-dodge",
     startPrompt: "가시를 피해라!",
     title: "지오메트리 대시",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "chessCapture",
+    microscope: {
+      description:
+        "6×6 체스판에서 흑색 룩, 나이트, 비숍 중 하나를 움직여 단 한 수로 백색 킹을 잡아보세요.",
+      imageAlt: "6×6 체스판과 흑색 기물",
+      imageSrc: "/games/chess/images/chess_board.png",
+    },
+    control: "mouseDrag",
+    id: "chess-one-move-capture",
+    startPrompt: "킹을 잡아라!",
+    title: "체스",
     type: "normal",
   },
 

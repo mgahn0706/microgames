@@ -1,5 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import {
+  DEFAULT_CHALLENGE_MODES,
+  type ChallengeModes,
+} from "@/data/challengeModes";
 import { useGameScreenFlow } from "@/hooks/useGameScreenFlow";
 import { useSeenMicrogames } from "@/hooks/useSeenMicrogames";
 import { GameScreen } from "./GameScreen";
@@ -16,6 +21,9 @@ export function GameFlowExperience({
 }: Readonly<{
   homeView: HomeView;
 }>) {
+  const [challengeModes, setChallengeModes] = useState<ChallengeModes>(
+    DEFAULT_CHALLENGE_MODES,
+  );
   const { recordSeenMicrogameId, seenMicrogameIds } = useSeenMicrogames();
   const {
     completeSetup,
@@ -34,7 +42,7 @@ export function GameFlowExperience({
     retryPreload,
     screen,
     startGame,
-  } = useGameScreenFlow();
+  } = useGameScreenFlow(challengeModes.singleLife ? 1 : 4);
 
   if (screen === "loading") {
     return (
@@ -55,6 +63,7 @@ export function GameFlowExperience({
   if (screen === "playing") {
     return (
       <GameScreen
+        challengeModes={challengeModes}
         lives={lives}
         maxLives={maxLives}
         onFinish={finishGame}
@@ -80,8 +89,10 @@ export function GameFlowExperience({
 
   return (
     <MainScreen
+      challengeModes={challengeModes}
       highestReachedRound={highestReachedRound}
       homeView={homeView}
+      onChallengeModesChange={setChallengeModes}
       onStart={startGame}
       seenMicrogameIds={seenMicrogameIds}
     />

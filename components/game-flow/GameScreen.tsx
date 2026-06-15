@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ChallengeModes } from "@/data/challengeModes";
 import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
 import { getMicrogamePoolForRound, type Microgame } from "@/data/microgames";
 import { useBeatGameRound } from "@/hooks/useBeatGameRound";
@@ -10,7 +11,10 @@ import { useRecordSeenMicrogame } from "@/hooks/useRecordSeenMicrogame";
 import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
 import { bgmLibrary, type SoundEffectTrack } from "@/lib/bgmLibrary";
 import { FixedLivesOverlay } from "./FixedLivesOverlay";
-import { RESULT_BGM_TRACKS } from "./gameFlowConstants";
+import {
+  NO_CONTROL_RESULT_BGM_TRACKS,
+  RESULT_BGM_TRACKS,
+} from "./gameFlowConstants";
 import { NeonShell } from "./NeonShell";
 import {
   BossStageScreen,
@@ -184,6 +188,7 @@ function avoidImmediateMicrogameRepeat(
 }
 
 export function GameScreen({
+  challengeModes,
   lives,
   maxLives,
   onFinish,
@@ -194,6 +199,7 @@ export function GameScreen({
   onSeenMicrogame,
   onSuccess,
 }: Readonly<{
+  challengeModes: ChallengeModes;
   lives: number;
   maxLives: number;
   onFinish: (reachedRound: number) => void;
@@ -229,12 +235,15 @@ export function GameScreen({
   } = useBeatGameRound({
     getGameBeatCount: (nextRoundNumber) =>
       getMicrogameForRound(nextRoundNumber).beatCount,
+    initialSpeedMultiplier: challengeModes.fastStart ? 1.8 : 1,
+    noControlHints: challengeModes.noControlHints,
     onFailure: onLoseLife,
     onFinish,
     onResetResult,
     onSuccess,
     shouldFinishAfterResult: lives <= 0,
-    shouldPlayOneUp: lives > 0 && lives < maxLives,
+    shouldPlayOneUp:
+      !challengeModes.singleLife && lives > 0 && lives < maxLives,
   });
   const { getStaggeredRhythmStyle, rhythmStyle } =
     useSynchronizedRhythm(beatDurationMs);
@@ -271,12 +280,7 @@ export function GameScreen({
       .catch((error: unknown) => {
         console.error(error);
       });
-  }, [
-    confirmSuccessFeedback,
-    microgame.canvas,
-    recordSuccess,
-    roundNumber,
-  ]);
+  }, [confirmSuccessFeedback, microgame.canvas, recordSuccess, roundNumber]);
 
   useMicrogameInput({
     isActive: phase === "game",
@@ -303,9 +307,16 @@ export function GameScreen({
     bgmLibrary.setBeatDurationMs(beatDurationMs);
 
     if (phase === "instruction") {
-      bgmLibrary.play("intermission", "once").catch((error: unknown) => {
-        console.error(error);
-      });
+      bgmLibrary
+        .play(
+          challengeModes.noControlHints
+            ? "intermissionNoControl"
+            : "intermission",
+          "once",
+        )
+        .catch((error: unknown) => {
+          console.error(error);
+        });
       return;
     }
 
@@ -583,7 +594,13 @@ export function GameScreen({
       return;
     }
 
-    const nextResultBgmTrack = RESULT_BGM_TRACKS[roundResult];
+    const resultBgmTracks = challengeModes.noControlHints
+      ? NO_CONTROL_RESULT_BGM_TRACKS
+      : RESULT_BGM_TRACKS;
+    const nextResultBgmTrack = resultBgmTracks[roundResult];
+    const intermissionTrack = challengeModes.noControlHints
+      ? "intermissionNoControl"
+      : "intermission";
     const shouldGoToGameOver = roundResult === "failure" && lives <= 0;
     const shouldSpeedUpAfterResult = roundNumber % 4 === 0;
 
@@ -606,12 +623,13 @@ export function GameScreen({
     }
 
     bgmLibrary
-      .playSequence(nextResultBgmTrack, "once", "intermission", "once")
+      .playSequence(nextResultBgmTrack, "once", intermissionTrack, "once")
       .catch((error: unknown) => {
         console.error(error);
       });
   }, [
     beatDurationMs,
+    challengeModes.noControlHints,
     lives,
     microgame.canvas,
     onGainLife,
@@ -640,6 +658,7 @@ export function GameScreen({
       <div className={phase === "instruction" ? "contents" : "hidden"}>
         <InstructionRoundScreen
           beatDurationMs={beatDurationMs}
+          hideControlIndicator={challengeModes.noControlHints}
           instructionStep={instructionStep}
           microgame={microgame}
           rhythmStyle={rhythmStyle}

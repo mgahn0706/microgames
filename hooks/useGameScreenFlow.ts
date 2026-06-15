@@ -5,7 +5,6 @@ import { ALL_GAME_PRELOAD_ASSETS } from "@/data/preloadAssets";
 import { useHighestReachedRound } from "@/hooks/useHighestReachedRound";
 import { BGM_LIBRARY_PRELOAD_ASSET_PATHS, bgmLibrary } from "@/lib/bgmLibrary";
 
-const MAX_LIVES = 4;
 const PRELOAD_CONCURRENCY = 16;
 const PRELOAD_PROGRESS_STEP = 5;
 
@@ -189,7 +188,7 @@ function areAllGameAssetsPreloaded() {
   return getGlobalPreloadState().isComplete;
 }
 
-export function useGameScreenFlow() {
+export function useGameScreenFlow(maxLives: number) {
   const [preloadStatus, setPreloadStatus] = useState<PreloadStatus>(
     areAllGameAssetsPreloaded()
       ? COMPLETE_PRELOAD_STATUS
@@ -199,7 +198,7 @@ export function useGameScreenFlow() {
   const [screen, setScreen] = useState<GameScreen>(
     areAllGameAssetsPreloaded() ? "main" : "loading",
   );
-  const [lives, setLives] = useState(MAX_LIVES);
+  const [lives, setLives] = useState(maxLives);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
   const [finalReachedRound, setFinalReachedRound] = useState(0);
   const { highestReachedRound, recordHighestReachedRound } =
@@ -240,10 +239,10 @@ export function useGameScreenFlow() {
 
   const startGame = useCallback(() => {
     setFinalReachedRound(0);
-    setLives(MAX_LIVES);
+    setLives(maxLives);
     setRoundResult("idle");
     setScreen("setup");
-  }, []);
+  }, [maxLives]);
 
   const completeSetup = useCallback(() => {
     setScreen("playing");
@@ -261,17 +260,17 @@ export function useGameScreenFlow() {
 
   const restartGame = useCallback(() => {
     setFinalReachedRound(0);
-    setLives(MAX_LIVES);
+    setLives(maxLives);
     setRoundResult("idle");
     setScreen("setup");
-  }, []);
+  }, [maxLives]);
 
   const returnToMain = useCallback(() => {
     setFinalReachedRound(0);
-    setLives(MAX_LIVES);
+    setLives(maxLives);
     setRoundResult("idle");
     setScreen("main");
-  }, []);
+  }, [maxLives]);
 
   const recordReachedRound = useCallback(
     (roundNumber: number) => {
@@ -304,9 +303,9 @@ export function useGameScreenFlow() {
         return currentLives;
       }
 
-      return Math.min(currentLives + 1, MAX_LIVES);
+      return Math.min(currentLives + 1, maxLives);
     });
-  }, []);
+  }, [maxLives]);
 
   return {
     completeSetup,
@@ -316,7 +315,7 @@ export function useGameScreenFlow() {
     highestReachedRound,
     lives,
     loseLife,
-    maxLives: MAX_LIVES,
+    maxLives,
     preloadStatus,
     recordReachedRound,
     recordSuccess,

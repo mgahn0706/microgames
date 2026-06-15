@@ -4,7 +4,6 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useState } from "react";
 import type { SynchronizedRhythmStyle } from "@/hooks/useSynchronizedRhythm";
-import { LIFE_LABELS } from "./gameFlowConstants";
 
 type LifeAnimationState = Readonly<{
   animationKey: number;
@@ -31,6 +30,10 @@ export function FixedLivesOverlay({
       lives,
       lostLifeIndexes: [],
     });
+  const lifeLabels = Array.from(
+    { length: maxLives },
+    (_, index) => `Life ${index + 1}`,
+  );
 
   if (lifeAnimationState.lives !== lives) {
     const previousLives = lifeAnimationState.lives;
@@ -66,7 +69,7 @@ export function FixedLivesOverlay({
       <div
         className={`${animateSetup ? "setup-screen" : ""} relative h-28 w-[min(92vw,720px)] sm:h-32`}
       >
-        {LIFE_LABELS.map((label, index) => {
+        {lifeLabels.map((label, index) => {
           const isActive = index < lives;
           const shouldAnimateGainedLife =
             lifeAnimationState.gainedLifeIndexes.includes(index);
@@ -75,7 +78,8 @@ export function FixedLivesOverlay({
           const lifeAnimationKey = `${label}-${lifeAnimationState.animationKey}`;
           const lifeSlotStyle = {
             "--setup-life-delay": animateSetup ? `${index * 140}ms` : "0ms",
-            left: `${12.5 + index * 25}%`,
+            left: `${((index + 0.5) / maxLives) * 100}%`,
+            transform: "translateX(-50%)",
           } satisfies CSSProperties & {
             "--setup-life-delay": string;
           };

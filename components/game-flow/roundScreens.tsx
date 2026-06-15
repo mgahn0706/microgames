@@ -55,12 +55,14 @@ function CurrentFloorDisplay({
 
 export function InstructionRoundScreen({
   beatDurationMs,
+  hideControlIndicator = false,
   instructionStep,
   microgame,
   rhythmStyle,
   roundNumber,
 }: Readonly<{
   beatDurationMs: number;
+  hideControlIndicator?: boolean;
   instructionStep: InstructionStep;
   microgame: Microgame;
   rhythmStyle: SynchronizedRhythmStyle;
@@ -76,6 +78,18 @@ export function InstructionRoundScreen({
 
   if (shouldHideInstruction) {
     return <div className="mx-auto min-h-screen w-full max-w-5xl" />;
+  }
+
+  if (hideControlIndicator) {
+    return (
+      <div className="mx-auto w-full max-w-5xl text-center">
+        <CurrentFloorDisplay
+          beatDurationMs={beatDurationMs}
+          rhythmStyle={rhythmStyle}
+          roundNumber={roundNumber}
+        />
+      </div>
+    );
   }
 
   return (

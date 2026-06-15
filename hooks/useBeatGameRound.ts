@@ -6,6 +6,7 @@ import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 
 const DEFAULT_GAME_BEATS = 8;
 const INSTRUCTION_BEATS = 8;
+const NO_CONTROL_INSTRUCTION_BEATS = 4;
 const RESULT_BEATS = 4;
 const SPEED_UP_BEATS = 8;
 const BOSS_STAGE_BEATS = 8;
@@ -41,6 +42,8 @@ const PHASE_LABELS = {
 type UseBeatGameRoundParams = Readonly<{
   gameBeatCount?: number;
   getGameBeatCount?: (roundNumber: number) => number;
+  initialSpeedMultiplier?: number;
+  noControlHints?: boolean;
   shouldPlayOneUp: boolean;
   onFailure: () => void;
   onFinish: (reachedRound: number) => void;
@@ -49,9 +52,13 @@ type UseBeatGameRoundParams = Readonly<{
   shouldFinishAfterResult: boolean;
 }>;
 
-function getPhaseBeatCount(phase: GameRoundPhase, gameBeatCount: number) {
+function getPhaseBeatCount(
+  phase: GameRoundPhase,
+  gameBeatCount: number,
+  noControlHints: boolean,
+) {
   if (phase === "instruction") {
-    return INSTRUCTION_BEATS;
+    return noControlHints ? NO_CONTROL_INSTRUCTION_BEATS : INSTRUCTION_BEATS;
   }
 
   if (phase === "result") {
@@ -77,10 +84,10 @@ function getSpeedRate(speedLevel: number) {
   return Math.pow(SPEED_UP_BEAT_DURATION_MULTIPLIER, speedLevel);
 }
 
-function getBeatDurationMs(speedLevel: number) {
+function getBeatDurationMs(speedLevel: number, initialSpeedMultiplier: number) {
   const speedRate = getSpeedRate(speedLevel);
 
-  return RHYTHM_DURATION_MS * speedRate;
+  return (RHYTHM_DURATION_MS * speedRate) / initialSpeedMultiplier;
 }
 
 function getBossStageSpeedLevel(roundNumber: number) {
@@ -93,17 +100,23 @@ function isBossGameRound(roundNumber: number) {
   );
 }
 
-function getPhaseBeatDurationMs(phase: GameRoundPhase, speedLevel: number) {
+function getPhaseBeatDurationMs(
+  phase: GameRoundPhase,
+  speedLevel: number,
+  initialSpeedMultiplier: number,
+) {
   if (phase === "oneUp") {
     return RHYTHM_DURATION_MS;
   }
 
-  return getBeatDurationMs(speedLevel);
+  return getBeatDurationMs(speedLevel, initialSpeedMultiplier);
 }
 
 export function useBeatGameRound({
   gameBeatCount = DEFAULT_GAME_BEATS,
   getGameBeatCount,
+  initialSpeedMultiplier = 1,
+  noControlHints = false,
   onFailure,
   onFinish,
   onResetResult,
@@ -112,8 +125,9 @@ export function useBeatGameRound({
   shouldFinishAfterResult,
 }: UseBeatGameRoundParams) {
   const [phase, setPhase] = useState<GameRoundPhase>("instruction");
-  const [instructionStep, setInstructionStep] =
-    useState<InstructionStep>("idle");
+  const [instructionStep, setInstructionStep] = useState<InstructionStep>(
+    noControlHints ? "floor" : "idle",
+  );
   const [roundNumber, setRoundNumber] = useState(1);
   const [roundResult, setRoundResult] = useState<GameRoundResult>("idle");
   const [gameBeatProgress, setGameBeatProgress] = useState({
@@ -127,19 +141,27 @@ export function useBeatGameRound({
   >(null);
   const [shouldOneUpAfterResult, setShouldOneUpAfterResult] = useState(false);
   const currentGameBeatCount = getGameBeatCount?.(roundNumber) ?? gameBeatCount;
-  const phaseBeatCount = getPhaseBeatCount(phase, currentGameBeatCount);
-  const beatDurationMs = getPhaseBeatDurationMs(phase, speedLevel);
+  const phaseBeatCount = getPhaseBeatCount(
+    phase,
+    currentGameBeatCount,
+    noControlHints,
+  );
+  const beatDurationMs = getPhaseBeatDurationMs(
+    phase,
+    speedLevel,
+    initialSpeedMultiplier,
+  );
   const phaseDurationMs = phaseBeatCount * beatDurationMs;
   const beatProgressKey = `${phase}-${roundNumber}-${phaseBeatCount}`;
 
   const beginInstruction = useCallback(() => {
-    setInstructionStep("idle");
+    setInstructionStep(noControlHints ? "floor" : "idle");
     setPhase("instruction");
     setRoundResult("idle");
     hasClearedCurrentGameRef.current = false;
     setSuccessFeedbackRound(null);
     onResetResult();
-  }, [onResetResult]);
+  }, [noControlHints, onResetResult]);
 
   const showResult = useCallback(
     (result: Exclude<GameRoundResult, "idle">) => {
@@ -265,6 +287,19 @@ export function useBeatGameRound({
       return;
     }
 
+    if (noControlHints) {
+      const promptTransitionTimer = window.setTimeout(
+        () => {
+          setInstructionStep("promptTransition");
+        },
+        (NO_CONTROL_INSTRUCTION_BEATS - 1) * beatDurationMs,
+      );
+
+      return () => {
+        window.clearTimeout(promptTransitionTimer);
+      };
+    }
+
     const formPhotoTimer = window.setTimeout(() => {
       setInstructionStep("formPhoto");
     }, 2 * beatDurationMs);
@@ -283,7 +318,7 @@ export function useBeatGameRound({
       window.clearTimeout(floorTimer);
       window.clearTimeout(promptTransitionTimer);
     };
-  }, [beatDurationMs, phase, roundNumber]);
+  }, [beatDurationMs, noControlHints, phase, roundNumber]);
 
   useEffect(() => {
     if (phase !== "game") {

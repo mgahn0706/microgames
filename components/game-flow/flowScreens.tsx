@@ -4,6 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ScoreSubmissionPanel } from "@/components/ranking/ScoreSubmissionPanel";
+import {
+  CHALLENGE_MODE_UNLOCK_ROUND,
+  CHALLENGE_MODE_OPTIONS,
+  type ChallengeModes,
+} from "@/data/challengeModes";
 import { MICROGAMES, getMicrogameFormInstruction } from "@/data/microgames";
 import type { PreloadStatus } from "@/hooks/useGameScreenFlow";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
@@ -81,14 +86,24 @@ const LOADING_GAMEPLAY_TIPS = [
 ] as const;
 
 function HomePanel({
+  challengeModes,
   highestReachedRound,
   isStarting,
+  onChallengeModesChange,
   startGame,
 }: Readonly<{
+  challengeModes: ChallengeModes;
   highestReachedRound: number;
   isStarting: boolean;
+  onChallengeModesChange: (challengeModes: ChallengeModes) => void;
   startGame: () => void;
 }>) {
+  const isChallengeModeUnlocked =
+    highestReachedRound >= CHALLENGE_MODE_UNLOCK_ROUND;
+  const activeChallengeModeCount = CHALLENGE_MODE_OPTIONS.filter(
+    (option) => challengeModes[option.key],
+  ).length;
+
   return (
     <div className="grid gap-7 lg:grid-cols-[1fr_260px] lg:items-center">
       <div className="space-y-7">
@@ -115,6 +130,77 @@ function HomePanel({
             <span className="pb-1 text-lg font-black leading-none">층</span>
           </p>
         </div>
+        {isChallengeModeUnlocked ? (
+          <details className="group max-w-2xl rounded-md border border-fuchsia-200/45 bg-fuchsia-950/20 shadow-[0_0_24px_rgba(232,121,249,0.12)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 text-fuchsia-100 marker:content-none">
+              <span>
+                <span className="block text-xs font-black uppercase tracking-[0.24em]">
+                  Challenge Mode
+                </span>
+                <span className="mt-1 block text-sm font-bold text-cyan-50/65">
+                  {activeChallengeModeCount > 0
+                    ? `${activeChallengeModeCount}개 활성화`
+                    : "눌러서 설정하기"}
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                className="text-xl font-black transition-transform group-open:rotate-180"
+              >
+                ▾
+              </span>
+            </summary>
+            <fieldset className="border-t border-fuchsia-100/20 p-4">
+              <legend className="sr-only">챌린지 모드 선택</legend>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {CHALLENGE_MODE_OPTIONS.map((option) => {
+                  const isChecked = challengeModes[option.key];
+
+                  return (
+                    <label
+                      className={`cursor-pointer rounded border p-3 transition ${
+                        isChecked
+                          ? "border-fuchsia-100 bg-fuchsia-300/16 shadow-[0_0_18px_rgba(232,121,249,0.18)]"
+                          : "border-white/20 bg-black/30 hover:border-fuchsia-100/55"
+                      } ${isStarting ? "pointer-events-none opacity-60" : ""}`}
+                      key={option.key}
+                    >
+                      <span className="flex items-center gap-2">
+                        <input
+                          checked={isChecked}
+                          className="size-4 accent-fuchsia-300"
+                          disabled={isStarting}
+                          onChange={(event) => {
+                            onChallengeModesChange({
+                              ...challengeModes,
+                              [option.key]: event.target.checked,
+                            });
+                          }}
+                          type="checkbox"
+                        />
+                        <span className="font-black text-white">
+                          {option.title}
+                        </span>
+                      </span>
+                      <span className="mt-2 block text-xs font-bold leading-5 text-cyan-50/68">
+                        {option.description}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+          </details>
+        ) : (
+          <div className="max-w-2xl rounded-md border border-white/20 bg-black/30 p-4 text-white/55">
+            <p className="text-xs font-black uppercase tracking-[0.24em]">
+              Challenge Mode · Locked
+            </p>
+            <p className="mt-2 text-sm font-bold text-cyan-50/60">
+              최고 기록 {CHALLENGE_MODE_UNLOCK_ROUND}층 달성 시 해금됩니다.
+            </p>
+          </div>
+        )}
         <div className="flex flex-col gap-3 sm:flex-row">
           <NeonButton onClick={startGame}>
             {isStarting ? "준비 중" : "게임 시작"}
@@ -294,9 +380,11 @@ function MicroscopePanel({
 }
 
 function renderHomeView(
+  challengeModes: ChallengeModes,
   homeView: HomeView,
   highestReachedRound: number,
   isStarting: boolean,
+  onChallengeModesChange: (challengeModes: ChallengeModes) => void,
   startGame: () => void,
   seenMicrogameIds: readonly string[],
 ) {
@@ -310,21 +398,27 @@ function renderHomeView(
 
   return (
     <HomePanel
+      challengeModes={challengeModes}
       highestReachedRound={highestReachedRound}
       isStarting={isStarting}
+      onChallengeModesChange={onChallengeModesChange}
       startGame={startGame}
     />
   );
 }
 
 export function MainScreen({
+  challengeModes,
   highestReachedRound,
   homeView,
+  onChallengeModesChange,
   onStart,
   seenMicrogameIds,
 }: Readonly<{
+  challengeModes: ChallengeModes;
   highestReachedRound: number;
   homeView: HomeView;
+  onChallengeModesChange: (challengeModes: ChallengeModes) => void;
   onStart: () => void;
   seenMicrogameIds: readonly string[];
 }>) {
@@ -380,9 +474,11 @@ export function MainScreen({
         } ${isStarting ? "main-screen-exit-up" : ""}`}
       >
         {renderHomeView(
+          challengeModes,
           homeView,
           highestReachedRound,
           isStarting,
+          onChallengeModesChange,
           startGame,
           seenMicrogameIds,
         )}

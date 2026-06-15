@@ -23,12 +23,16 @@ export const ELEVATOR_WARNING_IMAGES = [
   "/games/game-flow/images/main-elevator-warning-2.png",
 ];
 
-export const LIFE_LABELS = ["Life 1", "Life 2", "Life 3", "Life 4"];
-
 export const RESULT_BGM_TRACKS = {
   failure: "fail",
   idle: null,
   success: "success",
+} satisfies Record<GameRoundResult, BgmTrack | null>;
+
+export const NO_CONTROL_RESULT_BGM_TRACKS = {
+  failure: "failNoControl",
+  idle: null,
+  success: "successNoControl",
 } satisfies Record<GameRoundResult, BgmTrack | null>;
 
 const SPEED_UP_MESSAGES = [
