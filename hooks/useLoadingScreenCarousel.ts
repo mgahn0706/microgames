@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 
 export function useLoadingScreenCarousel({
+  cartoonCount,
   isPaused,
   messageCount,
-  tipCount,
 }: Readonly<{
+  cartoonCount: number;
   isPaused: boolean;
   messageCount: number;
-  tipCount: number;
 }>) {
+  const [cartoonIndex, setCartoonIndex] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
-  const [tipIndex, setTipIndex] = useState(0);
 
   useEffect(() => {
     if (isPaused || messageCount <= 1) {
@@ -31,21 +31,23 @@ export function useLoadingScreenCarousel({
   }, [isPaused, messageCount]);
 
   useEffect(() => {
-    if (isPaused || tipCount <= 1) {
+    if (isPaused || cartoonCount <= 1) {
       return;
     }
 
-    const tipTimer = window.setInterval(() => {
-      setTipIndex((currentTipIndex) => (currentTipIndex + 1) % tipCount);
+    const cartoonTimer = window.setInterval(() => {
+      setCartoonIndex(
+        (currentCartoonIndex) => (currentCartoonIndex + 1) % cartoonCount,
+      );
     }, 2400);
 
     return () => {
-      window.clearInterval(tipTimer);
+      window.clearInterval(cartoonTimer);
     };
-  }, [isPaused, tipCount]);
+  }, [cartoonCount, isPaused]);
 
   return {
+    cartoonIndex,
     messageIndex,
-    tipIndex,
   };
 }

@@ -19,6 +19,7 @@ import type { PreloadStatus } from "@/hooks/useGameScreenFlow";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
 import { useGameSetupTransition } from "@/hooks/useGameSetupTransition";
 import { useLoadingScreenCarousel } from "@/hooks/useLoadingScreenCarousel";
+import { usePracticeSpeedMultiplierState } from "@/hooks/usePracticeSpeedMultiplierState";
 import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
 import {
   bgmLibrary,
@@ -26,14 +27,11 @@ import {
   unlockBgmLibrary,
 } from "@/lib/bgmLibrary";
 import {
-  DEFAULT_PRACTICE_SPEED_MULTIPLIER,
   formatPracticeSpeedMultiplier,
   MAX_PRACTICE_SPEED_MULTIPLIER,
   MIN_PRACTICE_SPEED_MULTIPLIER,
   normalizePracticeSpeedMultiplier,
-  parsePracticeSpeedMultiplier,
   PRACTICE_SPEED_STEP,
-  PRACTICE_SPEED_STORAGE_KEY,
 } from "@/lib/practiceSpeed";
 import { FixedLivesOverlay } from "./FixedLivesOverlay";
 import { MAIN_SCREEN_EXIT_MS } from "./gameFlowConstants";
@@ -111,26 +109,22 @@ const LOADING_MESSAGES = [
   "결과 화면 준비 중...",
 ] as const;
 
-const LOADING_GAMEPLAY_TIPS = [
+const LOADING_CARTOONS = [
   {
-    body: "각 라운드가 시작되기 전에 필요한 입력 방식이 먼저 나옵니다. 그 안내를 보고 바로 준비하면 됩니다.",
-    title: "라운드마다 안내",
+    alt: "로딩 카툰 1",
+    src: "/games/game-flow/images/loading-cartoon-1.png",
   },
   {
-    body: "마이크로게임은 아주 짧게 지나갑니다. 대부분 4~8초 안에 보고, 판단하고, 입력해야 합니다.",
-    title: "빠른 판정",
+    alt: "로딩 카툰 2",
+    src: "/games/game-flow/images/loading-cartoon-2.png",
   },
   {
-    body: "처음 목숨은 4개입니다. 실패할 때마다 하나씩 줄어드니, 헷갈리는 라운드일수록 침착하게 입력하세요.",
-    title: "목숨 4개",
+    alt: "로딩 카툰 3",
+    src: "/games/game-flow/images/loading-cartoon-3.png",
   },
   {
-    body: "보스 라운드는 더 길고 까다롭습니다. 대신 클리어하면 목숨을 하나 더 얻어 다음 층을 버틸 여유가 생깁니다.",
-    title: "보스 보상",
-  },
-  {
-    body: "게임은 계속 빨라지고 라운드도 섞입니다. 외우기보다 화면에 뜨는 한 줄 명령을 바로 따라가는 게 핵심입니다.",
-    title: "명령 확인",
+    alt: "로딩 카툰 4",
+    src: "/games/game-flow/images/loading-cartoon-4.png",
   },
 ] as const;
 
@@ -342,41 +336,11 @@ function MicroscopePanel({
   const [testPracticeMicrogameId, setTestPracticeMicrogameId] = useState<
     string | null
   >(null);
-  const [practiceSpeedMultiplier, setPracticeSpeedMultiplier] = useState(
-    DEFAULT_PRACTICE_SPEED_MULTIPLIER,
-  );
+  const [practiceSpeedMultiplier, setPracticeSpeedMultiplier] =
+    usePracticeSpeedMultiplierState();
   const discoveredMicrogameCount = MICROGAMES.filter(({ id }) =>
     seenMicrogameIds.includes(id),
   ).length;
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const speedFromQuery = params.get("speed");
-    const speedFromStorage = window.localStorage.getItem(
-      PRACTICE_SPEED_STORAGE_KEY,
-    );
-    const initialSpeed = parsePracticeSpeedMultiplier(
-      speedFromQuery ?? speedFromStorage,
-    );
-
-    setPracticeSpeedMultiplier(initialSpeed);
-  }, []);
-
-  useEffect(() => {
-    const formattedSpeed = formatPracticeSpeedMultiplier(
-      practiceSpeedMultiplier,
-    );
-
-    window.localStorage.setItem(PRACTICE_SPEED_STORAGE_KEY, formattedSpeed);
-
-    if (window.location.pathname === "/microscope") {
-      window.history.replaceState(
-        null,
-        "",
-        `/microscope?speed=${formattedSpeed}`,
-      );
-    }
-  }, [practiceSpeedMultiplier]);
 
   useEffect(() => {
     if (!testPracticeMicrogameId) {
@@ -717,13 +681,13 @@ export function LoadingScreen({
 }>) {
   useBgmTrack("resultsAndMain", "loop", "now");
   const isFailed = preloadStatus.phase === "failed";
-  const { messageIndex, tipIndex } = useLoadingScreenCarousel({
+  const { cartoonIndex, messageIndex } = useLoadingScreenCarousel({
+    cartoonCount: LOADING_CARTOONS.length,
     isPaused: isFailed,
     messageCount: LOADING_MESSAGES.length,
-    tipCount: LOADING_GAMEPLAY_TIPS.length,
   });
   const loadingMessage = LOADING_MESSAGES[messageIndex];
-  const gameplayTip = LOADING_GAMEPLAY_TIPS[tipIndex];
+  const loadingCartoon = LOADING_CARTOONS[cartoonIndex];
 
   return (
     <NeonShell>
@@ -795,32 +759,36 @@ export function LoadingScreen({
             </div>
           </div>
         </div>
-        {gameplayTip ? (
-          <section className="flex min-h-72 flex-col rounded-md border border-cyan-100/25 bg-white/[0.04] p-5">
+        {loadingCartoon ? (
+          <section className="flex min-h-72 flex-col overflow-hidden rounded-md border border-cyan-100/25 bg-white/[0.04] p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-100/72">
-                게임 방법
+                배경 이야기
               </p>
               <p className="text-xs font-black text-cyan-50/55">
-                {tipIndex + 1}/{LOADING_GAMEPLAY_TIPS.length}
+                {cartoonIndex + 1}/{LOADING_CARTOONS.length}
               </p>
             </div>
-            <div className="my-auto min-w-0 py-8">
-              <h2 className="text-3xl font-black leading-tight text-white sm:text-4xl">
-                {gameplayTip.title}
-              </h2>
-              <p className="mt-4 text-base font-bold leading-7 text-cyan-50/78">
-                {gameplayTip.body}
-              </p>
+            <div className="grid min-h-0 flex-1 place-items-center py-3">
+              <Image
+                src={loadingCartoon.src}
+                alt={loadingCartoon.alt}
+                width={1024}
+                height={1536}
+                priority
+                className="max-h-[31rem] w-full rounded object-contain shadow-[0_0_22px_rgba(103,232,249,0.18)]"
+                sizes="(min-width: 1024px) 420px, 90vw"
+                unoptimized
+              />
             </div>
             <div className="flex gap-1.5">
-              {LOADING_GAMEPLAY_TIPS.map((tip, index) => (
+              {LOADING_CARTOONS.map((cartoon, index) => (
                 <span
                   aria-hidden="true"
                   className={`h-1.5 flex-1 rounded-full ${
-                    index === tipIndex ? "bg-cyan-100" : "bg-cyan-100/18"
+                    index === cartoonIndex ? "bg-cyan-100" : "bg-cyan-100/18"
                   }`}
-                  key={tip.title}
+                  key={cartoon.src}
                 />
               ))}
             </div>
