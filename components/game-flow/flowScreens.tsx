@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ScoreSubmissionPanel } from "@/components/ranking/ScoreSubmissionPanel";
 import {
@@ -9,7 +10,11 @@ import {
   CHALLENGE_MODE_OPTIONS,
   type ChallengeModes,
 } from "@/data/challengeModes";
-import { MICROGAMES, getMicrogameFormInstruction } from "@/data/microgames";
+import {
+  MICROGAMES,
+  getMicrogameFormInstruction,
+  type Microgame,
+} from "@/data/microgames";
 import type { PreloadStatus } from "@/hooks/useGameScreenFlow";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
 import { useGameSetupTransition } from "@/hooks/useGameSetupTransition";
@@ -26,39 +31,72 @@ import { HomeHeader, type HomeView } from "./HomeHeader";
 import { NeonButton, NeonShell } from "./NeonShell";
 
 const LOADING_MESSAGES = [
-  "식빵 굽는 중...",
   "엘리베이터 점검 중...",
-  "도장 잉크 채우는 중...",
-  "룬 해독하는 중...",
-  "카트 예열하는 중...",
-  "챔피언 목록 펼치는 중...",
+  "고양이 간식 채우는 중...",
+  "캣타워 층수 세는 중...",
+  "발판 미끄럼 방지 확인 중...",
+  "과제 제출 버튼 확인 중...",
+  "도블 카드 섞는 중...",
   "도감 페이지 넘기는 중...",
-  "전선 연결 순서 확인 중...",
-  "코인 블록 준비 중...",
-  "선인장 위치 확인 중...",
-  "점프 타이밍 맞추는 중...",
-  "슬라이드 구간 확인 중...",
-  "낱말 내려보내는 중...",
-  "원형 판정 준비 중...",
-  "긴 블록 위치 맞추는 중...",
-  "광석 배치하는 중...",
-  "멜로디 순서 맞추는 중...",
-  "블록 문제 고르는 중...",
-  "탐지기 문구 불러오는 중...",
-  "화살표 순서 섞는 중...",
-  "같은 모양 찾는 중...",
-  "밴할 챔피언 고르는 중...",
-  "카드 한 장 뒤집는 중...",
-  "벨 울릴 순간 기다리는 중...",
+  "레이튼 문제 그림 맞추는 중...",
+  "챔피언 밴 목록 불러오는 중...",
+  "코러스맨 숨 고르는 중...",
+  "목숨 표시등 닦는 중...",
+  "다이아몬드 광석 찾는 중...",
+  "두뇌교실 블록 쌓는 중...",
+  "거짓말 탐지기 문구 준비 중...",
+  "메이플 룬 방향 섞는 중...",
+  "라운드 순서 섞는 중...",
   "주사위 게이지 맞추는 중...",
-  "물풍선 위치 정하는 중...",
-  "마지막 바퀴 준비 중...",
-  "운하 코스 확인 중...",
-  "스탬프 위치 맞추는 중...",
-  "과일 개수 확인 중...",
-  "몬스터 이름 불러오는 중...",
-  "클리어 판정 준비 중...",
-  "다음 게임 순서 섞는 중...",
+  "스탬프 위치 정하는 중...",
+  "곰이 먹은 고기 세는 중...",
+  "바운스볼 별 올려두는 중...",
+  "고양이 앞발 스트레칭 중...",
+  "커비가 숨 들이마시는 중...",
+  "불과 얼음의 박자 맞추는 중...",
+  "사과 숫자판 채우는 중...",
+  "수박 합칠 준비 중...",
+  "박자 표시등 예열 중...",
+  "마리오 코인 개수 맞추는 중...",
+  "스타구슬 흩뿌리는 중...",
+  "스도쿠 빈칸 고르는 중...",
+  "알까기 돌 배치하는 중...",
+  "성공 효과음 고르는 중...",
+  "어몽어스 전선 색 맞추는 중...",
+  "뼈 공격 궤적 계산 중...",
+  "오목 승리 자리 찾는 중...",
+  "여신의 벽 문양 준비 중...",
+  "실패 화면 접어두는 중...",
+  "오카리나 악보 펼치는 중...",
+  "가시 점프 타이밍 맞추는 중...",
+  "체스 킹 잡을 수 찾는 중...",
+  "쿠키런 장애물 세우는 중...",
+  "고양이 털 날림 방지 중...",
+  "쿠키 스킬 순서 확인 중...",
+  "물풍선 설치 위치 정하는 중...",
+  "공룡 앞 선인장 세우는 중...",
+  "테트리스 긴 막대 기다리는 중...",
+  "최고 기록 칸 비워두는 중...",
+  "포켓몬 도감 켜는 중...",
+  "타입 카드 손패 섞는 중...",
+  "퐁 공 속도 맞추는 중...",
+  "플래피버드 파이프 세우는 중...",
+  "엘리베이터 문 닫는 중...",
+  "피아노 멜로디 고르는 중...",
+  "한컴 단어 내려보내는 중...",
+  "수박 던질 각도 재는 중...",
+  "Baba 규칙 블록 놓는 중...",
+  "보스 라운드 출입증 확인 중...",
+  "파이어보이와 워터걸 발판 확인 중...",
+  "Wii Sports 버튼 확인 중...",
+  "2048 보드 숫자 채우는 중...",
+  "동물농장 단어 거꾸로 뒤집는 중...",
+  "고양이 눈치 보는 중...",
+  "무궁화 꽃 타이밍 재는 중...",
+  "카트라이더 운하 코스 여는 중...",
+  "할리갈리 과일 카드 나누는 중...",
+  "다음 층 버튼 누르는 중...",
+  "캣타워 꼭대기 불 켜는 중...",
   "결과 화면 준비 중...",
 ] as const;
 
@@ -269,14 +307,43 @@ function maskMicroscopeText(value: string) {
     .join("");
 }
 
+function getMicrogamePracticeHref(microgame: Microgame) {
+  return `/microscope/${microgame.id}`;
+}
+
 function MicroscopePanel({
   seenMicrogameIds,
 }: Readonly<{
   seenMicrogameIds: readonly string[];
 }>) {
+  const router = useRouter();
+  const [testPracticeMicrogameId, setTestPracticeMicrogameId] = useState<
+    string | null
+  >(null);
   const discoveredMicrogameCount = MICROGAMES.filter(({ id }) =>
     seenMicrogameIds.includes(id),
   ).length;
+
+  useEffect(() => {
+    if (!testPracticeMicrogameId) {
+      return;
+    }
+
+    const openHoveredPractice = (event: KeyboardEvent) => {
+      if (event.key !== "Enter" || event.metaKey || event.ctrlKey) {
+        return;
+      }
+
+      event.preventDefault();
+      router.push(`/microscope/${testPracticeMicrogameId}`);
+    };
+
+    window.addEventListener("keydown", openHoveredPractice);
+
+    return () => {
+      window.removeEventListener("keydown", openHoveredPractice);
+    };
+  }, [router, testPracticeMicrogameId]);
 
   return (
     <div className="space-y-5">
@@ -361,17 +428,58 @@ function MicroscopePanel({
             </article>
           );
 
-          return isSeen ? (
-            <Link
-              aria-label={`${microgame.title} 연습하기`}
-              className="block"
-              href={`/microscope/${microgame.id}`}
+          if (isSeen) {
+            return (
+              <Link
+                aria-label={`${microgame.title} 연습하기`}
+                className="block"
+                href={getMicrogamePracticeHref(microgame)}
+                key={microgame.id}
+              >
+                {card}
+              </Link>
+            );
+          }
+
+          return (
+            <div
+              aria-label={`${microgame.title} 테스트 연습 열기`}
+              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/80"
               key={microgame.id}
+              onBlur={() => {
+                setTestPracticeMicrogameId((currentMicrogameId) =>
+                  currentMicrogameId === microgame.id
+                    ? null
+                    : currentMicrogameId,
+                );
+              }}
+              onFocus={() => {
+                setTestPracticeMicrogameId(microgame.id);
+              }}
+              onMouseEnter={() => {
+                setTestPracticeMicrogameId(microgame.id);
+              }}
+              onMouseLeave={() => {
+                setTestPracticeMicrogameId((currentMicrogameId) =>
+                  currentMicrogameId === microgame.id
+                    ? null
+                    : currentMicrogameId,
+                );
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" || event.metaKey || event.ctrlKey) {
+                  return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+                router.push(getMicrogamePracticeHref(microgame));
+              }}
+              role="button"
+              tabIndex={0}
             >
               {card}
-            </Link>
-          ) : (
-            <div key={microgame.id}>{card}</div>
+            </div>
           );
         })}
       </div>
