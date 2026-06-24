@@ -11,7 +11,10 @@ export function FruitNinjaGame({
   return (
     <canvas
       ref={canvasRef}
-      className="block h-screen w-screen cursor-none touch-none bg-lime-950"
+      className="block h-screen w-screen touch-none bg-lime-950"
+      style={{
+        cursor: 'url("/games/fruit-ninja/images/cursor.svg") 3 21, crosshair',
+      }}
     />
   );
 }

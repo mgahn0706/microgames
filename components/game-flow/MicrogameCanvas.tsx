@@ -39,6 +39,7 @@ import { PongGame } from "@/games/PongGame";
 import { PokemonTcgPocketGame } from "@/games/PokemonTcgPocketGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { RhythmHeavenChorusGame } from "@/games/RhythmHeavenChorusGame";
+import { SnakeGame } from "@/games/SnakeGame";
 import { SquidGameBossGame } from "@/games/SquidGameBossGame";
 import { SubmitAssignmentGame } from "@/games/SubmitAssignmentGame";
 import { SudokuGame } from "@/games/SudokuGame";
@@ -109,6 +110,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "superMarioGalaxyStarBits") {
     return <SuperMarioGalaxyGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "snakeApple") {
+    return <SnakeGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "pokemonTyping") {

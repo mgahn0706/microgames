@@ -25,6 +25,16 @@ import {
   GAME_OVER_DURATION_MS,
   unlockBgmLibrary,
 } from "@/lib/bgmLibrary";
+import {
+  DEFAULT_PRACTICE_SPEED_MULTIPLIER,
+  formatPracticeSpeedMultiplier,
+  MAX_PRACTICE_SPEED_MULTIPLIER,
+  MIN_PRACTICE_SPEED_MULTIPLIER,
+  normalizePracticeSpeedMultiplier,
+  parsePracticeSpeedMultiplier,
+  PRACTICE_SPEED_STEP,
+  PRACTICE_SPEED_STORAGE_KEY,
+} from "@/lib/practiceSpeed";
 import { FixedLivesOverlay } from "./FixedLivesOverlay";
 import { MAIN_SCREEN_EXIT_MS } from "./gameFlowConstants";
 import { HomeHeader, type HomeView } from "./HomeHeader";
@@ -59,6 +69,7 @@ const LOADING_MESSAGES = [
   "박자 표시등 예열 중...",
   "마리오 코인 개수 맞추는 중...",
   "스타구슬 흩뿌리는 중...",
+  "스네이크 사과 올려두는 중...",
   "스도쿠 빈칸 고르는 중...",
   "알까기 돌 배치하는 중...",
   "성공 효과음 고르는 중...",
@@ -307,8 +318,19 @@ function maskMicroscopeText(value: string) {
     .join("");
 }
 
-function getMicrogamePracticeHref(microgame: Microgame) {
-  return `/microscope/${microgame.id}`;
+function getMicrogamePracticeHref(
+  microgame: Microgame,
+  practiceSpeedMultiplier: number,
+) {
+  const speed = formatPracticeSpeedMultiplier(practiceSpeedMultiplier);
+
+  return `/microscope/${microgame.id}?speed=${speed}`;
+}
+
+function getMicroscopeClearSummary(microgame: Microgame) {
+  const prompt = microgame.startPrompt.replace(/[!！?？.。]+$/u, "");
+
+  return `클리어: ${prompt}`;
 }
 
 function MicroscopePanel({
@@ -320,9 +342,41 @@ function MicroscopePanel({
   const [testPracticeMicrogameId, setTestPracticeMicrogameId] = useState<
     string | null
   >(null);
+  const [practiceSpeedMultiplier, setPracticeSpeedMultiplier] = useState(
+    DEFAULT_PRACTICE_SPEED_MULTIPLIER,
+  );
   const discoveredMicrogameCount = MICROGAMES.filter(({ id }) =>
     seenMicrogameIds.includes(id),
   ).length;
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const speedFromQuery = params.get("speed");
+    const speedFromStorage = window.localStorage.getItem(
+      PRACTICE_SPEED_STORAGE_KEY,
+    );
+    const initialSpeed = parsePracticeSpeedMultiplier(
+      speedFromQuery ?? speedFromStorage,
+    );
+
+    setPracticeSpeedMultiplier(initialSpeed);
+  }, []);
+
+  useEffect(() => {
+    const formattedSpeed = formatPracticeSpeedMultiplier(
+      practiceSpeedMultiplier,
+    );
+
+    window.localStorage.setItem(PRACTICE_SPEED_STORAGE_KEY, formattedSpeed);
+
+    if (window.location.pathname === "/microscope") {
+      window.history.replaceState(
+        null,
+        "",
+        `/microscope?speed=${formattedSpeed}`,
+      );
+    }
+  }, [practiceSpeedMultiplier]);
 
   useEffect(() => {
     if (!testPracticeMicrogameId) {
@@ -335,7 +389,11 @@ function MicroscopePanel({
       }
 
       event.preventDefault();
-      router.push(`/microscope/${testPracticeMicrogameId}`);
+      router.push(
+        `/microscope/${testPracticeMicrogameId}?speed=${formatPracticeSpeedMultiplier(
+          practiceSpeedMultiplier,
+        )}`,
+      );
     };
 
     window.addEventListener("keydown", openHoveredPractice);
@@ -343,7 +401,7 @@ function MicroscopePanel({
     return () => {
       window.removeEventListener("keydown", openHoveredPractice);
     };
-  }, [router, testPracticeMicrogameId]);
+  }, [practiceSpeedMultiplier, router, testPracticeMicrogameId]);
 
   return (
     <div className="space-y-5">
@@ -356,11 +414,37 @@ function MicroscopePanel({
             게임 도감
           </h1>
         </div>
-        <p className="w-fit rounded-md border border-cyan-100/35 bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
-          발견 {discoveredMicrogameCount}/{MICROGAMES.length}
-        </p>
+        <div className="grid w-full gap-2 sm:w-72">
+          <p className="justify-self-end rounded-md border border-cyan-100/35 bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
+            발견 {discoveredMicrogameCount}/{MICROGAMES.length}
+          </p>
+          <label className="rounded-md border border-cyan-100/25 bg-black/35 px-3 py-2">
+            <span className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-100/80">
+              <span>연습 속도</span>
+              <span className="text-sm tracking-normal text-white">
+                x{formatPracticeSpeedMultiplier(practiceSpeedMultiplier)}
+              </span>
+            </span>
+            <input
+              aria-label="연습 게임 속도"
+              className="mt-2 w-full accent-cyan-200"
+              max={MAX_PRACTICE_SPEED_MULTIPLIER}
+              min={MIN_PRACTICE_SPEED_MULTIPLIER}
+              onChange={(event) => {
+                setPracticeSpeedMultiplier(
+                  normalizePracticeSpeedMultiplier(
+                    Number.parseFloat(event.target.value),
+                  ),
+                );
+              }}
+              step={PRACTICE_SPEED_STEP}
+              type="range"
+              value={practiceSpeedMultiplier}
+            />
+          </label>
+        </div>
       </div>
-      <div className="grid gap-px overflow-hidden rounded-md border border-cyan-100/25 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-px overflow-hidden rounded-md border border-cyan-100/25 bg-white/10 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {MICROGAMES.map((microgame) => {
           const formInstruction = getMicrogameFormInstruction(microgame);
           const isSeen = seenMicrogameIds.includes(microgame.id);
@@ -370,58 +454,54 @@ function MicroscopePanel({
           const displayControlTitle = isSeen
             ? formInstruction.title
             : maskMicroscopeText(formInstruction.title);
+          const clearSummary = getMicroscopeClearSummary(microgame);
           const displayDescription = isSeen
-            ? microgame.microscope.description
-            : maskMicroscopeText(microgame.microscope.description);
+            ? clearSummary
+            : maskMicroscopeText(clearSummary);
 
           const card = (
             <article
-              className={`grid h-full min-h-24 grid-cols-[64px_1fr] gap-3 p-3 ${
+              className={`grid h-full min-h-20 grid-cols-[48px_1fr] gap-2.5 p-2.5 ${
                 isSeen
                   ? "bg-slate-950/90 transition hover:bg-cyan-950/90"
                   : "bg-black/90 text-white/62"
               }`}
             >
-              <div className="relative size-16 overflow-hidden rounded border border-white/12 bg-slate-950">
+              <div className="relative size-12 overflow-hidden rounded border border-white/12 bg-slate-950">
                 <Image
                   alt={microgame.microscope.imageAlt}
                   className={`size-full object-cover ${
                     isSeen ? "opacity-100" : "opacity-20"
                   }`}
                   decoding="async"
-                  height={64}
-                  sizes="64px"
+                  height={48}
+                  sizes="48px"
                   src={microgame.microscope.imageSrc}
-                  width={64}
+                  width={48}
                 />
                 {isSeen ? null : (
                   <div className="absolute inset-0 grid place-items-center bg-black/45">
-                    <span className="rounded border border-white/30 bg-black/70 px-2 py-1 text-xs font-black text-white">
+                    <span className="rounded border border-white/30 bg-black/70 px-1.5 py-0.5 text-[0.62rem] font-black text-white">
                       잠금
                     </span>
                   </div>
                 )}
               </div>
-              <div className="min-w-0 pr-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="min-w-0 truncate text-base font-black leading-tight text-white">
+              <div className="min-w-0">
+                <div className="flex min-w-0 items-center gap-1.5">
+                  <h2 className="min-w-0 truncate text-sm font-black leading-tight text-white">
                     {displayTitle}
                   </h2>
                   {microgame.type === "boss" ? (
-                    <span className="rounded border border-amber-200/45 px-1.5 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.1em] text-amber-50">
+                    <span className="shrink-0 rounded border border-amber-200/45 px-1 py-0.5 text-[0.56rem] font-black uppercase tracking-[0.08em] text-amber-50">
                       Boss
                     </span>
                   ) : null}
-                  {isSeen ? null : (
-                    <span className="rounded border border-white/20 px-2 py-0.5 text-[0.68rem] font-black text-white/50">
-                      미발견
-                    </span>
-                  )}
                 </div>
-                <p className="mt-1 truncate text-sm font-black text-cyan-50/82">
+                <p className="mt-1 w-fit max-w-full truncate rounded border border-cyan-100/20 px-1.5 py-0.5 text-[0.64rem] font-black leading-none text-cyan-50/78">
                   {displayControlTitle}
                 </p>
-                <p className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-cyan-50/68">
+                <p className="mt-1 truncate text-xs font-bold leading-4 text-cyan-50/68">
                   {displayDescription}
                 </p>
               </div>
@@ -433,7 +513,10 @@ function MicroscopePanel({
               <Link
                 aria-label={`${microgame.title} 연습하기`}
                 className="block"
-                href={getMicrogamePracticeHref(microgame)}
+                href={getMicrogamePracticeHref(
+                  microgame,
+                  practiceSpeedMultiplier,
+                )}
                 key={microgame.id}
               >
                 {card}
@@ -473,7 +556,9 @@ function MicroscopePanel({
 
                 event.preventDefault();
                 event.stopPropagation();
-                router.push(getMicrogamePracticeHref(microgame));
+                router.push(
+                  getMicrogamePracticeHref(microgame, practiceSpeedMultiplier),
+                );
               }}
               role="button"
               tabIndex={0}

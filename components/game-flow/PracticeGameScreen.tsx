@@ -11,12 +11,15 @@ import { InstructionRoundScreen, MicrogameRoundScreen } from "./roundScreens";
 
 export function PracticeGameScreen({
   microgame,
+  practiceSpeedMultiplier,
 }: Readonly<{
   microgame: Microgame;
+  practiceSpeedMultiplier: number;
 }>) {
-  const { rhythmStyle } = useSynchronizedRhythm();
+  const beatDurationMs = RHYTHM_DURATION_MS / practiceSpeedMultiplier;
+  const { rhythmStyle } = useSynchronizedRhythm(beatDurationMs);
   const { beatsLeft, instructionStep, phase, result, returnToMicroscope } =
-    usePracticeMicrogame(microgame);
+    usePracticeMicrogame(microgame, beatDurationMs, practiceSpeedMultiplier);
 
   if (phase === "instruction" || phase === "playing") {
     const isPromptTransition =
@@ -30,7 +33,7 @@ export function PracticeGameScreen({
       >
         {phase === "instruction" ? (
           <InstructionRoundScreen
-            beatDurationMs={RHYTHM_DURATION_MS}
+            beatDurationMs={beatDurationMs}
             instructionStep={instructionStep}
             microgame={microgame}
             rhythmStyle={rhythmStyle}
@@ -39,7 +42,7 @@ export function PracticeGameScreen({
         ) : null}
         {phase === "playing" || isPromptTransition ? (
           <MicrogameRoundScreen
-            beatDurationMs={RHYTHM_DURATION_MS}
+            beatDurationMs={beatDurationMs}
             beatsLeft={beatsLeft}
             isTransitioning={isPromptTransition}
             microgame={microgame}

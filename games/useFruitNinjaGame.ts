@@ -13,8 +13,9 @@ const DEFAULT_BEAT_DURATION_MS = 500;
 const MAX_DELTA_SECONDS = 1 / 30;
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
-const SLASH_LIFETIME_MS = 260;
-const TRAIL_MAX_POINTS = 9;
+const SLICE_SPREAD_DURATION_MS = 620;
+const SLASH_LIFETIME_MS = 180;
+const TRAIL_MAX_POINTS = 5;
 
 type AssetKey = keyof typeof ASSETS;
 
@@ -39,7 +40,9 @@ type GameState = {
   isDragging: boolean;
   isSliced: boolean;
   lastTimestamp: number | null;
+  pointerPosition: Point | null;
   slashAngle: number;
+  slicedAtMs: number | null;
   slashTrail: Point[];
 };
 
@@ -94,7 +97,9 @@ function createInitialState() {
     isDragging: false,
     isSliced: false,
     lastTimestamp: null,
+    pointerPosition: null,
     slashAngle: -Math.PI / 4,
+    slicedAtMs: null,
     slashTrail: [],
   } satisfies GameState;
 }
@@ -240,14 +245,67 @@ function drawFruit(
   context.restore();
 }
 
+function drawSlicedFruit(
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  fruit: FruitPosition,
+  state: GameState,
+) {
+  const slicedElapsedMs =
+    state.slicedAtMs === null ? 0 : state.elapsedMs - state.slicedAtMs;
+  const progress = Math.min(
+    Math.max(slicedElapsedMs / SLICE_SPREAD_DURATION_MS, 0),
+    1,
+  );
+  const easedProgress = 1 - Math.pow(1 - progress, 2.2);
+  const drawWidth = fruit.size * 1.02;
+  const drawHeight = drawWidth * (image.naturalHeight / image.naturalWidth);
+  const perpendicularAngle = state.slashAngle + Math.PI / 2;
+  const spread = fruit.size * (0.18 + easedProgress * 0.64);
+  const fall = fruit.size * progress * progress * 0.28;
+  const pieces = [
+    {
+      mirrored: false,
+      rotation: -0.28 - easedProgress * 0.56,
+      spreadDirection: -1,
+    },
+    {
+      mirrored: true,
+      rotation: 0.28 + easedProgress * 0.56,
+      spreadDirection: 1,
+    },
+  ] as const;
+
+  pieces.forEach((piece) => {
+    const xOffset =
+      Math.cos(perpendicularAngle) * spread * piece.spreadDirection;
+    const yOffset =
+      Math.sin(perpendicularAngle) * spread * piece.spreadDirection + fall;
+
+    context.save();
+    context.translate(fruit.x + xOffset, fruit.y + yOffset);
+    context.rotate(fruit.rotation + piece.rotation);
+    context.scale(piece.mirrored ? -1 : 1, 1);
+    context.drawImage(
+      image,
+      -drawWidth / 2,
+      -drawHeight / 2,
+      drawWidth,
+      drawHeight,
+    );
+    context.restore();
+  });
+}
+
 function drawSlashTrail(context: CanvasRenderingContext2D, state: GameState) {
-  if (state.slashTrail.length < 2) {
+  if (!state.isDragging || state.slashTrail.length < 2) {
     return;
   }
 
   context.save();
   context.lineCap = "round";
   context.lineJoin = "round";
+  context.shadowBlur = 0;
   state.slashTrail.slice(1).forEach((point, index) => {
     const previousPoint = state.slashTrail[index];
 
@@ -257,53 +315,20 @@ function drawSlashTrail(context: CanvasRenderingContext2D, state: GameState) {
 
     const opacity = (index + 1) / state.slashTrail.length;
 
-    context.strokeStyle = `rgba(255, 255, 255, ${0.24 + opacity * 0.54})`;
-    context.shadowBlur = 22;
-    context.shadowColor = "rgba(185, 255, 124, 0.88)";
-    context.lineWidth = 7 + opacity * 11;
+    context.strokeStyle = `rgba(255, 255, 255, ${0.18 + opacity * 0.52})`;
+    context.lineWidth = 5 + opacity * 8;
     context.beginPath();
     context.moveTo(previousPoint.x, previousPoint.y);
     context.lineTo(point.x, point.y);
     context.stroke();
 
-    context.strokeStyle = `rgba(195, 255, 98, ${0.24 + opacity * 0.48})`;
-    context.shadowBlur = 0;
-    context.lineWidth = 2 + opacity * 4;
+    context.strokeStyle = `rgba(190, 242, 100, ${0.18 + opacity * 0.46})`;
+    context.lineWidth = 1.5 + opacity * 2.5;
     context.beginPath();
     context.moveTo(previousPoint.x, previousPoint.y);
     context.lineTo(point.x, point.y);
     context.stroke();
   });
-  context.restore();
-}
-
-function drawCursorSlash(context: CanvasRenderingContext2D, state: GameState) {
-  const cursor = state.slashTrail.at(-1);
-
-  if (!cursor) {
-    return;
-  }
-
-  const length = 76;
-  const xOffset = Math.cos(state.slashAngle) * length * 0.5;
-  const yOffset = Math.sin(state.slashAngle) * length * 0.5;
-
-  context.save();
-  context.lineCap = "round";
-  context.shadowBlur = 20;
-  context.shadowColor = "rgba(255, 255, 255, 0.78)";
-  context.strokeStyle = "rgba(255, 255, 255, 0.92)";
-  context.lineWidth = 5;
-  context.beginPath();
-  context.moveTo(cursor.x - xOffset, cursor.y - yOffset);
-  context.lineTo(cursor.x + xOffset, cursor.y + yOffset);
-  context.stroke();
-  context.strokeStyle = "rgba(171, 255, 82, 0.88)";
-  context.lineWidth = 2;
-  context.beginPath();
-  context.moveTo(cursor.x - xOffset * 0.68, cursor.y - yOffset * 0.68);
-  context.lineTo(cursor.x + xOffset * 0.68, cursor.y + yOffset * 0.68);
-  context.stroke();
   context.restore();
 }
 
@@ -324,13 +349,13 @@ function drawScene(
     roundDurationMs,
   );
 
-  drawFruit(
-    context,
-    state.isSliced ? images.watermelonSliced : images.watermelon,
-    fruit,
-  );
+  if (state.isSliced) {
+    drawSlicedFruit(context, images.watermelonSliced, fruit, state);
+  } else {
+    drawFruit(context, images.watermelon, fruit);
+  }
+
   drawSlashTrail(context, state);
-  drawCursorSlash(context, state);
 }
 
 export function useFruitNinjaGameCanvas(gameBeatCount: number) {
@@ -365,8 +390,6 @@ export function useFruitNinjaGameCanvas(gameBeatCount: number) {
       canvasHeight = Math.max(bounds.height, MIN_CANVAS_HEIGHT);
       canvas.width = Math.floor(canvasWidth * pixelRatio);
       canvas.height = Math.floor(canvasHeight * pixelRatio);
-      canvas.style.width = `${bounds.width}px`;
-      canvas.style.height = `${bounds.height}px`;
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       beatDurationMs = getBeatDurationMs(canvas);
       stateRef.current = createInitialState();
@@ -382,6 +405,7 @@ export function useFruitNinjaGameCanvas(gameBeatCount: number) {
       state.hasCleared = true;
       state.isSliced = true;
       state.slashAngle = angle;
+      state.slicedAtMs = state.elapsedMs;
       playSliceSound();
       dispatchClear();
     };
@@ -393,11 +417,15 @@ export function useFruitNinjaGameCanvas(gameBeatCount: number) {
       event.preventDefault();
       canvas.setPointerCapture(event.pointerId);
       state.isDragging = true;
+      state.pointerPosition = point;
       state.slashTrail = [point];
     };
 
     const handlePointerMove = (event: PointerEvent) => {
       const state = stateRef.current;
+      const point = getPointerPoint(canvas, event);
+
+      state.pointerPosition = point;
 
       if (!state.isDragging) {
         return;
@@ -405,7 +433,6 @@ export function useFruitNinjaGameCanvas(gameBeatCount: number) {
 
       event.preventDefault();
 
-      const point = getPointerPoint(canvas, event);
       const previousPoint = state.slashTrail.at(-1);
 
       addTrailPoint(state, point);
@@ -436,6 +463,14 @@ export function useFruitNinjaGameCanvas(gameBeatCount: number) {
 
       if (canvas.hasPointerCapture(event.pointerId)) {
         canvas.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    const handlePointerLeave = () => {
+      const state = stateRef.current;
+
+      if (!state.isDragging) {
+        state.pointerPosition = null;
       }
     };
 
@@ -489,6 +524,7 @@ export function useFruitNinjaGameCanvas(gameBeatCount: number) {
     window.addEventListener("resize", resizeCanvas);
     canvas.addEventListener("pointercancel", handlePointerUp);
     canvas.addEventListener("pointerdown", handlePointerDown);
+    canvas.addEventListener("pointerleave", handlePointerLeave);
     canvas.addEventListener("pointermove", handlePointerMove);
     canvas.addEventListener("pointerup", handlePointerUp);
     animationFrame = window.requestAnimationFrame(render);
@@ -499,6 +535,7 @@ export function useFruitNinjaGameCanvas(gameBeatCount: number) {
       window.removeEventListener("resize", resizeCanvas);
       canvas.removeEventListener("pointercancel", handlePointerUp);
       canvas.removeEventListener("pointerdown", handlePointerDown);
+      canvas.removeEventListener("pointerleave", handlePointerLeave);
       canvas.removeEventListener("pointermove", handlePointerMove);
       canvas.removeEventListener("pointerup", handlePointerUp);
     };

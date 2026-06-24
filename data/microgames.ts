@@ -51,6 +51,7 @@ export type MicrogameCanvas =
   | "pokemonTcgPocket"
   | "pokemonTyping"
   | "rhythmHeavenChorus"
+  | "snakeApple"
   | "superMarioGalaxyStarBits"
   | "superMarioCoins"
   | "submitAssignment"
@@ -394,6 +395,22 @@ export const MICROGAMES = [
     id: "super-mario-galaxy-star-bits",
     startPrompt: "스타구슬을 모아라!",
     title: "슈퍼마리오 갤럭시",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "snakeApple",
+    microscope: {
+      description:
+        "스네이크는 방향을 한 번 잘못 틀면 바로 벽을 만납니다. 초록 뱀을 움직여 빨간 사과를 먹어보세요.",
+      imageAlt: "스네이크 게임 썸네일",
+      imageSrc: "/games/snake/images/thumbnail.svg",
+    },
+    control: "arrowKeys",
+    id: "snake-apple",
+    startPrompt: "사과를 먹어라!",
+    title: "스네이크",
     type: "normal",
   },
 

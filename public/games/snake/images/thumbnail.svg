@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="스네이크 게임 썸네일">
+  <rect width="256" height="256" fill="#0f172a" />
+  <rect x="24" y="24" width="208" height="208" rx="16" fill="#1e3a8a" stroke="#93c5fd" stroke-opacity="0.45" stroke-width="4" />
+  <circle cx="184" cy="72" r="18" fill="#dc2626" />
+  <path d="M192 50c8-10 18-9 26-3-6 9-16 12-26 3Z" fill="#22c55e" />
+  <path d="M56 168h48v-40h48V88h48" fill="none" stroke="#2563eb" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="193" cy="80" r="6" fill="#eff6ff" />
+  <circle cx="193" cy="96" r="6" fill="#eff6ff" />
+  <circle cx="195" cy="80" r="3" fill="#1d4ed8" />
+  <circle cx="195" cy="96" r="3" fill="#1d4ed8" />
+</svg>
