@@ -32,6 +32,7 @@ export type MicrogameCanvas =
   | "fireBoyWaterGirl"
   | "flickingGame"
   | "flappyBird"
+  | "fruitNinja"
   | "geometryDashSpikes"
   | "gomokuWhiteStone"
   | "halliGalliBoss"
@@ -716,6 +717,22 @@ export const MICROGAMES = [
 
   {
     beatCount: 8,
+    canvas: "fruitNinja",
+    microscope: {
+      description:
+        "후르츠 닌자에서는 망설이는 순간 과일이 화면 밖으로 사라집니다. 날아오르는 수박을 마우스로 시원하게 베어보세요.",
+      imageAlt: "후르츠 닌자 수박",
+      imageSrc: "/games/fruit-ninja/images/watermelon.png",
+    },
+    control: "mouseDrag",
+    id: "fruit-ninja-watermelon-slice",
+    startPrompt: "베어라!",
+    title: "후르츠 닌자",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
     canvas: "babaIsYou",
     microscope: {
       description:
@@ -893,36 +910,4 @@ function getFormInstructionByControl(control: MicrogameControl) {
   }
 
   return formInstruction;
-}
-
-export function isMicrogameClearKey(
-  control: MicrogameControl,
-  event: KeyboardEvent,
-) {
-  if (control === "arrowKeys") {
-    return ["ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp"].includes(
-      event.key,
-    );
-  }
-
-  if (control === "space") {
-    return event.code === "Space";
-  }
-
-  if (control === "arrowAndSpace") {
-    return (
-      event.code === "Space" ||
-      ["ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp"].includes(event.key)
-    );
-  }
-
-  if (control === "numberKeys") {
-    return /^\d$/.test(event.key);
-  }
-
-  if (control === "koreanKeyboard") {
-    return /^[ㄱ-ㅎㅏ-ㅣ가-힣]$/.test(event.key);
-  }
-
-  return false;
 }

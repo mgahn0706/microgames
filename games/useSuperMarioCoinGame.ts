@@ -174,7 +174,6 @@ function drawScene(
   images: LoadedImages,
   width: number,
   height: number,
-  remainingMs: number,
 ) {
   const groundY = height * 0.89;
   const marioX = width / 2 - MARIO_WIDTH / 2;
@@ -332,7 +331,7 @@ export function useSuperMarioCoinGameCanvas(gameBeatCount: number) {
         return;
       }
 
-      drawScene(context, state, images, canvasWidth, canvasHeight, remainingMs);
+      drawScene(context, state, images, canvasWidth, canvasHeight);
 
       if (
         !state.hasCleared &&

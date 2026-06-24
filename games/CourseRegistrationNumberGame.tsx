@@ -5,8 +5,10 @@ import type { Microgame } from "@/data/microgames";
 import { drawCenteredText, useStaticCanvas } from "@/lib/canvasUtils";
 
 export function CourseRegistrationNumberGame(
-  _props: Readonly<{ microgame: Microgame }>,
+  { microgame }: Readonly<{ microgame: Microgame }>,
 ) {
+  void microgame;
+
   const draw = useCallback(
     (context: CanvasRenderingContext2D, width: number, height: number) => {
       context.fillStyle = "#082f49";

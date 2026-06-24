@@ -34,6 +34,7 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
   crazyArcade: "crazyArcade",
   dobble: "dobble",
   fireAndIceDance: "fireAndIce",
+  fruitNinja: "fruitNinja",
   geometryDashSpikes: "geometryDash",
   halliGalliBoss: "halliGalli",
   hancomTyping: "hancom",
@@ -114,7 +115,6 @@ export function usePracticeMicrogame(microgame: Microgame) {
 
   useMicrogameInput({
     isActive: phase === "playing",
-    microgame,
     onClear: recordSuccess,
     onFailure: recordFailure,
     roundNumber: 1,

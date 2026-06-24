@@ -16,6 +16,7 @@ export type BgmTrack =
   | "fail"
   | "failNoControl"
   | "fireAndIce"
+  | "fruitNinja"
   | "gameOver"
   | "geometryDash"
   | "halliGalli"
@@ -60,6 +61,7 @@ export type SoundEffectTrack =
   | "crazyArcadeBombInstall"
   | "halliGalliBell"
   | "halliGalliCard"
+  | "fruitNinjaImpact"
   | "minecraftDig1"
   | "minecraftDig2"
   | "modooDiceRoll"
@@ -83,6 +85,7 @@ const BGM_TRACK_PATHS = {
   fail: "/games/game-flow/sounds/fail.mp3",
   failNoControl: "/games/game-flow/sounds/fail-no-control.mp3",
   fireAndIce: "/games/a-dance-of-fire-and-ice/sounds/fire-and-ice-bgm.mp3",
+  fruitNinja: "/games/fruit-ninja/sounds/Game-start.wav",
   gameOver: "/games/game-flow/sounds/game-over.mp3",
   geometryDash: "/games/geometry-dash/sounds/geometry-dash-bgm.mp3",
   halliGalli: "/games/halli-galli/sounds/halli-galli-bgm.mp3",
@@ -131,6 +134,7 @@ const SOUND_EFFECT_TRACK_PATHS = {
     "/games/crazy-arcade/sounds/crazy-arcade-bomb-install.mp3",
   halliGalliBell: "/games/halli-galli/sounds/bell-chime.mp3",
   halliGalliCard: "/games/halli-galli/sounds/card-draw.mp3",
+  fruitNinjaImpact: "/games/fruit-ninja/sounds/Impact-Watermelon.wav",
   leagueChampionSelect: "/games/league-of-legend/sounds/champ-select.mp3",
   minecraftDig1: "/games/minecraft/sounds/dig-1.mp3",
   minecraftDig2: "/games/minecraft/sounds/dig-2.mp3",
@@ -177,6 +181,7 @@ const BGM_TRACK_BEATS = {
   fail: 4,
   failNoControl: 4,
   fireAndIce: 8,
+  fruitNinja: 8,
   geometryDash: 12,
   halliGalli: 36,
   hancom: 12,

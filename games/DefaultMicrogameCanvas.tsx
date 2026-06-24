@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import type { Microgame } from "@/data/microgames";
-import { drawCenteredText, useStaticCanvas } from "@/lib/canvasUtils";
+import { useStaticCanvas } from "@/lib/canvasUtils";
 
 export function DefaultMicrogameCanvas({
   microgame,

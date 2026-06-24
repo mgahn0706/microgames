@@ -284,7 +284,6 @@ export function GameScreen({
 
   useMicrogameInput({
     isActive: phase === "game",
-    microgame,
     onClear: recordSuccessWithClearSound,
     onFailure: recordFailure,
     roundNumber,
@@ -371,6 +370,13 @@ export function GameScreen({
 
       if (microgame.canvas === "fireAndIceDance") {
         bgmLibrary.play("fireAndIce", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "fruitNinja") {
+        bgmLibrary.play("fruitNinja", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
         return;

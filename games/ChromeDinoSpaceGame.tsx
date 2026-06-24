@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { Microgame } from "@/data/microgames";
+import { MICROGAME_CLEAR_EVENT } from "@/hooks/useMicrogameInput";
 import { drawCenteredText } from "@/lib/canvasUtils";
 
 const CACTUS_COUNT = 2;
@@ -46,10 +47,7 @@ type GroundCache = {
   width: number;
 };
 
-function createInitialGameState(
-  width: number,
-  beatDurationMs: number,
-): GameState {
+function createInitialGameState(width: number): GameState {
   const dinoX = width * 0.18;
 
   return {
@@ -170,29 +168,23 @@ function createGroundCache(
   return { canvas, width };
 }
 
-function dispatchSpaceClear() {
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      code: "Space",
-      key: " ",
-    }),
-  );
+function dispatchClear() {
+  window.dispatchEvent(new CustomEvent(MICROGAME_CLEAR_EVENT));
 }
 
 export function ChromeDinoSpaceGame(
-  _props: Readonly<{ microgame: Microgame }>,
+  { microgame }: Readonly<{ microgame: Microgame }>,
 ) {
+  void microgame;
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const jumpAudioRef = useRef<HTMLAudioElement | null>(null);
   const dieAudioRef = useRef<HTMLAudioElement | null>(null);
   const groundCacheRef = useRef<GroundCache | null>(null);
   const imagesRef = useRef<LoadedImages | null>(null);
   const stateRef = useRef<GameState>(
-    createInitialGameState(MIN_CANVAS_WIDTH, DEFAULT_BEAT_DURATION_MS),
+    createInitialGameState(MIN_CANVAS_WIDTH),
   );
-  const allowNextSpaceClearRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -224,7 +216,7 @@ export function ChromeDinoSpaceGame(
       beatDurationMs = getBeatDurationMs(canvas);
       cactusSpeed = getCactusSpeed(beatDurationMs);
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      stateRef.current = createInitialGameState(canvasWidth, beatDurationMs);
+      stateRef.current = createInitialGameState(canvasWidth);
 
       const images = imagesRef.current;
 
@@ -246,11 +238,6 @@ export function ChromeDinoSpaceGame(
 
     const handleSpace = (event: KeyboardEvent) => {
       if (event.code !== "Space") {
-        return;
-      }
-
-      if (allowNextSpaceClearRef.current) {
-        allowNextSpaceClearRef.current = false;
         return;
       }
 
@@ -338,8 +325,7 @@ export function ChromeDinoSpaceGame(
           !state.hasCleared
         ) {
           state.hasCleared = true;
-          allowNextSpaceClearRef.current = true;
-          dispatchSpaceClear();
+          dispatchClear();
         }
       }
 

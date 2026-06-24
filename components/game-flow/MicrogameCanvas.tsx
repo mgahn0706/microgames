@@ -19,6 +19,7 @@ import { FireAndIceDanceGame } from "@/games/FireAndIceDanceGame";
 import { FireBoyWaterGirlGame } from "@/games/FireBoyWaterGirlGame";
 import { FlickingGame } from "@/games/FlickingGame";
 import { FlappyBirdGame } from "@/games/FlappyBirdGame";
+import { FruitNinjaGame } from "@/games/FruitNinjaGame";
 import { GeometryDashGame } from "@/games/GeometryDashGame";
 import { GomokuGame } from "@/games/GomokuGame";
 import { HalliGalliBossGame } from "@/games/HalliGalliBossGame";
@@ -190,6 +191,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "flappyBird") {
     return <FlappyBirdGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "fruitNinja") {
+    return <FruitNinjaGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "flickingGame") {
