@@ -74,6 +74,7 @@ export const ALL_GAME_PRELOAD_ASSETS = [
   "/games/cookie-run-kingdom/images/skill-profile-licorice.png",
   "/games/cookie-run-kingdom/images/skill-profile-pomegranate.png",
   "/games/cookie-run-kingdom/images/skill-profile-vampire.png",
+  "/games/crossword/images/thumbnail.svg",
   "/games/crazy-arcade/images/background.png",
   "/games/crazy-arcade/images/player-down.png",
   "/games/crazy-arcade/images/player-left.png",

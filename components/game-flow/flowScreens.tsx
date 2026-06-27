@@ -364,17 +364,14 @@ function MicroscopePanel({
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-2">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-100">
-            Game Microscope
-          </p>
+        <div>
           <h1 className="text-3xl font-black leading-none text-white drop-shadow-[0_0_14px_rgba(103,232,249,0.55)] sm:text-4xl">
             게임 도감
           </h1>
         </div>
         <div className="flex w-full items-stretch gap-2 sm:w-[28rem]">
-          <p className="grid shrink-0 place-items-center whitespace-nowrap rounded-md border border-cyan-100/35 bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
-            발견 {discoveredMicrogameCount}/{MICROGAMES.length}
+          <p className="grid shrink-0 place-items-center whitespace-nowrap rounded-md bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
+            {discoveredMicrogameCount}/{MICROGAMES.length}
           </p>
           <label className="min-w-0 flex-1 rounded-md border border-cyan-100/25 bg-black/35 px-3 py-2">
             <span className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-100/80">

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="십자말풀이 4칸 격자">
+  <rect width="160" height="160" fill="#0f172a"/>
+  <rect x="16" y="16" width="128" height="128" rx="8" fill="#111827" stroke="#67e8f9" stroke-width="4"/>
+  <g stroke="#67e8f9" stroke-width="3">
+    <path d="M48 16v128"/>
+    <path d="M80 16v128"/>
+    <path d="M112 16v128"/>
+    <path d="M16 48h128"/>
+    <path d="M16 80h128"/>
+    <path d="M16 112h128"/>
+  </g>
+  <rect x="48" y="48" width="32" height="32" fill="#fef3c7"/>
+  <rect x="16" y="48" width="32" height="32" fill="#f8fafc"/>
+  <rect x="80" y="48" width="32" height="32" fill="#f8fafc"/>
+  <rect x="112" y="48" width="32" height="32" fill="#f8fafc"/>
+  <rect x="48" y="16" width="32" height="32" fill="#f8fafc"/>
+  <rect x="48" y="80" width="32" height="32" fill="#f8fafc"/>
+  <rect x="48" y="112" width="32" height="32" fill="#f8fafc"/>
+  <g fill="#0f172a" font-family="sans-serif" font-size="24" font-weight="900" text-anchor="middle" dominant-baseline="middle">
+    <text x="32" y="64">안</text>
+    <text x="64" y="32">유</text>
+    <text x="64" y="64">?</text>
+    <text x="96" y="64">인</text>
+    <text x="64" y="96">환</text>
+  </g>
+</svg>

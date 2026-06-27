@@ -14,6 +14,7 @@ import { CookieClickerGame } from "@/games/CookieClickerGame";
 import { CookieRunGame } from "@/games/CookieRunGame";
 import { CookieRunKingdomGame } from "@/games/CookieRunKingdomGame";
 import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGame";
+import { CrosswordGame } from "@/games/CrosswordGame";
 import { CrazyArcadeGame } from "@/games/CrazyArcadeGame";
 import { DefaultMicrogameCanvas } from "@/games/DefaultMicrogameCanvas";
 import { DobbleGame } from "@/games/DobbleGame";
@@ -189,6 +190,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "crazyArcade") {
     return <CrazyArcadeGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "crosswordPuzzle") {
+    return <CrosswordGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "dobble") {

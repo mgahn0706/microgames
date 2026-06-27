@@ -27,6 +27,7 @@ export type MicrogameCanvas =
   | "cookieRun"
   | "cookieRunKingdom"
   | "courseRegistrationNumber"
+  | "crosswordPuzzle"
   | "crazyArcade"
   | "default"
   | "dobble"
@@ -446,6 +447,22 @@ export const MICROGAMES = [
     id: "sudoku-missing-number",
     startPrompt: "빈칸을 채워라!",
     title: "스도쿠",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "crosswordPuzzle",
+    microscope: {
+      description:
+        "십자말풀이는 가로와 세로 단어가 만나는 한 칸을 찾는 퍼즐입니다. 두 사자성어가 공유하는 빈칸 글자를 빠르게 입력하세요.",
+      imageAlt: "십자말풀이 4칸 격자",
+      imageSrc: "/games/crossword/images/thumbnail.svg",
+    },
+    control: "koreanKeyboard",
+    id: "crossword-four-character-idiom",
+    startPrompt: "빈칸을 채워라!",
+    title: "십자말풀이",
     type: "normal",
   },
 
