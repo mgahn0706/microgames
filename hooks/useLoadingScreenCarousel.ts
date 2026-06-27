@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+const LOADING_MESSAGE_INTERVAL_MS = 1400;
+const LOADING_CARTOON_INTERVAL_MS = 4800;
+
 export function useLoadingScreenCarousel({
   cartoonCount,
   isPaused,
@@ -23,7 +26,7 @@ export function useLoadingScreenCarousel({
       setMessageIndex(
         (currentMessageIndex) => (currentMessageIndex + 1) % messageCount,
       );
-    }, 1400);
+    }, LOADING_MESSAGE_INTERVAL_MS);
 
     return () => {
       window.clearInterval(messageTimer);
@@ -39,7 +42,7 @@ export function useLoadingScreenCarousel({
       setCartoonIndex(
         (currentCartoonIndex) => (currentCartoonIndex + 1) % cartoonCount,
       );
-    }, 2400);
+    }, LOADING_CARTOON_INTERVAL_MS);
 
     return () => {
       window.clearInterval(cartoonTimer);

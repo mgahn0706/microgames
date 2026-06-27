@@ -7,8 +7,10 @@ import { AmongUsWireGame } from "@/games/AmongUsWireGame";
 import { BabaIsYouGame } from "@/games/BabaIsYouGame";
 import { BounceBallGame } from "@/games/BounceBallGame";
 import { BrainAcademyBlockGame } from "@/games/BrainAcademyBlockGame";
+import { BubbleBobbleGame } from "@/games/BubbleBobbleGame";
 import { ChessGame } from "@/games/ChessGame";
 import { ChromeDinoSpaceGame } from "@/games/ChromeDinoSpaceGame";
+import { CookieClickerGame } from "@/games/CookieClickerGame";
 import { CookieRunGame } from "@/games/CookieRunGame";
 import { CookieRunKingdomGame } from "@/games/CookieRunKingdomGame";
 import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGame";
@@ -47,6 +49,7 @@ import { SuperMarioGalaxyGame } from "@/games/SuperMarioGalaxyGame";
 import { SuperMarioCoinGame } from "@/games/SuperMarioCoinGame";
 import { SuikaGame } from "@/games/SuikaGame";
 import { TetrisLineClearGame } from "@/games/TetrisLineClearGame";
+import { TheWorldHardestGame } from "@/games/TheWorldHardestGame";
 import { TwoThousandFortyEightBossGame } from "@/games/TwoThousandFortyEightBossGame";
 import { UndertaleMouseGame } from "@/games/UndertaleMouseGame";
 import { WiiSportsGame } from "@/games/WiiSportsGame";
@@ -90,6 +93,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "brainAcademyBlocks") {
     return <BrainAcademyBlockGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "bubbleBobble") {
+    return <BubbleBobbleGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "chessCapture") {
@@ -170,6 +177,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "cookieRun") {
     return <CookieRunGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "cookieClicker") {
+    return <CookieClickerGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "cookieRunKingdom") {
@@ -258,6 +269,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "tetrisLineClear") {
     return <TetrisLineClearGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "theWorldHardestGame") {
+    return <TheWorldHardestGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "twoThousandFortyEightBoss") {

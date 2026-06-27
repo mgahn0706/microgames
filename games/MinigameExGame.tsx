@@ -5,7 +5,7 @@ import type { Microgame } from "@/data/microgames";
 import type { BearNumber } from "@/games/useMinigameExGame";
 import { useMinigameExGame } from "@/games/useMinigameExGame";
 
-const BACKGROUND_SRC = "/games/minigame-ex/images/background.png";
+const BACKGROUND_SRC = "/games/minigame-ex/images/background.webp";
 const EATING_BEAR_SRC = "/games/minigame-ex/images/eating-bear.png";
 const IDLE_BEAR_SRC = "/games/minigame-ex/images/idle-bear.png";
 const BEAR_LAYOUT = [

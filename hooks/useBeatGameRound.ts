@@ -13,7 +13,8 @@ const BOSS_STAGE_BEATS = 8;
 const ONE_UP_BEATS = 8;
 const SPEED_UP_INTERVAL_ROUNDS = 4;
 const BOSS_STAGE_INTERVAL_ROUNDS = 12;
-const BOSS_EARLY_RESULT_BEAT_INTERVAL = 4;
+const EARLY_SUCCESS_RESULT_BEAT_INTERVAL = 4;
+const EARLY_SUCCESS_RESULT_DELAY_MS = 500;
 const SPEED_UP_BEAT_DURATION_MULTIPLIER = 0.94;
 const BEAT_PROGRESS_INTERVAL_MS = 50;
 
@@ -135,7 +136,9 @@ export function useBeatGameRound({
     key: "instruction-1",
   });
   const [speedLevel, setSpeedLevel] = useState(0);
+  const earlySuccessResultTimerRef = useRef<number | null>(null);
   const hasClearedCurrentGameRef = useRef(false);
+  const latestRoundStateRef = useRef({ phase, roundNumber });
   const [successFeedbackRound, setSuccessFeedbackRound] = useState<
     number | null
   >(null);
@@ -154,14 +157,24 @@ export function useBeatGameRound({
   const phaseDurationMs = phaseBeatCount * beatDurationMs;
   const beatProgressKey = `${phase}-${roundNumber}-${phaseBeatCount}`;
 
+  const clearEarlySuccessResultTimer = useCallback(() => {
+    if (earlySuccessResultTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(earlySuccessResultTimerRef.current);
+    earlySuccessResultTimerRef.current = null;
+  }, []);
+
   const beginInstruction = useCallback(() => {
+    clearEarlySuccessResultTimer();
     setInstructionStep(noControlHints ? "floor" : "idle");
     setPhase("instruction");
     setRoundResult("idle");
     hasClearedCurrentGameRef.current = false;
     setSuccessFeedbackRound(null);
     onResetResult();
-  }, [noControlHints, onResetResult]);
+  }, [clearEarlySuccessResultTimer, noControlHints, onResetResult]);
 
   const showResult = useCallback(
     (result: Exclude<GameRoundResult, "idle">) => {
@@ -169,6 +182,7 @@ export function useBeatGameRound({
         return;
       }
 
+      clearEarlySuccessResultTimer();
       setRoundResult(result);
       setPhase("result");
 
@@ -182,8 +196,12 @@ export function useBeatGameRound({
         setShouldOneUpAfterResult(result === "success");
       }
     },
-    [onFailure, onSuccess, phase, roundNumber],
+    [clearEarlySuccessResultTimer, onFailure, onSuccess, phase, roundNumber],
   );
+
+  useEffect(() => {
+    latestRoundStateRef.current = { phase, roundNumber };
+  }, [phase, roundNumber]);
 
   useEffect(() => {
     const phaseTimer = window.setTimeout(() => {
@@ -369,18 +387,49 @@ export function useBeatGameRound({
       : phaseBeatCount;
 
   useEffect(() => {
-    const canFinishSuccessfulBossEarly =
+    const canShowSuccessfulResultEarly =
       phase === "game" &&
-      isBossGameRound(roundNumber) &&
       hasClearedCurrentGameRef.current &&
       successFeedbackRound === roundNumber &&
       beatsLeft > 0 &&
-      beatsLeft % BOSS_EARLY_RESULT_BEAT_INTERVAL === 0;
+      beatsLeft % EARLY_SUCCESS_RESULT_BEAT_INTERVAL === 0;
 
-    if (canFinishSuccessfulBossEarly) {
-      showResult("success");
+    if (
+      !canShowSuccessfulResultEarly ||
+      earlySuccessResultTimerRef.current !== null
+    ) {
+      return;
     }
+
+    const scheduledRoundNumber = roundNumber;
+
+    earlySuccessResultTimerRef.current = window.setTimeout(() => {
+      earlySuccessResultTimerRef.current = null;
+
+      if (
+        latestRoundStateRef.current.phase !== "game" ||
+        latestRoundStateRef.current.roundNumber !== scheduledRoundNumber ||
+        !hasClearedCurrentGameRef.current ||
+        successFeedbackRound !== scheduledRoundNumber
+      ) {
+        return;
+      }
+
+      showResult("success");
+    }, EARLY_SUCCESS_RESULT_DELAY_MS);
   }, [beatsLeft, phase, roundNumber, showResult, successFeedbackRound]);
+
+  useEffect(() => {
+    if (phase !== "game") {
+      clearEarlySuccessResultTimer();
+    }
+  }, [clearEarlySuccessResultTimer, phase]);
+
+  useEffect(() => {
+    return () => {
+      clearEarlySuccessResultTimer();
+    };
+  }, [clearEarlySuccessResultTimer]);
 
   return useMemo(
     () => ({

@@ -20,8 +20,10 @@ export type MicrogameCanvas =
   | "babaIsYou"
   | "bounceBall"
   | "brainAcademyBlocks"
+  | "bubbleBobble"
   | "chessCapture"
   | "chromeDinoSpace"
+  | "cookieClicker"
   | "cookieRun"
   | "cookieRunKingdom"
   | "courseRegistrationNumber"
@@ -59,6 +61,7 @@ export type MicrogameCanvas =
   | "squidGameRedLight"
   | "suikaGame"
   | "tetrisLineClear"
+  | "theWorldHardestGame"
   | "twoThousandFortyEightBoss"
   | "undertaleMouse"
   | "wiiSportsDualPress"
@@ -303,6 +306,22 @@ export const MICROGAMES = [
   },
 
   {
+    beatCount: 12,
+    canvas: "bubbleBobble",
+    microscope: {
+      description:
+        "버블보블은 버블 드래곤이 방울을 쏴 적을 가두고 무찌르는 게임입니다. 방향키로 움직이고 Space로 버블을 쏘세요.",
+      imageAlt: "버블보블 버블 드래곤",
+      imageSrc: "/games/bubble-bobble/images/background.png",
+    },
+    control: "arrowAndSpace",
+    id: "bubble-bobble-defeat-enemies",
+    startPrompt: "모든 적을 무찔러라!",
+    title: "버블보블",
+    type: "normal",
+  },
+
+  {
     beatCount: 8,
     canvas: "kirbyInhale",
     microscope: {
@@ -429,6 +448,7 @@ export const MICROGAMES = [
     title: "스도쿠",
     type: "normal",
   },
+
   {
     beatCount: 8,
     canvas: "flickingGame",
@@ -452,7 +472,7 @@ export const MICROGAMES = [
       description:
         "어몽어스, 코로나 시절 때 많이 했는데 말이죠. 전선 색깔 맞춰 쭉 연결하면 되는데, 급하면 꼭 손이 꼬입니다.",
       imageAlt: "어몽어스 전선 작업 배경",
-      imageSrc: "/games/among-us/images/background.png",
+      imageSrc: "/games/among-us/images/background.webp",
     },
     control: "mouseDrag",
     id: "among-us-wire-task",
@@ -557,13 +577,29 @@ export const MICROGAMES = [
   },
 
   {
+    beatCount: 8,
+    canvas: "cookieClicker",
+    microscope: {
+      description:
+        "쿠키 클리커는 커다란 쿠키를 쉬지 않고 눌러 숫자를 올리는 게임입니다. 빠르게 클릭해서 쿠키를 10개 모으세요.",
+      imageAlt: "쿠키 클리커 쿠키",
+      imageSrc: "/games/cookie-clicker/images/cookie.png",
+    },
+    control: "mouseClick",
+    id: "cookie-clicker",
+    startPrompt: "10개 모아라!",
+    title: "쿠키 클리커",
+    type: "normal",
+  },
+
+  {
     beatCount: 12,
     canvas: "cookieRun",
     microscope: {
       description:
         "쿠키런은 달리기만 하면 끝이 아니죠. 뛰고, 숙이고, 또 뛰고... 쿠키들의 반란이 시작된다!",
       imageAlt: "쿠키런 배경",
-      imageSrc: "/games/cookie-run/images/background.png",
+      imageSrc: "/games/cookie-run/images/background.webp",
     },
     control: "arrowAndSpace",
     id: "cookie-run-obstacle-dodge",
@@ -579,7 +615,7 @@ export const MICROGAMES = [
       description:
         "쿠키런: 킹덤 전투에서는 타이밍에 맞는 쿠키의 스킬을 골라야 합니다. 목표 쿠키를 확인하고 1~5 숫자키를 눌러 스킬을 발동하세요.",
       imageAlt: "쿠키런 킹덤 전투 화면",
-      imageSrc: "/games/cookie-run-kingdom/images/background.png",
+      imageSrc: "/games/cookie-run-kingdom/images/background.webp",
     },
     control: "numberKeys",
     id: "cookie-run-kingdom-skill",
@@ -829,6 +865,22 @@ export const MICROGAMES = [
   },
 
   {
+    beatCount: 50,
+    canvas: "theWorldHardestGame",
+    microscope: {
+      description:
+        "세상에서 제일 어려운 게임은 빨간 사각형 하나로 파란 장애물을 피해 목표 구역까지 가는 게임입니다. 죽어도 다시 시작해서 시간 안에 도착하세요.",
+      imageAlt: "세상에서 제일 어려운 게임 레벨",
+      imageSrc: "/games/the-world-hardest-game/images/background.png",
+    },
+    control: "arrowKeys",
+    id: "the-world-hardest-game",
+    startPrompt: "끝까지 가라!",
+    title: "세상에서 제일 어려운 게임",
+    type: "boss",
+  },
+
+  {
     beatCount: 36,
     canvas: "squidGameRedLight",
     microscope: {
@@ -851,7 +903,7 @@ export const MICROGAMES = [
       description:
         "카트라이더는 속도보다 라인을 잡는 게 더 어렵죠. 벽에 박지 말고 빌리지 운하 코스를 끝까지 달려야 합니다.",
       imageAlt: "카트라이더 운하 코스",
-      imageSrc: "/games/kartrider/images/track.png",
+      imageSrc: "/games/kartrider/images/track.webp",
     },
     control: "arrowKeys",
     id: "kartrider-village-canal-course",
@@ -867,7 +919,7 @@ export const MICROGAMES = [
       description:
         "할리갈리는 종 치는 손이 빠른 사람이 이깁니다. 과일이 다섯 개가 되는 순간, 고민하지 말고 눌러야 해요.",
       imageAlt: "할리갈리 종",
-      imageSrc: "/games/halli-galli/images/bell.png",
+      imageSrc: "/games/halli-galli/images/bell.webp",
     },
     control: "mouseClick",
     id: "halli-galli-bell-boss",

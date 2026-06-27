@@ -8,7 +8,7 @@ import {
   useCookieRunKingdomGame,
 } from "@/games/useCookieRunKingdomGame";
 
-const BACKGROUND_SRC = "/games/cookie-run-kingdom/images/background.png";
+const BACKGROUND_SRC = "/games/cookie-run-kingdom/images/background.webp";
 
 export function CookieRunKingdomGame({
   microgame,

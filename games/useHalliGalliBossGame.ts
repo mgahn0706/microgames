@@ -16,7 +16,7 @@ const FRUITS = ["banana", "lime", "plum", "strawberry"] as const;
 const COUNTS = [1, 2, 3, 4, 5] as const;
 const HALLI_GALLI_ASSETS = {
   background: "/games/halli-galli/images/background.png",
-  bell: "/games/halli-galli/images/bell.png",
+  bell: "/games/halli-galli/images/bell.webp",
 } as const;
 const HALLI_GALLI_SOUNDS = {
   bell: "/games/halli-galli/sounds/bell-chime.mp3",

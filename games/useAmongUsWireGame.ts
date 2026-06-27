@@ -9,7 +9,7 @@ const MIN_CANVAS_WIDTH = 640;
 const WIRE_RADIUS = 18;
 const WIRE_DROP_RADIUS = 82;
 const WIRE_GRAB_RADIUS = 82;
-const AMONG_US_BACKGROUND = "/games/among-us/images/background.png";
+const AMONG_US_BACKGROUND = "/games/among-us/images/background.webp";
 const AMONG_US_SOUNDS = {
   connected: "/games/among-us/sounds/wire-connected.mp3",
   opening: "/games/among-us/sounds/wire-opening.mp3",

@@ -262,10 +262,7 @@ export function GameScreen({
   const recordSuccessWithClearSound = useCallback(() => {
     recordSuccess();
 
-    if (
-      microgame.canvas === "babaIsYou" ||
-      microgame.canvas === "sudokuMissingNumber"
-    ) {
+    if (microgame.canvas === "babaIsYou") {
       return;
     }
 

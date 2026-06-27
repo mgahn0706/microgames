@@ -13,6 +13,7 @@ const ASSETS = {
 const APPLE_CELL = { x: 5, y: 2 } as const;
 const DEFAULT_BEAT_DURATION_MS = 500;
 const GRID_SIZE = 7;
+const SNAKE_STEP_BEAT_RATIO = 0.5;
 const INITIAL_SNAKE = [
   { x: 2, y: 4 },
   { x: 1, y: 4 },
@@ -586,7 +587,7 @@ export function useSnakeGameCanvas(gameBeatCount: number) {
         state.lastTimestamp === null ? 0 : timestamp - state.lastTimestamp;
 
       beatDurationMs = getBeatDurationMs(canvas);
-      const stepIntervalMs = beatDurationMs;
+      const stepIntervalMs = beatDurationMs * SNAKE_STEP_BEAT_RATIO;
 
       state.lastTimestamp = timestamp;
       state.elapsedMs += deltaMs;

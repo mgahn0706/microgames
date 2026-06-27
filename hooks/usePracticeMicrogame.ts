@@ -14,6 +14,8 @@ import { formatPracticeSpeedMultiplier } from "@/lib/practiceSpeed";
 
 const RESULT_BEATS = 4;
 const INSTRUCTION_BEATS = 8;
+const EARLY_SUCCESS_RESULT_BEAT_INTERVAL = 4;
+const EARLY_SUCCESS_RESULT_DELAY_MS = 500;
 const BEAT_PROGRESS_INTERVAL_MS = 50;
 const CLEAR_SOUND_EFFECTS = [
   "clear1",
@@ -79,18 +81,33 @@ export function usePracticeMicrogame(
     useState<InstructionStep>("idle");
   const [phase, setPhase] = useState<PracticePhase>("instruction");
   const [result, setResult] = useState<PracticeResult | null>(null);
+  const earlySuccessResultTimerRef = useRef<number | null>(null);
   const hasClearedRef = useRef(false);
   const hasResolvedRef = useRef(false);
+  const latestPhaseRef = useRef(phase);
 
-  const showResult = useCallback((nextResult: PracticeResult) => {
-    if (hasResolvedRef.current) {
+  const clearEarlySuccessResultTimer = useCallback(() => {
+    if (earlySuccessResultTimerRef.current === null) {
       return;
     }
 
-    hasResolvedRef.current = true;
-    setResult(nextResult);
-    setPhase("result");
+    window.clearTimeout(earlySuccessResultTimerRef.current);
+    earlySuccessResultTimerRef.current = null;
   }, []);
+
+  const showResult = useCallback(
+    (nextResult: PracticeResult) => {
+      if (hasResolvedRef.current) {
+        return;
+      }
+
+      clearEarlySuccessResultTimer();
+      hasResolvedRef.current = true;
+      setResult(nextResult);
+      setPhase("result");
+    },
+    [clearEarlySuccessResultTimer],
+  );
 
   const recordSuccess = useCallback(() => {
     if (hasClearedRef.current || hasResolvedRef.current) {
@@ -123,6 +140,10 @@ export function usePracticeMicrogame(
     onFailure: recordFailure,
     roundNumber: 1,
   });
+
+  useEffect(() => {
+    latestPhaseRef.current = phase;
+  }, [phase]);
 
   useEffect(() => {
     if (phase !== "instruction") {
@@ -180,6 +201,42 @@ export function usePracticeMicrogame(
   }, [beatDurationMs, microgame.beatCount, phase, showResult]);
 
   useEffect(() => {
+    const canShowSuccessfulResultEarly =
+      phase === "playing" &&
+      hasClearedRef.current &&
+      !hasResolvedRef.current &&
+      beatsLeft > 0 &&
+      beatsLeft % EARLY_SUCCESS_RESULT_BEAT_INTERVAL === 0;
+
+    if (
+      !canShowSuccessfulResultEarly ||
+      earlySuccessResultTimerRef.current !== null
+    ) {
+      return;
+    }
+
+    earlySuccessResultTimerRef.current = window.setTimeout(() => {
+      earlySuccessResultTimerRef.current = null;
+
+      if (
+        latestPhaseRef.current !== "playing" ||
+        !hasClearedRef.current ||
+        hasResolvedRef.current
+      ) {
+        return;
+      }
+
+      showResult("success");
+    }, EARLY_SUCCESS_RESULT_DELAY_MS);
+  }, [beatsLeft, phase, showResult]);
+
+  useEffect(() => {
+    if (phase !== "playing") {
+      clearEarlySuccessResultTimer();
+    }
+  }, [clearEarlySuccessResultTimer, phase]);
+
+  useEffect(() => {
     bgmLibrary.setBeatDurationMs(beatDurationMs);
 
     if (phase === "instruction") {
@@ -234,9 +291,10 @@ export function usePracticeMicrogame(
 
   useEffect(
     () => () => {
+      clearEarlySuccessResultTimer();
       bgmLibrary.stop();
     },
-    [],
+    [clearEarlySuccessResultTimer],
   );
 
   const returnToMicroscope = useCallback(() => {

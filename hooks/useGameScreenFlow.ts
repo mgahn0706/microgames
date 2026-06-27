@@ -5,7 +5,7 @@ import { ALL_GAME_PRELOAD_ASSETS } from "@/data/preloadAssets";
 import { useHighestReachedRound } from "@/hooks/useHighestReachedRound";
 import { BGM_LIBRARY_PRELOAD_ASSET_PATHS, bgmLibrary } from "@/lib/bgmLibrary";
 
-const PRELOAD_CONCURRENCY = 16;
+const PRELOAD_CONCURRENCY = 24;
 const PRELOAD_PROGRESS_STEP = 5;
 
 const GENERAL_PRELOAD_ASSETS = ALL_GAME_PRELOAD_ASSETS.filter(
@@ -135,20 +135,21 @@ async function runPreloadTasks(onProgress: PreloadProgressHandler | undefined) {
     PRELOAD_CONCURRENCY,
     GENERAL_PRELOAD_ASSETS.length,
   );
-  const assetWorkers = Array.from({ length: workerCount }, (_, workerIndex) => {
-    const loadWorkerAssets = async (assetIndex: number): Promise<void> => {
-      const assetPath = GENERAL_PRELOAD_ASSETS[assetIndex];
+  let nextAssetIndex = 0;
+  const getNextAssetPath = () => {
+    const assetPath = GENERAL_PRELOAD_ASSETS[nextAssetIndex];
+    nextAssetIndex += 1;
 
-      if (!assetPath) {
-        return;
-      }
+    return assetPath;
+  };
+  const assetWorkers = Array.from({ length: workerCount }, async () => {
+    let assetPath = getNextAssetPath();
 
+    while (assetPath) {
       await preloadAsset(assetPath);
       reportTaskComplete();
-      await loadWorkerAssets(assetIndex + workerCount);
-    };
-
-    return loadWorkerAssets(workerIndex);
+      assetPath = getNextAssetPath();
+    }
   });
   const audioPreload = bgmLibrary.preloadAll().then(() => {
     reportTaskComplete();

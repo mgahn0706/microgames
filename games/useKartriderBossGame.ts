@@ -22,8 +22,8 @@ const LAP_TWO_BANNER_SECONDS = 1.15;
 const FINAL_LAP_BANNER_SECONDS = 1.35;
 const TOTAL_LAPS = 3;
 const KARTRIDER_ASSETS = {
-  kart: "/games/kartrider/images/kart.png",
-  track: "/games/kartrider/images/track.png",
+  kart: "/games/kartrider/images/kart.webp",
+  track: "/games/kartrider/images/track.webp",
 } as const;
 const KARTRIDER_SOUNDS = {
   finalLap: "/games/kartrider/sounds/final-lap.mp3",

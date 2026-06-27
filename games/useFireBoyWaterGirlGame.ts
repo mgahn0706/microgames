@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { MICROGAME_CLEAR_EVENT } from "@/hooks/useMicrogameInput";
 
 const ASSETS = {
-  background: "/games/fire-boy-and-water-girl/images/background.png",
+  background: "/games/fire-boy-and-water-girl/images/background.webp",
   fireIdle: "/games/fire-boy-and-water-girl/images/fire-boy-idle.png",
   fireRun: "/games/fire-boy-and-water-girl/images/fire-boy-run.png",
   waterIdle: "/games/fire-boy-and-water-girl/images/water-girl-idle.png",
@@ -18,21 +18,21 @@ const JUMP_SOUND_SRCS = {
 } as const;
 const DEFAULT_BEAT_DURATION_MS = 500;
 const DEFAULT_GRAVITY_HEIGHTS_PER_SECOND = 1.8;
-const DEFAULT_JUMP_VELOCITY_HEIGHTS_PER_SECOND = -0.75;
+const DEFAULT_JUMP_VELOCITY_HEIGHTS_PER_SECOND = -0.78;
 const MAX_DELTA_SECONDS = 1 / 30;
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
-const MOVE_RATIO_PER_BEAT = 0.09;
+const MOVE_RATIO_PER_BEAT = 0.115;
 const PLAYER_HEIGHT_RATIO = 0.072;
 const START_X_RATIO = 0.39;
 const FLOOR_Y_RATIO = 0.965;
-const LAVA_LEFT_RATIO = 0.47;
-const LAVA_RIGHT_RATIO = 0.59;
+const LAVA_LEFT_RATIO = 0.49;
+const LAVA_RIGHT_RATIO = 0.57;
 const LAVA_EDGE_BLEND_RATIO = 0.018;
 const LAVA_SINK_RATIO = 0.01;
-const WATER_LEFT_RATIO = 0.68;
-const WATER_RIGHT_RATIO = 0.79;
-const POOL_TOP_RATIO = 0.945;
+const WATER_LEFT_RATIO = 0.7;
+const WATER_RIGHT_RATIO = 0.77;
+const POOL_TOP_RATIO = 0.958;
 const GOAL_X_RATIO = 0.87;
 
 type LoadedImages = Record<keyof typeof ASSETS, HTMLImageElement>;

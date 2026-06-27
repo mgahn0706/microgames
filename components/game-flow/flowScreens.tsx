@@ -321,12 +321,6 @@ function getMicrogamePracticeHref(
   return `/microscope/${microgame.id}?speed=${speed}`;
 }
 
-function getMicroscopeClearSummary(microgame: Microgame) {
-  const prompt = microgame.startPrompt.replace(/[!！?？.。]+$/u, "");
-
-  return `클리어: ${prompt}`;
-}
-
 function MicroscopePanel({
   seenMicrogameIds,
 }: Readonly<{
@@ -378,11 +372,11 @@ function MicroscopePanel({
             게임 도감
           </h1>
         </div>
-        <div className="grid w-full gap-2 sm:w-72">
-          <p className="justify-self-end rounded-md border border-cyan-100/35 bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
+        <div className="flex w-full items-stretch gap-2 sm:w-[28rem]">
+          <p className="grid shrink-0 place-items-center whitespace-nowrap rounded-md border border-cyan-100/35 bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
             발견 {discoveredMicrogameCount}/{MICROGAMES.length}
           </p>
-          <label className="rounded-md border border-cyan-100/25 bg-black/35 px-3 py-2">
+          <label className="min-w-0 flex-1 rounded-md border border-cyan-100/25 bg-black/35 px-3 py-2">
             <span className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-100/80">
               <span>연습 속도</span>
               <span className="text-sm tracking-normal text-white">
@@ -418,10 +412,6 @@ function MicroscopePanel({
           const displayControlTitle = isSeen
             ? formInstruction.title
             : maskMicroscopeText(formInstruction.title);
-          const clearSummary = getMicroscopeClearSummary(microgame);
-          const displayDescription = isSeen
-            ? clearSummary
-            : maskMicroscopeText(clearSummary);
 
           const card = (
             <article
@@ -464,9 +454,6 @@ function MicroscopePanel({
                 </div>
                 <p className="mt-1 w-fit max-w-full truncate rounded border border-cyan-100/20 px-1.5 py-0.5 text-[0.64rem] font-black leading-none text-cyan-50/78">
                   {displayControlTitle}
-                </p>
-                <p className="mt-1 truncate text-xs font-bold leading-4 text-cyan-50/68">
-                  {displayDescription}
                 </p>
               </div>
             </article>
@@ -691,76 +678,9 @@ export function LoadingScreen({
 
   return (
     <NeonShell>
-      <div className="mx-auto grid w-full max-w-4xl gap-4 rounded-lg border border-cyan-100/70 bg-black/65 p-4 shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm sm:p-5 lg:grid-cols-2 lg:items-stretch">
-        <div className="flex min-h-72 flex-col rounded-md border border-cyan-100/25 bg-black/38 p-5 text-left">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-cyan-100">
-                Cat Tower
-              </p>
-              <h1 className="mt-3 text-3xl font-black leading-none text-white drop-shadow-[0_0_16px_rgba(103,232,249,0.58)] sm:text-4xl">
-                잠시만 기다려 주세요
-              </h1>
-            </div>
-            <div className="loading-spinner-vital grid size-11 shrink-0 place-items-center sm:size-12">
-              <Image
-                src="/games/game-flow/images/loading-spinner.png"
-                alt=""
-                width={64}
-                height={54}
-                priority
-                className="h-auto w-full object-contain drop-shadow-[0_0_14px_rgba(103,232,249,0.58)]"
-                unoptimized
-              />
-            </div>
-          </div>
-          <div className="mt-auto pt-8">
-            <div className="flex items-end justify-between gap-4">
-              <div className="min-w-0">
-                <p className="text-sm font-black text-cyan-50/85">
-                  {isFailed ? "로딩을 멈췄어요" : loadingMessage}
-                </p>
-                <p className="mt-1 text-xs font-black text-cyan-100/62">
-                  이미지와 오디오를 병렬로 준비하고 있습니다
-                </p>
-              </div>
-              <p className="shrink-0 text-3xl font-black leading-none text-cyan-100">
-                {isFailed ? "!" : `${preloadStatus.progress}%`}
-              </p>
-            </div>
-            <div className="mt-4 h-3 overflow-hidden rounded-full border border-cyan-100/55 bg-black">
-              <div
-                className="h-full rounded-full bg-cyan-200 shadow-[0_0_16px_rgba(103,232,249,0.85)] transition-[width] duration-150 ease-out"
-                style={{ width: `${preloadStatus.progress}%` }}
-              />
-            </div>
-            <div className="mt-4 h-16 rounded border border-cyan-100/18 bg-black/35 px-3 py-2 text-xs leading-5 text-cyan-50/68">
-              <div className="font-black text-cyan-100">
-                {isFailed ? "프리로딩 실패" : "프리로딩 중"}
-              </div>
-              {isFailed ? (
-                <div className="mt-1 flex min-w-0 items-center gap-2 text-red-100">
-                  <span className="truncate">
-                    {preloadStatus.errorMessage ?? "에셋 로딩에 실패했습니다."}
-                  </span>
-                  <button
-                    className="ml-auto shrink-0 rounded border border-red-100/45 px-2 py-0.5 text-xs font-black text-red-50 transition hover:bg-red-500/20"
-                    onClick={onRetry}
-                    type="button"
-                  >
-                    다시 시도
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-1">
-                  최대한 빠르게 한 번에 불러오고 있습니다.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 rounded-lg border border-cyan-100/70 bg-black/65 p-4 shadow-[0_0_36px_rgba(103,232,249,0.22)] backdrop-blur-sm sm:p-5">
         {loadingCartoon ? (
-          <section className="flex min-h-72 flex-col overflow-hidden rounded-md border border-cyan-100/25 bg-white/[0.04] p-4">
+          <section className="flex min-h-0 flex-col overflow-hidden rounded-md border border-cyan-100/25 bg-white/[0.04] p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-100/72">
                 배경 이야기
@@ -769,15 +689,15 @@ export function LoadingScreen({
                 {cartoonIndex + 1}/{LOADING_CARTOONS.length}
               </p>
             </div>
-            <div className="grid min-h-0 flex-1 place-items-center py-3">
+            <div className="grid min-h-0 place-items-center py-3">
               <Image
                 src={loadingCartoon.src}
                 alt={loadingCartoon.alt}
                 width={1024}
                 height={1536}
                 priority
-                className="max-h-[31rem] w-full rounded object-contain shadow-[0_0_22px_rgba(103,232,249,0.18)]"
-                sizes="(min-width: 1024px) 420px, 90vw"
+                className="max-h-[68vh] w-full rounded object-contain shadow-[0_0_22px_rgba(103,232,249,0.18)]"
+                sizes="(min-width: 768px) 600px, 92vw"
                 unoptimized
               />
             </div>
@@ -794,6 +714,47 @@ export function LoadingScreen({
             </div>
           </section>
         ) : null}
+        <div className="flex items-center gap-3">
+          <div className="loading-spinner-vital grid size-10 shrink-0 place-items-center">
+            <Image
+              src="/games/game-flow/images/loading-spinner.png"
+              alt=""
+              width={64}
+              height={54}
+              priority
+              className="h-auto w-full object-contain drop-shadow-[0_0_14px_rgba(103,232,249,0.58)]"
+              unoptimized
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black text-cyan-50/88">
+              {isFailed ? "로딩을 멈췄어요" : loadingMessage}
+            </p>
+            {isFailed ? (
+              <div className="mt-1 flex min-w-0 items-center gap-2 text-xs font-black text-red-100">
+                <span className="truncate">
+                  {preloadStatus.errorMessage ?? "게임 준비에 실패했습니다."}
+                </span>
+                <button
+                  className="ml-auto shrink-0 rounded border border-red-100/45 px-2 py-0.5 text-xs font-black text-red-50 transition hover:bg-red-500/20"
+                  onClick={onRetry}
+                  type="button"
+                >
+                  다시 시도
+                </button>
+              </div>
+            ) : null}
+            <div className="mt-2 h-2 overflow-hidden rounded-full border border-cyan-100/40 bg-black">
+              <div
+                className="h-full rounded-full bg-cyan-200 shadow-[0_0_16px_rgba(103,232,249,0.85)] transition-[width] duration-150 ease-out"
+                style={{ width: `${preloadStatus.progress}%` }}
+              />
+            </div>
+          </div>
+          <p className="shrink-0 text-2xl font-black leading-none text-cyan-100">
+            {isFailed ? "!" : `${preloadStatus.progress}%`}
+          </p>
+        </div>
       </div>
     </NeonShell>
   );

@@ -153,6 +153,9 @@ export const BGM_LIBRARY_PRELOAD_ASSET_PATHS: ReadonlySet<string> = new Set(
   Object.values(AUDIO_TRACK_PATHS),
 );
 
+const AUDIO_PRELOAD_SKIP_TRACKS: ReadonlySet<BgmTrack | SoundEffectTrack> =
+  new Set(["resultsAndMain"]);
+
 const DEFAULT_BEAT_DURATION_SECONDS = RHYTHM_DURATION_MS / 1000;
 const BGM_GAIN = 0.72;
 const BGM_TRACK_GAINS: Partial<Record<BgmTrack, number>> = {
@@ -271,9 +274,9 @@ class BgmLibrary {
 
   async preloadAll() {
     await Promise.all(
-      Object.keys(AUDIO_TRACK_PATHS).map((track) =>
-        this.loadTrack(track as BgmTrack | SoundEffectTrack),
-      ),
+      (Object.keys(AUDIO_TRACK_PATHS) as (BgmTrack | SoundEffectTrack)[])
+        .filter((track) => !AUDIO_PRELOAD_SKIP_TRACKS.has(track))
+        .map((track) => this.loadTrack(track)),
     );
   }
 

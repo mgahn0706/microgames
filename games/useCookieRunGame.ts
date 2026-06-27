@@ -23,7 +23,7 @@ const OBSTACLE_GROUPS = [
   { beatOffset: 10.45, type: "bottom" },
 ] as const;
 const COOKIE_RUN_ASSETS = {
-  background: "/games/cookie-run/images/background.png",
+  background: "/games/cookie-run/images/background.webp",
   bottomSpikes: "/games/cookie-run/images/bottom_spikes.png",
   ceilingFork: "/games/cookie-run/images/ceiling-fork.png",
   jump: "/games/cookie-run/images/cookie-jump.png",
