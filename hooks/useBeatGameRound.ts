@@ -142,6 +142,9 @@ export function useBeatGameRound({
   const [successFeedbackRound, setSuccessFeedbackRound] = useState<
     number | null
   >(null);
+  const [failureFeedbackRound, setFailureFeedbackRound] = useState<
+    number | null
+  >(null);
   const [shouldOneUpAfterResult, setShouldOneUpAfterResult] = useState(false);
   const currentGameBeatCount = getGameBeatCount?.(roundNumber) ?? gameBeatCount;
   const phaseBeatCount = getPhaseBeatCount(
@@ -173,6 +176,7 @@ export function useBeatGameRound({
     setRoundResult("idle");
     hasClearedCurrentGameRef.current = false;
     setSuccessFeedbackRound(null);
+    setFailureFeedbackRound(null);
     onResetResult();
   }, [clearEarlySuccessResultTimer, noControlHints, onResetResult]);
 
@@ -388,14 +392,16 @@ export function useBeatGameRound({
 
   useEffect(() => {
     const canShowSuccessfulResultEarly =
+      hasClearedCurrentGameRef.current && successFeedbackRound === roundNumber;
+    const canShowFailureResultEarly = failureFeedbackRound === roundNumber;
+    const canShowResultEarly =
       phase === "game" &&
-      hasClearedCurrentGameRef.current &&
-      successFeedbackRound === roundNumber &&
       beatsLeft > 0 &&
-      beatsLeft % EARLY_SUCCESS_RESULT_BEAT_INTERVAL === 0;
+      beatsLeft % EARLY_SUCCESS_RESULT_BEAT_INTERVAL === 0 &&
+      (canShowSuccessfulResultEarly || canShowFailureResultEarly);
 
     if (
-      !canShowSuccessfulResultEarly ||
+      !canShowResultEarly ||
       earlySuccessResultTimerRef.current !== null
     ) {
       return;
@@ -409,15 +415,21 @@ export function useBeatGameRound({
       if (
         latestRoundStateRef.current.phase !== "game" ||
         latestRoundStateRef.current.roundNumber !== scheduledRoundNumber ||
-        !hasClearedCurrentGameRef.current ||
-        successFeedbackRound !== scheduledRoundNumber
+        (!canShowSuccessfulResultEarly && !canShowFailureResultEarly)
       ) {
         return;
       }
 
-      showResult("success");
+      showResult(canShowSuccessfulResultEarly ? "success" : "failure");
     }, EARLY_SUCCESS_RESULT_DELAY_MS);
-  }, [beatsLeft, phase, roundNumber, showResult, successFeedbackRound]);
+  }, [
+    beatsLeft,
+    failureFeedbackRound,
+    phase,
+    roundNumber,
+    showResult,
+    successFeedbackRound,
+  ]);
 
   useEffect(() => {
     if (phase !== "game") {
@@ -444,7 +456,7 @@ export function useBeatGameRound({
       phaseBeatCount,
       phaseLabel,
       recordFailure: () => {
-        showResult("failure");
+        setFailureFeedbackRound(roundNumber);
       },
       recordSuccess: () => {
         hasClearedCurrentGameRef.current = true;
@@ -463,7 +475,6 @@ export function useBeatGameRound({
       phaseLabel,
       roundNumber,
       roundResult,
-      showResult,
       speedLevel,
     ],
   );

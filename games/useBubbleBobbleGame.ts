@@ -21,27 +21,46 @@ const MIN_CANVAS_WIDTH = 640;
 const PLAYER_HEIGHT = 74;
 const PLAYER_SPEED = 520;
 const PLAYER_WIDTH = 72;
-const BUBBLE_RADIUS = 27;
-const BUBBLE_SPEED = 650;
+const PLAYER_HALF_FOOT_WIDTH = 25;
+const GRAVITY = 2200;
+const JUMP_VELOCITY = -980;
+const MAX_FALL_SPEED = 1220;
+const BUBBLE_RADIUS = 31;
+const BUBBLE_SPEED = 820;
+const BUBBLE_FORWARD_SECONDS = 1.05;
+const BUBBLE_DRIFT_SPEED = 150;
+const BUBBLE_RISE_SPEED = 210;
+const BUBBLE_WOBBLE_AMPLITUDE = 10;
+const BUBBLE_WOBBLE_FREQUENCY = 11;
 const ENEMY_SIZE = 70;
-const ENEMY_COUNT = 3;
+const ENEMY_COUNT = 2;
+const ENEMY_PATROL_DISTANCE = 72;
 const BUBBLE_COOLDOWN_SECONDS = 0.2;
-const PLAYER_BOUNDS = {
-  bottom: 826,
-  left: 110,
-  right: 1560,
-  top: 145,
-} as const;
+const PLAYER_LEFT_BOUND = 78;
+const PLAYER_RIGHT_BOUND = 1594;
+const PLATFORM_SNAP_DISTANCE = 5;
+const PLATFORMS = [
+  { left: 42, right: 128, top: 374 },
+  { left: 240, right: 1426, top: 374 },
+  { left: 1538, right: 1626, top: 374 },
+  { left: 42, right: 128, top: 537 },
+  { left: 240, right: 1426, top: 537 },
+  { left: 1538, right: 1626, top: 537 },
+  { left: 42, right: 128, top: 701 },
+  { left: 240, right: 1426, top: 701 },
+  { left: 1538, right: 1626, top: 701 },
+  { left: 42, right: 1626, top: 888 },
+] as const;
 const ENEMY_BASE_POINTS = [
-  { x: 1040, y: 326 },
-  { x: 1308, y: 522 },
-  { x: 920, y: 718 },
+  { x: 1040, y: 337 },
+  { x: 1308, y: 500 },
 ] as const;
 
 type Direction = -1 | 1;
 type AssetKey = keyof typeof ASSETS;
 type LoadedImages = Record<AssetKey, HTMLImageElement>;
 type Bubble = {
+  ageSeconds: number;
   direction: Direction;
   id: number;
   x: number;
@@ -53,18 +72,22 @@ type Enemy = {
   x: number;
   y: number;
 };
+type Platform = (typeof PLATFORMS)[number];
 type GameState = {
   bubbles: Bubble[];
   bubbleCooldownSeconds: number;
   direction: Direction;
   enemies: Enemy[];
   hasCleared: boolean;
+  isGrounded: boolean;
+  jumpRequested: boolean;
   keys: Set<string>;
   lastTimestamp: number | null;
   nextBubbleId: number;
   playerX: number;
   playerY: number;
   timeSeconds: number;
+  velocityY: number;
 };
 type MapLayout = Readonly<{
   height: number;
@@ -124,12 +147,15 @@ function createInitialState() {
     direction: 1,
     enemies: createEnemies(),
     hasCleared: false,
+    isGrounded: true,
+    jumpRequested: false,
     keys: new Set<string>(),
     lastTimestamp: null,
     nextBubbleId: 0,
     playerX: 282,
-    playerY: 800,
+    playerY: 888 - PLAYER_HEIGHT / 2,
     timeSeconds: 0,
+    velocityY: 0,
   } satisfies GameState;
 }
 
@@ -143,6 +169,43 @@ function getInputAxis(
   negativeKey: string,
 ) {
   return Number(keys.has(positiveKey)) - Number(keys.has(negativeKey));
+}
+
+function overlapsPlatform(x: number, platform: Platform) {
+  return (
+    x + PLAYER_HALF_FOOT_WIDTH >= platform.left &&
+    x - PLAYER_HALF_FOOT_WIDTH <= platform.right
+  );
+}
+
+function getSupportedPlatform(state: GameState) {
+  const playerFeetY = state.playerY + PLAYER_HEIGHT / 2;
+
+  return PLATFORMS.find(
+    (platform) =>
+      overlapsPlatform(state.playerX, platform) &&
+      Math.abs(playerFeetY - platform.top) <= PLATFORM_SNAP_DISTANCE,
+  );
+}
+
+function resolvePlatformLanding(state: GameState, previousY: number) {
+  const previousFeetY = previousY + PLAYER_HEIGHT / 2;
+  const playerFeetY = state.playerY + PLAYER_HEIGHT / 2;
+  const landedPlatform = PLATFORMS.find(
+    (platform) =>
+      overlapsPlatform(state.playerX, platform) &&
+      previousFeetY <= platform.top + PLATFORM_SNAP_DISTANCE &&
+      playerFeetY >= platform.top,
+  );
+
+  if (!landedPlatform) {
+    state.isGrounded = false;
+    return;
+  }
+
+  state.playerY = landedPlatform.top - PLAYER_HEIGHT / 2;
+  state.velocityY = 0;
+  state.isGrounded = true;
 }
 
 function preloadImage(src: string) {
@@ -198,6 +261,7 @@ function shootBubble(state: GameState) {
   }
 
   state.bubbles.push({
+    ageSeconds: 0,
     direction: state.direction,
     id: state.nextBubbleId,
     x: state.playerX + state.direction * (PLAYER_WIDTH * 0.52),
@@ -217,8 +281,10 @@ function updateEnemies(enemies: Enemy[], timeSeconds: number) {
 
     const basePoint = ENEMY_BASE_POINTS[index] ?? ENEMY_BASE_POINTS[0];
 
-    enemy.x = basePoint.x + Math.sin(timeSeconds * 2.2 + enemy.phase) * 72;
-    enemy.y = basePoint.y + Math.cos(timeSeconds * 1.9 + enemy.phase) * 26;
+    enemy.x =
+      basePoint.x +
+      Math.sin(timeSeconds * 2.2 + enemy.phase) * ENEMY_PATROL_DISTANCE;
+    enemy.y = basePoint.y;
   });
 }
 
@@ -227,12 +293,37 @@ function updateBubbles(
   deltaSeconds: number,
   speedScale: number,
 ) {
+  const scaledDeltaSeconds = deltaSeconds * speedScale;
+
   state.bubbles = state.bubbles
-    .map((bubble) => ({
-      ...bubble,
-      x: bubble.x + bubble.direction * BUBBLE_SPEED * speedScale * deltaSeconds,
-      y: bubble.y - BUBBLE_SPEED * 0.18 * speedScale * deltaSeconds,
-    }))
+    .map((bubble) => {
+      const nextAgeSeconds = bubble.ageSeconds + scaledDeltaSeconds;
+      const forwardRatio = Math.max(
+        0,
+        1 - nextAgeSeconds / BUBBLE_FORWARD_SECONDS,
+      );
+      const horizontalSpeed =
+        BUBBLE_DRIFT_SPEED +
+        (BUBBLE_SPEED - BUBBLE_DRIFT_SPEED) * forwardRatio;
+      const riseSpeed =
+        BUBBLE_RISE_SPEED * (0.35 + (1 - forwardRatio) * 0.85);
+      const currentWave = Math.sin(
+        bubble.ageSeconds * BUBBLE_WOBBLE_FREQUENCY + bubble.id,
+      );
+      const nextWave = Math.sin(
+        nextAgeSeconds * BUBBLE_WOBBLE_FREQUENCY + bubble.id,
+      );
+
+      return {
+        ...bubble,
+        ageSeconds: nextAgeSeconds,
+        x:
+          bubble.x +
+          bubble.direction * horizontalSpeed * scaledDeltaSeconds +
+          (nextWave - currentWave) * BUBBLE_WOBBLE_AMPLITUDE,
+        y: bubble.y - riseSpeed * scaledDeltaSeconds,
+      };
+    })
     .filter(
       (bubble) =>
         bubble.x > -BUBBLE_RADIUS &&
@@ -269,29 +360,41 @@ function updatePlayer(
   speedScale: number,
 ) {
   const inputX = getInputAxis(state.keys, "ArrowRight", "ArrowLeft");
-  const inputY = getInputAxis(state.keys, "ArrowDown", "ArrowUp");
-  const inputLength = Math.hypot(inputX, inputY);
 
   if (inputX !== 0) {
     state.direction = inputX > 0 ? 1 : -1;
   }
 
-  if (inputLength === 0) {
+  state.playerX = clamp(
+    state.playerX + inputX * PLAYER_SPEED * speedScale * deltaSeconds,
+    PLAYER_LEFT_BOUND,
+    PLAYER_RIGHT_BOUND,
+  );
+
+  if (state.isGrounded && !getSupportedPlatform(state)) {
+    state.isGrounded = false;
+  }
+
+  if (state.jumpRequested && state.isGrounded) {
+    state.velocityY = JUMP_VELOCITY * speedScale;
+    state.isGrounded = false;
+  }
+
+  state.jumpRequested = false;
+
+  if (state.isGrounded) {
+    state.velocityY = 0;
     return;
   }
 
-  const distance = PLAYER_SPEED * speedScale * deltaSeconds;
+  const previousY = state.playerY;
 
-  state.playerX = clamp(
-    state.playerX + (inputX / inputLength) * distance,
-    PLAYER_BOUNDS.left,
-    PLAYER_BOUNDS.right,
+  state.velocityY = Math.min(
+    state.velocityY + GRAVITY * speedScale * deltaSeconds,
+    MAX_FALL_SPEED * speedScale,
   );
-  state.playerY = clamp(
-    state.playerY + (inputY / inputLength) * distance,
-    PLAYER_BOUNDS.top,
-    PLAYER_BOUNDS.bottom,
-  );
+  state.playerY += state.velocityY * deltaSeconds;
+  resolvePlatformLanding(state, previousY);
 }
 
 function updateGame(
@@ -346,7 +449,7 @@ function drawPlayer(
 ) {
   context.save();
   context.translate(state.playerX, state.playerY);
-  context.scale(state.direction, 1);
+  context.scale(-state.direction, 1);
   context.drawImage(
     image,
     -PLAYER_WIDTH / 2,
@@ -361,12 +464,12 @@ function drawEnemy(
   context: CanvasRenderingContext2D,
   image: HTMLImageElement,
   enemy: Enemy,
-  timeSeconds: number,
 ) {
   if (enemy.captured) {
     context.save();
     context.globalAlpha = 0.36;
     drawBubble(context, {
+      ageSeconds: 0,
       direction: 1,
       id: -1,
       x: enemy.x,
@@ -378,7 +481,6 @@ function drawEnemy(
 
   context.save();
   context.translate(enemy.x, enemy.y);
-  context.rotate(Math.sin(timeSeconds * 4 + enemy.phase) * 0.12);
   context.drawImage(
     image,
     -ENEMY_SIZE / 2,
@@ -418,7 +520,7 @@ function drawScene(
   context.scale(layout.scale, layout.scale);
 
   state.enemies.forEach((enemy) => {
-    drawEnemy(context, images.enemy, enemy, state.timeSeconds);
+    drawEnemy(context, images.enemy, enemy);
   });
   state.bubbles.forEach((bubble) => {
     drawBubble(context, bubble);
@@ -500,6 +602,9 @@ export function useBubbleBobbleGameCanvas(gameBeatCount: number) {
         return;
       }
 
+      if (event.key === "ArrowUp" && !event.repeat) {
+        stateRef.current.jumpRequested = true;
+      }
       stateRef.current.keys.add(event.key);
     };
 

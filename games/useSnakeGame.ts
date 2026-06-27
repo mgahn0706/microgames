@@ -23,7 +23,6 @@ const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
 const APPLE_EAT_ANIMATION_MS = 360;
 const SOUND_EFFECTS = {
-  die: "/games/snake/sounds/die.ogg",
   eat: "/games/snake/sounds/eat.ogg",
 } as const;
 
@@ -201,7 +200,6 @@ function resolveFailure(state: GameState) {
   }
 
   state.hasResolved = true;
-  playSoundEffect(SOUND_EFFECTS.die);
   dispatchFailure();
 }
 

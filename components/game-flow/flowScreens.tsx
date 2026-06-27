@@ -402,7 +402,7 @@ function MicroscopePanel({
           </label>
         </div>
       </div>
-      <div className="grid gap-px overflow-hidden rounded-md border border-cyan-100/25 bg-white/10 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-px overflow-hidden rounded-md border border-cyan-100/25 bg-white/10 sm:grid-cols-2 lg:grid-cols-5">
         {MICROGAMES.map((microgame) => {
           const formInstruction = getMicrogameFormInstruction(microgame);
           const isSeen = seenMicrogameIds.includes(microgame.id);

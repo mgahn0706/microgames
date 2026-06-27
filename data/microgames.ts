@@ -310,7 +310,7 @@ export const MICROGAMES = [
     canvas: "bubbleBobble",
     microscope: {
       description:
-        "버블보블은 버블 드래곤이 방울을 쏴 적을 가두고 무찌르는 게임입니다. 방향키로 움직이고 Space로 버블을 쏘세요.",
+        "버블보블은 버블 드래곤이 발판을 뛰어다니며 방울을 쏴 적을 가두고 무찌르는 게임입니다. 방향키로 이동/점프하고 Space로 버블을 쏘세요.",
       imageAlt: "버블보블 버블 드래곤",
       imageSrc: "/games/bubble-bobble/images/background.png",
     },

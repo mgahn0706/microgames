@@ -343,7 +343,6 @@ export const ALL_GAME_PRELOAD_ASSETS = [
   "/games/pokemon-tcg-pocket/sounds/pokemon-card-pocket-bgm.mp3",
   "/games/rhythm-heaven/sounds/chorus-man-sing-basic.wav",
   "/games/rhythm-heaven/sounds/chorus-man-sing-stopped.wav",
-  "/games/snake/sounds/die.ogg",
   "/games/snake/sounds/eat.ogg",
   "/games/super-mario-galaxy/sounds/star-bits-dragged-successfully.mp3",
   "/games/super-mario-galaxy/sounds/star-bits-dragged.mp3",
