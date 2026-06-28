@@ -412,7 +412,7 @@ function MicroscopePanel({
 
           const card = (
             <article
-              className={`grid h-full min-h-20 grid-cols-[48px_1fr] gap-2.5 p-2.5 ${
+              className={`grid h-full min-h-17 grid-cols-[48px_1fr] gap-2.5 p-2.5 ${
                 isSeen
                   ? "bg-slate-950/90 transition hover:bg-cyan-950/90"
                   : "bg-black/90 text-white/62"
@@ -449,7 +449,7 @@ function MicroscopePanel({
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-1 w-fit max-w-full truncate rounded border border-cyan-100/20 px-1.5 py-0.5 text-[0.64rem] font-black leading-none text-cyan-50/78">
+                <p className="mt-1 w-fit max-w-full truncate rounded py-0.5 text-[0.64rem] font-black leading-none text-cyan-50/78">
                   {displayControlTitle}
                 </p>
               </div>

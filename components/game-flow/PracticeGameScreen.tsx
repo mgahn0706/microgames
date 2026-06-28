@@ -6,7 +6,7 @@ import {
   RHYTHM_DURATION_MS,
   useSynchronizedRhythm,
 } from "@/hooks/useSynchronizedRhythm";
-import { NeonButton, NeonShell } from "./NeonShell";
+import { NeonShell } from "./NeonShell";
 import { InstructionRoundScreen, MicrogameRoundScreen } from "./roundScreens";
 
 export function PracticeGameScreen({
@@ -18,8 +18,11 @@ export function PracticeGameScreen({
 }>) {
   const beatDurationMs = RHYTHM_DURATION_MS / practiceSpeedMultiplier;
   const { rhythmStyle } = useSynchronizedRhythm(beatDurationMs);
-  const { beatsLeft, instructionStep, phase, result, returnToMicroscope } =
-    usePracticeMicrogame(microgame, beatDurationMs, practiceSpeedMultiplier);
+  const { beatsLeft, instructionStep, phase, result } = usePracticeMicrogame(
+    microgame,
+    beatDurationMs,
+    practiceSpeedMultiplier,
+  );
 
   if (phase === "instruction" || phase === "playing") {
     const isPromptTransition =
@@ -74,9 +77,6 @@ export function PracticeGameScreen({
         <p className="text-base font-bold text-cyan-50/75">
           잠시 후 게임 도감으로 돌아갑니다.
         </p>
-        <NeonButton onClick={returnToMicroscope} variant="secondary">
-          도감으로 돌아가기
-        </NeonButton>
       </div>
     </NeonShell>
   );
