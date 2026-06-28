@@ -12,8 +12,8 @@ const STAMP_ANIMATION_MS = 420;
 const MISS_PULSE_MS = 240;
 const TARGET_HIT_RADIUS = 86;
 const ANIMAL_CROSSING_ASSETS = {
-  background: "/games/animal-crossing/images/background.png",
-  stamp: "/games/animal-crossing/images/stamp.png",
+  background: "/games/animal-crossing/images/background.webp",
+  stamp: "/games/animal-crossing/images/stamp.webp",
 } as const;
 const STAMP_TARGET_RATIOS = [
   { x: 0.32, y: 0.39 },

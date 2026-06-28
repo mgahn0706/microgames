@@ -112,19 +112,19 @@ const LOADING_MESSAGES = [
 const LOADING_CARTOONS = [
   {
     alt: "로딩 카툰 1",
-    src: "/games/game-flow/images/loading-cartoon-1.png",
+    src: "/games/game-flow/images/loading-cartoon-1.webp",
   },
   {
     alt: "로딩 카툰 2",
-    src: "/games/game-flow/images/loading-cartoon-2.png",
+    src: "/games/game-flow/images/loading-cartoon-2.webp",
   },
   {
     alt: "로딩 카툰 3",
-    src: "/games/game-flow/images/loading-cartoon-3.png",
+    src: "/games/game-flow/images/loading-cartoon-3.webp",
   },
   {
     alt: "로딩 카툰 4",
-    src: "/games/game-flow/images/loading-cartoon-4.png",
+    src: "/games/game-flow/images/loading-cartoon-4.webp",
   },
 ] as const;
 
@@ -252,7 +252,7 @@ function HomePanel({
       </div>
       <div className="mx-auto w-full max-w-48 lg:max-w-none">
         <Image
-          src="/games/game-flow/images/game-main-logo.png"
+          src="/games/game-flow/images/game-main-logo.webp"
           alt="캣타워 오르기 로고"
           width={880}
           height={1268}
@@ -714,7 +714,7 @@ export function LoadingScreen({
         <div className="flex items-center gap-3">
           <div className="loading-spinner-vital grid size-10 shrink-0 place-items-center">
             <Image
-              src="/games/game-flow/images/loading-spinner.png"
+              src="/games/game-flow/images/loading-spinner.webp"
               alt=""
               width={64}
               height={54}

@@ -60,7 +60,7 @@ export function LeagueChampionBanGame({
           fill
           priority
           sizes="100vw"
-          src="/games/league-of-legend/images/background.png"
+          src="/games/league-of-legend/images/background.webp"
           unoptimized
         />
         <div className="pointer-events-none absolute left-1/2 top-[8.2%] z-20 flex -translate-x-1/2 items-center gap-[clamp(0.5rem,1vw,0.9rem)] rounded-md border-2 border-[#f3c95f] bg-[#160706]/90 px-[clamp(0.9rem,2vw,1.8rem)] py-[clamp(0.35rem,0.9vw,0.7rem)] text-center shadow-[0_0_26px_rgba(243,201,95,0.42),0_0_42px_rgba(0,0,0,0.85)]">

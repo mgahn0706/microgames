@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { MICROGAME_CLEAR_EVENT } from "@/hooks/useMicrogameInput";
 
 const ASSETS = {
-  background: "/games/bubble-bobble/images/background.png",
+  background: "/games/bubble-bobble/images/background.webp",
   enemy: "/games/bubble-bobble/images/enemy.png",
   player: "/games/bubble-bobble/images/player.png",
 } as const;

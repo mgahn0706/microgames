@@ -19,6 +19,7 @@ Workflow rule for Codex:
 - If the user has not asked to commit yet, only summarize the changes and wait.
 - If the current change is cohesive and clearly commit-ready, Codex may commit it without waiting for a separate commit request.
 - In frontend UI components and route pages, move `useEffect`-driven loading or sync logic into custom hooks in separate files whenever possible.
+- For tiny CSS-only tweaks, such as adjusting spacing, z-index, transform offsets, colors, or sizes without changing logic or types, Codex may skip lint, type, build, and test checks unless the user explicitly asks for validation.
 - For any commit that directly changes frontend features or components, run the React Testing Library suite with `npm test` in `frontend` before commit. If the tests fail, refactor or fix the code before committing.
 - Prefer `const` by default. Do not use `var`, and do not use `let` unless mutation is truly unavoidable.
 - In React code, preserve immutability of state, props, and derived data. Do not mutate arrays, objects, or nested structures in place.

@@ -5,7 +5,7 @@ import { MICROGAME_CLEAR_EVENT } from "@/hooks/useMicrogameInput";
 import { bgmLibrary } from "@/lib/bgmLibrary";
 
 const ASSETS = {
-  background: "/games/fruit-ninja/images/background.png",
+  background: "/games/fruit-ninja/images/background.webp",
   watermelon: "/games/fruit-ninja/images/watermelon.png",
   watermelonSliced: "/games/fruit-ninja/images/watermelon-sliced.png",
 } as const;

@@ -552,6 +552,15 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "infiniteStairs") {
+        bgmLibrary
+          .play("infiniteStairs", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
+        return;
+      }
+
       if (microgame.canvas === "zeldaCircleDraw") {
         bgmLibrary.play("zelda", "once", "now").catch((error: unknown) => {
           console.error(error);

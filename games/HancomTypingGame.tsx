@@ -21,7 +21,7 @@ export function HancomTypingGame({
           fill
           priority
           sizes="100vw"
-          src="/games/hancom/images/background.png"
+          src="/games/hancom/images/background.webp"
           unoptimized
         />
         <div className="absolute left-[1.7%] top-[12.7%] h-[78.6%] w-[77.9%] overflow-hidden">

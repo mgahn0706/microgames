@@ -11,7 +11,10 @@ type Point = Readonly<{
 }>;
 
 const CLEAR_GAUGE = 100;
-const GAUGE_PER_TURN = 48;
+const GAUGE_PER_TURN = 30;
+const INERTIA_DECAY_PER_SECOND = 3.4;
+const MAX_ANGULAR_VELOCITY = 24;
+const MIN_INERTIA_VELOCITY = 0.22;
 const SPIN_SOUND_SRC = "/games/rhythm-hero/sounds/spinning-sound.mp3";
 const SPINNER_RADIUS_PERCENT = 25.5;
 const SPINNER_CENTER = { x: 49.94, y: 53.35 } satisfies Point;
@@ -57,6 +60,13 @@ function isInsideSpinner(point: Point) {
   return distance <= SPINNER_RADIUS_PERCENT;
 }
 
+function clampAngularVelocity(velocity: number) {
+  return Math.max(
+    -MAX_ANGULAR_VELOCITY,
+    Math.min(MAX_ANGULAR_VELOCITY, velocity),
+  );
+}
+
 export function useRhythmHeroGame({
   beatDurationMs,
 }: Readonly<{ beatDurationMs: number }>): Readonly<{
@@ -69,8 +79,13 @@ export function useRhythmHeroGame({
   spinnerRotation: number;
   spinnerStageRef: RefObject<HTMLDivElement | null>;
 }> {
+  const animationFrameRef = useRef<number | null>(null);
+  const angularVelocityRef = useRef(0);
   const hasClearedRef = useRef(false);
+  const inertiaStepRef = useRef<(timestamp: number) => void>(() => {});
   const lastAngleRef = useRef<number | null>(null);
+  const lastMoveTimeRef = useRef<number | null>(null);
+  const previousFrameTimeRef = useRef<number | null>(null);
   const spinSoundRef = useRef<HTMLAudioElement | null>(null);
   const spinnerStageRef = useRef<HTMLDivElement | null>(null);
   const [gauge, setGauge] = useState(0);
@@ -109,6 +124,16 @@ export function useRhythmHeroGame({
     });
   }, []);
 
+  const clearInertiaFrame = useCallback(() => {
+    if (animationFrameRef.current === null) {
+      return;
+    }
+
+    window.cancelAnimationFrame(animationFrameRef.current);
+    animationFrameRef.current = null;
+    previousFrameTimeRef.current = null;
+  }, []);
+
   const increaseGauge = useCallback(
     (angleTravel: number) => {
       if (hasClearedRef.current) {
@@ -135,6 +160,70 @@ export function useRhythmHeroGame({
     [beatDurationMs, stopSpinSound],
   );
 
+  const stepInertia = useCallback(
+    (timestamp: number) => {
+      if (hasClearedRef.current) {
+        clearInertiaFrame();
+        stopSpinSound();
+        setIsDragging(false);
+        return;
+      }
+
+      const previousFrameTime = previousFrameTimeRef.current ?? timestamp;
+      const deltaSeconds = Math.min(
+        Math.max((timestamp - previousFrameTime) / 1000, 0),
+        0.05,
+      );
+
+      previousFrameTimeRef.current = timestamp;
+
+      const angularVelocity = angularVelocityRef.current;
+
+      if (Math.abs(angularVelocity) < MIN_INERTIA_VELOCITY) {
+        angularVelocityRef.current = 0;
+        clearInertiaFrame();
+        stopSpinSound();
+        setIsDragging(false);
+        return;
+      }
+
+      const angleTravel = angularVelocity * deltaSeconds;
+      const rotationDelta = (angleTravel * 180) / Math.PI;
+      const nextVelocity =
+        angularVelocity * Math.exp(-INERTIA_DECAY_PER_SECOND * deltaSeconds);
+
+      angularVelocityRef.current = nextVelocity;
+      setSpinnerRotation((rotation) => rotation + rotationDelta);
+      increaseGauge(angleTravel);
+
+      animationFrameRef.current = window.requestAnimationFrame(
+        inertiaStepRef.current,
+      );
+    },
+    [clearInertiaFrame, increaseGauge, stopSpinSound],
+  );
+
+  useEffect(() => {
+    inertiaStepRef.current = stepInertia;
+  }, [stepInertia]);
+
+  const startInertia = useCallback(() => {
+    clearInertiaFrame();
+
+    if (Math.abs(angularVelocityRef.current) < MIN_INERTIA_VELOCITY) {
+      angularVelocityRef.current = 0;
+      stopSpinSound();
+      setIsDragging(false);
+      return;
+    }
+
+    setIsDragging(true);
+    playSpinSound();
+    animationFrameRef.current = window.requestAnimationFrame(
+      inertiaStepRef.current,
+    );
+  }, [clearInertiaFrame, playSpinSound, stopSpinSound]);
+
   const handlePointerDown = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
       const stage = spinnerStageRef.current;
@@ -150,12 +239,15 @@ export function useRhythmHeroGame({
       }
 
       event.preventDefault();
+      clearInertiaFrame();
+      angularVelocityRef.current = 0;
       stage.setPointerCapture(event.pointerId);
       lastAngleRef.current = getAngle(point);
+      lastMoveTimeRef.current = window.performance.now();
       setIsDragging(true);
       playSpinSound();
     },
-    [playSpinSound],
+    [clearInertiaFrame, playSpinSound],
   );
 
   const handlePointerMove = useCallback(
@@ -172,33 +264,50 @@ export function useRhythmHeroGame({
       const nextAngle = getAngle(getPointerPercentPoint(stage, event));
       const angleDelta = normalizeAngleDelta(nextAngle - lastAngle);
       const rotationDelta = (angleDelta * 180) / Math.PI;
+      const moveTime = window.performance.now();
+      const previousMoveTime = lastMoveTimeRef.current ?? moveTime;
+      const deltaSeconds = Math.max((moveTime - previousMoveTime) / 1000, 0.001);
 
       lastAngleRef.current = nextAngle;
+      lastMoveTimeRef.current = moveTime;
+      angularVelocityRef.current = clampAngularVelocity(
+        angleDelta / deltaSeconds,
+      );
       setSpinnerRotation((rotation) => rotation + rotationDelta);
       increaseGauge(angleDelta);
     },
     [increaseGauge],
   );
 
-  const stopDragging = useCallback(() => {
+  const releaseDragging = useCallback(() => {
     lastAngleRef.current = null;
+    lastMoveTimeRef.current = null;
+    startInertia();
+  }, [startInertia]);
+
+  const cancelDragging = useCallback(() => {
+    lastAngleRef.current = null;
+    lastMoveTimeRef.current = null;
+    angularVelocityRef.current = 0;
+    clearInertiaFrame();
     setIsDragging(false);
     stopSpinSound();
-  }, [stopSpinSound]);
+  }, [clearInertiaFrame, stopSpinSound]);
 
   useEffect(
     () => () => {
+      clearInertiaFrame();
       stopSpinSound();
     },
-    [stopSpinSound],
+    [clearInertiaFrame, stopSpinSound],
   );
 
   return {
     gauge,
-    handlePointerCancel: stopDragging,
+    handlePointerCancel: cancelDragging,
     handlePointerDown,
     handlePointerMove,
-    handlePointerUp: stopDragging,
+    handlePointerUp: releaseDragging,
     isDragging,
     spinnerRotation,
     spinnerStageRef,

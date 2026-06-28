@@ -11,7 +11,7 @@ export const FORM_INSTRUCTIONS = [
     alt: "Space key control form",
     control: "space",
     description: "스페이스 입력 타이밍을 박자에 맞춰 성공시키세요.",
-    imageSrc: "/games/forms/images/space.png",
+    imageSrc: "/games/forms/images/space.webp",
     title: "스페이스",
   },
   {
@@ -53,14 +53,14 @@ export const FORM_INSTRUCTIONS = [
     alt: "Number keys control form",
     control: "numberKeys",
     description: "숫자키를 확인하고 제한 시간 안에 입력하세요.",
-    imageSrc: "/games/forms/images/number-keys.png",
+    imageSrc: "/games/forms/images/number-keys.webp",
     title: "숫자키",
   },
   {
     alt: "Korean keyboard control form",
     control: "koreanKeyboard",
     description: "한글 키 입력을 리듬에 맞춰 처리하세요.",
-    imageSrc: "/games/forms/images/korean-keyboard.png",
+    imageSrc: "/games/forms/images/korean-keyboard.webp",
     title: "한글 타자",
   },
 ] satisfies FormInstruction[];

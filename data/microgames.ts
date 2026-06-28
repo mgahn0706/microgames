@@ -40,6 +40,7 @@ export type MicrogameCanvas =
   | "gomokuWhiteStone"
   | "halliGalliBoss"
   | "hancomTyping"
+  | "infiniteStairs"
   | "kartriderCourse"
   | "kirbyInhale"
   | "laytonShapeMatch"
@@ -141,7 +142,7 @@ export const MICROGAMES = [
       description:
         "도와줘! 리듬 히어로에서는 스피너를 빠르게 돌려 게이지를 채워야 합니다. 원을 따라 드래그하면 게이지가 차오릅니다.",
       imageAlt: "도와줘! 리듬 히어로 스피너",
-      imageSrc: "/games/rhythm-hero/images/spinner.png",
+      imageSrc: "/games/rhythm-hero/images/spinner.webp",
     },
     control: "mouseDrag",
     id: "rhythm-hero-spinner",
@@ -173,7 +174,7 @@ export const MICROGAMES = [
       description:
         "롤 챔피언 선택창은 늘 시간이 부족하죠. 밴해야 할 챔피언을 찾고, 망설이지 말고 눌러야 합니다.",
       imageAlt: "리그 오브 레전드 챔피언 선택 배경",
-      imageSrc: "/games/league-of-legend/images/background.png",
+      imageSrc: "/games/league-of-legend/images/background.webp",
     },
     control: "mouseClick",
     id: "league-of-legend-champion-ban",
@@ -221,7 +222,7 @@ export const MICROGAMES = [
       description:
         "말랑말랑 두뇌교실 문제는 쉬워 보일 때가 제일 위험합니다. 블록을 얼른 세고 맞는 숫자를 눌러야 해요.",
       imageAlt: "두뇌교실 블록 문제 배경",
-      imageSrc: "/games/brain-academy/images/background.png",
+      imageSrc: "/games/brain-academy/images/background.webp",
     },
     control: "numberKeys",
     id: "brain-academy-block-count",
@@ -269,7 +270,7 @@ export const MICROGAMES = [
       description:
         "모두의 마블의 주사위 컨트롤을 아시나요? 꾹 눌러 12를 띄워보세요.",
       imageAlt: "모두의마블 배경",
-      imageSrc: "/games/modoo-marble/images/background.png",
+      imageSrc: "/games/modoo-marble/images/background.webp",
     },
     control: "mouseHold",
     id: "modoo-marble-big-number",
@@ -285,12 +286,28 @@ export const MICROGAMES = [
       description:
         "동물의 숲 박물관의 스탬프를 보고 빠르게 쾅쾅 찍어야 합니다. 아, 잘못 찍으면 실패예요!",
       imageAlt: "동물의 숲 스탬프",
-      imageSrc: "/games/animal-crossing/images/stamp.png",
+      imageSrc: "/games/animal-crossing/images/stamp.webp",
     },
     control: "mouseClick",
     id: "animal-crossing-stamp-card",
     startPrompt: "찍어라!",
     title: "모여봐요 동물의 숲",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "infiniteStairs",
+    microscope: {
+      description:
+        "무한의계단은 좌우 방향을 놓치지 않고 빠르게 올라가는 게임입니다. 계단 방향에 맞춰 화살표를 입력하세요.",
+      imageAlt: "무한의계단 계단",
+      imageSrc: "/games/infinite-stairs/images/stair-brick.png",
+    },
+    control: "arrowKeys",
+    id: "infinite-stairs-climb",
+    startPrompt: "올라가라!",
+    title: "무한의계단",
     type: "normal",
   },
 
@@ -333,7 +350,7 @@ export const MICROGAMES = [
       description:
         "버블보블은 버블 드래곤이 발판을 뛰어다니며 방울을 쏴 적을 가두고 무찌르는 게임입니다. 방향키로 이동/점프하고 Space로 버블을 쏘세요.",
       imageAlt: "버블보블 버블 드래곤",
-      imageSrc: "/games/bubble-bobble/images/background.png",
+      imageSrc: "/games/bubble-bobble/images/background.webp",
     },
     control: "arrowAndSpace",
     id: "bubble-bobble-defeat-enemies",
@@ -572,7 +589,7 @@ export const MICROGAMES = [
       description:
         "젤다의 전설: 스카이워드 소드입니다. 마스터소드로 여신의 벽에 문양을 그리면 폭탄이 나와요.",
       imageAlt: "젤다 원 그리기 배경",
-      imageSrc: "/games/zelda/images/background.png",
+      imageSrc: "/games/zelda/images/background.webp",
     },
     control: "mouseDrag",
     id: "zelda-circle-draw",
@@ -684,7 +701,7 @@ export const MICROGAMES = [
       description:
         "크레이지 아케이드 하면 물풍선이죠. 추억이네요. 다들 드림서버였나요, 해피서버였나요?",
       imageAlt: "크레이지 아케이드 배경",
-      imageSrc: "/games/crazy-arcade/images/background.png",
+      imageSrc: "/games/crazy-arcade/images/background.webp",
     },
     control: "arrowAndSpace",
     id: "crazy-arcade-water-bomb",
@@ -732,7 +749,7 @@ export const MICROGAMES = [
       description:
         "피카츄, 라이츄, 파이리, 꼬부기... 다들 포켓몬 아시나요? 빠르게 포켓몬 이름을 맞춰야 해요. 아, 얘 이름이 뭐였더라?",
       imageAlt: "포켓몬 도감 배경",
-      imageSrc: "/games/pokemon/images/pokedex-background.png",
+      imageSrc: "/games/pokemon/images/pokedex-background.webp",
     },
     control: "koreanKeyboard",
     id: "pokemon-name-typing",
@@ -828,7 +845,7 @@ export const MICROGAMES = [
       description:
         "한컴 타자 연습하던 시절 기억나나요? 단어가 내려오기 전에 빠르게 치면 되는데, 오타 하나가 꽤 아픕니다.",
       imageAlt: "한컴 타자 배경",
-      imageSrc: "/games/hancom/images/background.png",
+      imageSrc: "/games/hancom/images/background.webp",
     },
     control: "koreanKeyboard",
     id: "hancom-word-typing",
@@ -924,7 +941,7 @@ export const MICROGAMES = [
       description:
         "다들 동물농장을 아시나요? 샤르릉 뿌뿡 뿍짝뿍짝 사람이 되어라 얍~!",
       imageAlt: "동물농장 배경",
-      imageSrc: "/games/animal-farm/images/background.png",
+      imageSrc: "/games/animal-farm/images/background.webp",
     },
     control: "koreanKeyboard",
     id: "animal-farm-reverse-typing",

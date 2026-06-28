@@ -192,7 +192,7 @@ export function MicrogameRoundScreen({
       />
       {isTransitioning ? null : (
         <>
-          <div className="timer-beat-shell absolute left-4 top-4 size-28 sm:left-6 sm:top-6 sm:size-32">
+          <div className="timer-beat-shell absolute left-4 top-4 z-50 size-28 sm:left-6 sm:top-6 sm:size-32">
             <Image
               src="/games/game-flow/images/timer.png"
               alt=""

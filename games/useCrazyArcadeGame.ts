@@ -20,7 +20,7 @@ const SOURCE_GRID_X = 67;
 const SOURCE_GRID_Y = 70;
 const SOURCE_CELL_SIZE = 73;
 const CRAZY_ARCADE_ASSETS = {
-  background: "/games/crazy-arcade/images/background.png",
+  background: "/games/crazy-arcade/images/background.webp",
   bomb: "/games/crazy-arcade/images/water-bomb.png",
   playerDown: "/games/crazy-arcade/images/player-down.png",
   playerLeft: "/games/crazy-arcade/images/player-left.png",

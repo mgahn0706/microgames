@@ -156,7 +156,7 @@ function loadImage(src: string) {
 
 function loadGameImages(): GameImages {
   return {
-    background: loadImage("/games/suika-game/images/background.png"),
+    background: loadImage("/games/suika-game/images/background.webp"),
     fruits: Object.fromEntries(
       FRUIT_LEVELS.map(({ imageSrc, name }) => [name, loadImage(imageSrc)]),
     ) as Record<FruitLevel, HTMLImageElement>,

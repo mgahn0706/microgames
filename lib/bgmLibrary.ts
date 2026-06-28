@@ -24,6 +24,7 @@ export type BgmTrack =
   | "hancom"
   | "intermission"
   | "intermissionNoControl"
+  | "infiniteStairs"
   | "kartrider"
   | "kirby"
   | "layton"
@@ -67,6 +68,7 @@ export type SoundEffectTrack =
   | "halliGalliBell"
   | "halliGalliCard"
   | "fruitNinjaImpact"
+  | "infiniteStairsStep"
   | "minecraftDig1"
   | "minecraftDig2"
   | "modooDiceRoll"
@@ -102,6 +104,7 @@ const BGM_TRACK_PATHS = {
   hancom: "/games/hancom/sounds/hancom-bgm.mp3",
   intermission: "/games/game-flow/sounds/intermission.mp3",
   intermissionNoControl: "/games/game-flow/sounds/intermission-no-control.mp3",
+  infiniteStairs: "/games/infinite-stairs/sounds/infinite-stair-bgm.mp3",
   kartrider: "/games/kartrider/sounds/kartrider-bgm.mp3",
   kirby: "/games/kirby/sounds/kirby-bgm.mp3",
   layton: "/games/layton/sounds/layton-bgm.mp3",
@@ -149,6 +152,7 @@ const SOUND_EFFECT_TRACK_PATHS = {
   halliGalliBell: "/games/halli-galli/sounds/bell-chime.mp3",
   halliGalliCard: "/games/halli-galli/sounds/card-draw.mp3",
   fruitNinjaImpact: "/games/fruit-ninja/sounds/Impact-Watermelon.wav",
+  infiniteStairsStep: "/games/infinite-stairs/sounds/button-click.mp3",
   leagueChampionSelect: "/games/league-of-legend/sounds/champ-select.mp3",
   minecraftDig1: "/games/minecraft/sounds/dig-1.mp3",
   minecraftDig2: "/games/minecraft/sounds/dig-2.mp3",
@@ -209,6 +213,7 @@ const BGM_TRACK_BEATS = {
   hancom: 12,
   intermission: 8,
   intermissionNoControl: 4,
+  infiniteStairs: 8,
   kartrider: 36,
   kirby: 8,
   layton: 8,
@@ -243,6 +248,7 @@ const BGM_TRACK_BEATS = {
 const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<Record<BgmTrack, number>> =
   {
     crossword: DEFAULT_BEAT_DURATION_SECONDS,
+    infiniteStairs: DEFAULT_BEAT_DURATION_SECONDS,
     pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
     wordle: DEFAULT_BEAT_DURATION_SECONDS,
   };

@@ -6,7 +6,7 @@ import {
   MICROGAME_FAILURE_EVENT,
 } from "@/hooks/useMicrogameInput";
 
-const BACKGROUND_SRC = "/games/flappy-bird/images/background.png";
+const BACKGROUND_SRC = "/games/flappy-bird/images/background.webp";
 const BIRD_SRC = "/games/flappy-bird/images/bird.png";
 const DIE_SOUND_SRC = "/games/flappy-bird/sounds/die.mp3";
 const PIPE_SRC = "/games/flappy-bird/images/pipe-upward.png";

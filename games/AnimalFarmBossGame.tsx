@@ -32,7 +32,7 @@ export function AnimalFarmBossGame({
         fill
         className="absolute inset-0 size-full object-cover object-center"
         priority
-        src="/games/animal-farm/images/background.png"
+        src="/games/animal-farm/images/background.webp"
         unoptimized
       />
       <div className="absolute right-[2vw] top-[8vh] grid h-[31vh] w-[41vw] place-items-center px-[3.5vw] text-center text-slate-950">

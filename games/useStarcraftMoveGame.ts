@@ -35,7 +35,7 @@ const MINERAL_HOTSPOT = {
   y: 498,
 } satisfies Rect;
 const STARCRAFT_ASSETS = {
-  background: "/games/starcraft/images/background.png",
+  background: "/games/starcraft/images/background.webp",
   idle: "/games/starcraft/images/idle.png",
   moving1: "/games/starcraft/images/moving-1.png",
   moving2: "/games/starcraft/images/moving-2.png",

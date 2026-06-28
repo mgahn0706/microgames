@@ -14,7 +14,7 @@ const GAUGE_CYCLE_MS = 1180;
 const RESULT_POPUP_DELAY_MS = 620;
 const SEGMENT_RESULTS = [2, 7, 9, 12] as const;
 const MODOO_MARBLE_ASSETS = {
-  background: "/games/modoo-marble/images/background.png",
+  background: "/games/modoo-marble/images/background.webp",
   buttonIdle: "/games/modoo-marble/images/roll-button-idle.png",
   buttonPressed: "/games/modoo-marble/images/roll-button-pressed.png",
 } as const;

@@ -8,7 +8,7 @@ import { convertEnglishKeyboardInputToKorean } from "@/lib/hangulInput";
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
 const POKEMON_ASSETS = {
-  background: "/games/pokemon/images/pokedex-background.png",
+  background: "/games/pokemon/images/pokedex-background.webp",
   blastoise: "/games/pokemon/images/blastoise.png",
   bulbasaur: "/games/pokemon/images/bulbasaur.png",
   butterfree: "/games/pokemon/images/butterfree.png",

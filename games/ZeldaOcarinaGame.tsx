@@ -8,7 +8,7 @@ import {
   type OcarinaInput,
 } from "@/games/useZeldaOcarinaGame";
 
-const BACKGROUND_SRC = "/games/zelda-ocarina-of-time/images/background.png";
+const BACKGROUND_SRC = "/games/zelda-ocarina-of-time/images/background.webp";
 
 function getArrowStyle(input: Exclude<OcarinaInput, "space">): CSSProperties {
   const transparent = "clamp(0.42rem,0.9vw,0.7rem) solid transparent";

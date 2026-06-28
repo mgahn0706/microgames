@@ -9,7 +9,7 @@ import {
 } from "@/games/useKirbyInhaleGame";
 
 const KIRBY_ASSETS = {
-  background: "/games/kirby/images/background.png",
+  background: "/games/kirby/images/background.webp",
   enemyA: "/games/kirby/images/enemy-A.png",
   enemyB: "/games/kirby/images/enemy-B.png",
   inhaleA: "/games/kirby/images/kirby-inhaling-A.png",

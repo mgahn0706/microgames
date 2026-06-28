@@ -8,7 +8,7 @@ const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
 const MAX_DELTA_MS = 50;
 const FEEDBACK_DURATION_MS = 360;
-const BACKGROUND_IMAGE_SRC = "/games/brain-academy/images/background.png";
+const BACKGROUND_IMAGE_SRC = "/games/brain-academy/images/background.webp";
 
 type AnswerWord =
   | "eight"

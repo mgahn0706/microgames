@@ -48,7 +48,7 @@ type GameState = {
 };
 
 const MINECRAFT_ASSETS = {
-  background: "/games/minecraft/images/background.png",
+  background: "/games/minecraft/images/background.webp",
   crack1: "/games/minecraft/images/cracked-1.png",
   crack2: "/games/minecraft/images/cracked-2.png",
   crack3: "/games/minecraft/images/cracked-3.png",

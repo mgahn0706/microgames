@@ -41,6 +41,7 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
   geometryDashSpikes: "geometryDash",
   halliGalliBoss: "halliGalli",
   hancomTyping: "hancom",
+  infiniteStairs: "infiniteStairs",
   kartriderCourse: "kartrider",
   kirbyInhale: "kirby",
   laytonShapeMatch: "layton",

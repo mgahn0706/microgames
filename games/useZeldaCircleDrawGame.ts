@@ -14,7 +14,7 @@ const MAX_CIRCLE_DIAMETER_RATIO = 0.7;
 const MIN_POINT_COUNT = 20;
 const MIN_PASSING_CIRCLE_SCORE = 0.6;
 const ZELDA_ASSETS = {
-  background: "/games/zelda/images/background.png",
+  background: "/games/zelda/images/background.webp",
   cursor: "/games/zelda/images/cursor.png",
 } as const;
 

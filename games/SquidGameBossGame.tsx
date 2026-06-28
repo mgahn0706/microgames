@@ -44,7 +44,7 @@ export function SquidGameBossGame({
         fill
         priority
         sizes="100vw"
-        src="/games/squid-game/images/background.png"
+        src="/games/squid-game/images/background.webp"
         unoptimized
       />
       <div

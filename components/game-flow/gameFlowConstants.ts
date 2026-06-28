@@ -2,25 +2,25 @@ import type { GameRoundResult } from "@/hooks/useGameScreenFlow";
 import type { BgmTrack } from "@/lib/bgmLibrary";
 
 export const ELEVATOR_IMAGES = [
-  "/games/game-flow/images/main-elevator-1.png",
-  "/games/game-flow/images/main-elevator-2.png",
+  "/games/game-flow/images/main-elevator-1.webp",
+  "/games/game-flow/images/main-elevator-2.webp",
 ];
 
 export const ELEVATOR_RESULT_IMAGES = {
   failure: [
-    "/games/game-flow/images/main-elevator-fail-1.png",
-    "/games/game-flow/images/main-elevator-fail-2.png",
+    "/games/game-flow/images/main-elevator-fail-1.webp",
+    "/games/game-flow/images/main-elevator-fail-2.webp",
   ],
   idle: ELEVATOR_IMAGES,
   success: [
-    "/games/game-flow/images/main-elevator-success-1.png",
-    "/games/game-flow/images/main-elevator-success-2.png",
+    "/games/game-flow/images/main-elevator-success-1.webp",
+    "/games/game-flow/images/main-elevator-success-2.webp",
   ],
 } satisfies Record<GameRoundResult, string[]>;
 
 export const ELEVATOR_WARNING_IMAGES = [
-  "/games/game-flow/images/main-elevator-warning-1.png",
-  "/games/game-flow/images/main-elevator-warning-2.png",
+  "/games/game-flow/images/main-elevator-warning-1.webp",
+  "/games/game-flow/images/main-elevator-warning-2.webp",
 ];
 
 export const RESULT_BGM_TRACKS = {

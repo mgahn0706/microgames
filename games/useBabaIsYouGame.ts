@@ -13,7 +13,7 @@ const SOURCE_GRID_Y = 457;
 const SPRITE_SIZE = 48;
 const BABA_ASSETS = {
   baba: "/games/baba-is-you/images/baba.png",
-  background: "/games/baba-is-you/images/background.png",
+  background: "/games/baba-is-you/images/background.webp",
   flag: "/games/baba-is-you/images/flag.png",
   rock: "/games/baba-is-you/images/rock.png",
 } as const;

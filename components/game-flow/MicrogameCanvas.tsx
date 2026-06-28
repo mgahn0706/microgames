@@ -27,6 +27,7 @@ import { GeometryDashGame } from "@/games/GeometryDashGame";
 import { GomokuGame } from "@/games/GomokuGame";
 import { HalliGalliBossGame } from "@/games/HalliGalliBossGame";
 import { HancomTypingGame } from "@/games/HancomTypingGame";
+import { InfiniteStairsGame } from "@/games/InfiniteStairsGame";
 import { KartriderBossGame } from "@/games/KartriderBossGame";
 import { KirbyInhaleGame } from "@/games/KirbyInhaleGame";
 import { LaytonShapeMatchGame } from "@/games/LaytonShapeMatchGame";
@@ -259,6 +260,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "hancomTyping") {
     return <HancomTypingGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "infiniteStairs") {
+    return <InfiniteStairsGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "halliGalliBoss") {
