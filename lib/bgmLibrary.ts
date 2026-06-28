@@ -34,9 +34,11 @@ export type BgmTrack =
   | "minecraft"
   | "modooMarble"
   | "oneUp"
+  | "pokerouge"
   | "pokemon"
   | "pokemonTcgPocket"
   | "resultsAndMain"
+  | "rhythmHero"
   | "setup"
   | "speedUp"
   | "starcraft"
@@ -70,6 +72,9 @@ export type SoundEffectTrack =
   | "modooDiceRoll"
   | "pongHit"
   | "leagueChampionSelect"
+  | "pokerougeBuy"
+  | "pokerougeSelect"
+  | "rhythmHeroSpin"
   | "runeEffect"
   | "starcraftMove"
   | "twentyFortyEightSwipe";
@@ -107,10 +112,12 @@ const BGM_TRACK_PATHS = {
   minecraft: "/games/minecraft/sounds/minecraft-bgm.mp3",
   modooMarble: "/games/modoo-marble/sounds/modoo-bgm.mp3",
   oneUp: "/games/game-flow/sounds/1-up.mp3",
+  pokerouge: "/games/pokerouge/sounds/pokegoruge-bgm.flac",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
   pokemonTcgPocket:
     "/games/pokemon-tcg-pocket/sounds/pokemon-card-pocket-bgm.mp3",
   resultsAndMain: "/games/game-flow/sounds/results-and-main.mp3",
+  rhythmHero: "/games/rhythm-hero/sounds/rhythm-hero-bgm.mp3",
   setup: "/games/game-flow/sounds/setup.mp3",
   speedUp: "/games/game-flow/sounds/speed-up.mp3",
   starcraft: "/games/starcraft/sounds/starcraft-bgm.mp3",
@@ -147,6 +154,9 @@ const SOUND_EFFECT_TRACK_PATHS = {
   minecraftDig2: "/games/minecraft/sounds/dig-2.mp3",
   modooDiceRoll: "/games/modoo-marble/sounds/dice-roll.mp3",
   pongHit: "/games/pong/sounds/pong-hit.mp3",
+  pokerougeBuy: "/games/pokerouge/sounds/buy.wav",
+  pokerougeSelect: "/games/pokerouge/sounds/select.wav",
+  rhythmHeroSpin: "/games/rhythm-hero/sounds/spinning-sound.mp3",
   runeEffect: "/games/maple-story-rune/sounds/rune-effect.mp3",
   starcraftMove: "/games/starcraft/sounds/moving-voice.wav",
   twentyFortyEightSwipe: "/games/two-thousand-forty-eight/sounds/swipe.mp3",
@@ -209,9 +219,11 @@ const BGM_TRACK_BEATS = {
   minecraft: 8,
   modooMarble: 8,
   oneUp: 8,
+  pokerouge: 8,
   pokemon: 12,
   pokemonTcgPocket: 12,
   resultsAndMain: 83,
+  rhythmHero: 8,
   setup: 4,
   speedUp: 8,
   starcraft: 8,
@@ -231,6 +243,7 @@ const BGM_TRACK_BEATS = {
 const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<Record<BgmTrack, number>> =
   {
     crossword: DEFAULT_BEAT_DURATION_SECONDS,
+    pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
     wordle: DEFAULT_BEAT_DURATION_SECONDS,
   };
 

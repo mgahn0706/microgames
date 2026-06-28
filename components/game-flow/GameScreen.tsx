@@ -395,6 +395,20 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "pokerougeShop") {
+        bgmLibrary.play("pokerouge", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "rhythmHeroSpinner") {
+        bgmLibrary.play("rhythmHero", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "undertaleMouse") {
         bgmLibrary.play("undertale", "once", "now").catch((error: unknown) => {
           console.error(error);

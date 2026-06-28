@@ -51,9 +51,11 @@ export type MicrogameCanvas =
   | "modooMarble"
   | "pianoMelody"
   | "pongSurvival"
+  | "pokerougeShop"
   | "pokemonTcgPocket"
   | "pokemonTyping"
   | "rhythmHeavenChorus"
+  | "rhythmHeroSpinner"
   | "snakeApple"
   | "starcraftMove"
   | "superMarioGalaxyStarBits"
@@ -129,6 +131,22 @@ export const MICROGAMES = [
     id: "dobble-symbol-match",
     startPrompt: "같은 그림을 찾아라!",
     title: "도블",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "rhythmHeroSpinner",
+    microscope: {
+      description:
+        "도와줘! 리듬 히어로에서는 스피너를 빠르게 돌려 게이지를 채워야 합니다. 원을 따라 드래그하면 게이지가 차오릅니다.",
+      imageAlt: "도와줘! 리듬 히어로 스피너",
+      imageSrc: "/games/rhythm-hero/images/spinner.png",
+    },
+    control: "mouseDrag",
+    id: "rhythm-hero-spinner",
+    startPrompt: "돌려라!",
+    title: "도와줘! 리듬 히어로",
     type: "normal",
   },
 
@@ -736,6 +754,22 @@ export const MICROGAMES = [
     id: "pokemon-tcg-pocket-type-card",
     startPrompt: "맞는 타입 카드를 내라!",
     title: "포켓몬 카드 게임 Pocket",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "pokerougeShop",
+    microscope: {
+      description:
+        "포켓로그 상점에서는 좋은 아이템을 빠르게 골라야 합니다. 커서를 움직여 마스터볼을 선택하세요.",
+      imageAlt: "포켓로그 마스터볼",
+      imageSrc: "/games/pokerouge/images/master-ball.png",
+    },
+    control: "arrowAndSpace",
+    id: "pokerouge-master-ball-shop",
+    startPrompt: "마스터볼을 골라라!",
+    title: "포켓로그",
     type: "normal",
   },
 

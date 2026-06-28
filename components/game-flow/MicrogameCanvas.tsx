@@ -39,9 +39,11 @@ import { ModooMarbleGame } from "@/games/ModooMarbleGame";
 import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
 import { PongGame } from "@/games/PongGame";
+import { PokerougeShopGame } from "@/games/PokerougeShopGame";
 import { PokemonTcgPocketGame } from "@/games/PokemonTcgPocketGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { RhythmHeavenChorusGame } from "@/games/RhythmHeavenChorusGame";
+import { RhythmHeroGame } from "@/games/RhythmHeroGame";
 import { SnakeGame } from "@/games/SnakeGame";
 import { StarcraftMoveGame } from "@/games/StarcraftMoveGame";
 import { SquidGameBossGame } from "@/games/SquidGameBossGame";
@@ -147,6 +149,12 @@ function renderGameCanvas(
     return <RhythmHeavenChorusGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "rhythmHeroSpinner") {
+    return (
+      <RhythmHeroGame beatDurationMs={beatDurationMs} microgame={microgame} />
+    );
+  }
+
   if (microgame.canvas === "minecraftMining") {
     return <MinecraftMiningGame microgame={microgame} />;
   }
@@ -181,6 +189,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "pongSurvival") {
     return <PongGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "pokerougeShop") {
+    return <PokerougeShopGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "chromeDinoSpace") {
