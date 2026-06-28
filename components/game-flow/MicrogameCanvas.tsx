@@ -43,6 +43,7 @@ import { PokemonTcgPocketGame } from "@/games/PokemonTcgPocketGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { RhythmHeavenChorusGame } from "@/games/RhythmHeavenChorusGame";
 import { SnakeGame } from "@/games/SnakeGame";
+import { StarcraftMoveGame } from "@/games/StarcraftMoveGame";
 import { SquidGameBossGame } from "@/games/SquidGameBossGame";
 import { SubmitAssignmentGame } from "@/games/SubmitAssignmentGame";
 import { SudokuGame } from "@/games/SudokuGame";
@@ -54,6 +55,7 @@ import { TheWorldHardestGame } from "@/games/TheWorldHardestGame";
 import { TwoThousandFortyEightBossGame } from "@/games/TwoThousandFortyEightBossGame";
 import { UndertaleMouseGame } from "@/games/UndertaleMouseGame";
 import { WiiSportsGame } from "@/games/WiiSportsGame";
+import { WordleBossGame } from "@/games/WordleBossGame";
 import { ZeldaCircleDrawGame } from "@/games/ZeldaCircleDrawGame";
 import { ZeldaOcarinaGame } from "@/games/ZeldaOcarinaGame";
 
@@ -122,6 +124,15 @@ function renderGameCanvas(
 
   if (microgame.canvas === "snakeApple") {
     return <SnakeGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "starcraftMove") {
+    return (
+      <StarcraftMoveGame
+        beatDurationMs={beatDurationMs}
+        microgame={microgame}
+      />
+    );
   }
 
   if (microgame.canvas === "pokemonTyping") {
@@ -294,6 +305,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "zeldaOcarinaOfTime") {
     return <ZeldaOcarinaGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "wordleBoss") {
+    return <WordleBossGame microgame={microgame} />;
   }
 
   return <DefaultMicrogameCanvas microgame={microgame} />;

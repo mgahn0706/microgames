@@ -33,6 +33,7 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
   brainAcademyBlocks: "brainAcademy",
   cookieRun: "cookieRun",
   cookieRunKingdom: "cookieRunKingdom",
+  crosswordPuzzle: "crossword",
   crazyArcade: "crazyArcade",
   dobble: "dobble",
   fireAndIceDance: "fireAndIce",
@@ -52,12 +53,14 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
   pokemonTcgPocket: "pokemonTcgPocket",
   pokemonTyping: "pokemon",
   sudokuMissingNumber: "sudoku",
+  starcraftMove: "starcraft",
   superMarioCoins: "superMario",
   superMarioGalaxyStarBits: "superMarioGalaxy",
   suikaGame: "suikaGame",
   tetrisLineClear: "tetris",
   undertaleMouse: "undertale",
   wiiSportsDualPress: "wiiSports",
+  wordleBoss: "wordle",
   zeldaCircleDraw: "zelda",
 };
 

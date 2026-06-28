@@ -11,6 +11,7 @@ export type BgmTrack =
   | "brainAcademy"
   | "cookieRun"
   | "cookieRunKingdom"
+  | "crossword"
   | "crazyArcade"
   | "dobble"
   | "fail"
@@ -38,6 +39,7 @@ export type BgmTrack =
   | "resultsAndMain"
   | "setup"
   | "speedUp"
+  | "starcraft"
   | "sudoku"
   | "superMarioGalaxy"
   | "superMario"
@@ -47,6 +49,7 @@ export type BgmTrack =
   | "tetris"
   | "undertale"
   | "wiiSports"
+  | "wordle"
   | "zelda";
 
 export type SoundEffectTrack =
@@ -68,6 +71,7 @@ export type SoundEffectTrack =
   | "pongHit"
   | "leagueChampionSelect"
   | "runeEffect"
+  | "starcraftMove"
   | "twentyFortyEightSwipe";
 
 const BGM_TRACK_PATHS = {
@@ -80,6 +84,7 @@ const BGM_TRACK_PATHS = {
   cookieRun: "/games/cookie-run/sounds/cookie-run-bgm.mp3",
   cookieRunKingdom:
     "/games/cookie-run-kingdom/sounds/cookie-run-kingdom-bgm.mp3",
+  crossword: "/games/crossword/sounds/turkey-bgm.mp3",
   crazyArcade: "/games/crazy-arcade/sounds/crazy-arcade-bgm.mp3",
   dobble: "/games/dobble/sounds/dobble-bgm.mp3",
   fail: "/games/game-flow/sounds/fail.mp3",
@@ -108,6 +113,7 @@ const BGM_TRACK_PATHS = {
   resultsAndMain: "/games/game-flow/sounds/results-and-main.mp3",
   setup: "/games/game-flow/sounds/setup.mp3",
   speedUp: "/games/game-flow/sounds/speed-up.mp3",
+  starcraft: "/games/starcraft/sounds/starcraft-bgm.mp3",
   sudoku: "/games/sudoku/sounds/sudoku-bgm.mp3",
   superMarioGalaxy:
     "/games/super-mario-galaxy/sounds/super-mario-galaxy-bgm.mp3",
@@ -118,6 +124,7 @@ const BGM_TRACK_PATHS = {
   tetris: "/games/tetris/sounds/tetris-bgm.mp3",
   undertale: "/games/undertale/sounds/undertale-bgm.mp3",
   wiiSports: "/games/wii-sports/sounds/wii-sports-bgm.mp3",
+  wordle: "/games/wordle/sounds/wordle-bgm.mp3",
   zelda: "/games/zelda/sounds/zelda-bgm.mp3",
 } satisfies Record<BgmTrack, string>;
 
@@ -141,6 +148,7 @@ const SOUND_EFFECT_TRACK_PATHS = {
   modooDiceRoll: "/games/modoo-marble/sounds/dice-roll.mp3",
   pongHit: "/games/pong/sounds/pong-hit.mp3",
   runeEffect: "/games/maple-story-rune/sounds/rune-effect.mp3",
+  starcraftMove: "/games/starcraft/sounds/moving-voice.wav",
   twentyFortyEightSwipe: "/games/two-thousand-forty-eight/sounds/swipe.mp3",
 } satisfies Record<SoundEffectTrack, string>;
 
@@ -179,6 +187,7 @@ const BGM_TRACK_BEATS = {
   brainAcademy: 12,
   cookieRun: 12,
   cookieRunKingdom: 8,
+  crossword: 8,
   crazyArcade: 12,
   dobble: 12,
   fail: 4,
@@ -205,6 +214,7 @@ const BGM_TRACK_BEATS = {
   resultsAndMain: 83,
   setup: 4,
   speedUp: 8,
+  starcraft: 8,
   sudoku: 12,
   superMarioGalaxy: 12,
   superMario: 8,
@@ -214,8 +224,15 @@ const BGM_TRACK_BEATS = {
   tetris: 12,
   undertale: 8,
   wiiSports: 8,
+  wordle: 52,
   zelda: 12,
 } satisfies Record<Exclude<BgmTrack, "gameOver">, number>;
+
+const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<Record<BgmTrack, number>> =
+  {
+    crossword: DEFAULT_BEAT_DURATION_SECONDS,
+    wordle: DEFAULT_BEAT_DURATION_SECONDS,
+  };
 
 export const GAME_OVER_DURATION_MS = 5208;
 
@@ -342,8 +359,9 @@ class BgmLibrary {
     const gainNode = audioContext.createGain();
     const source = audioContext.createBufferSource();
     const targetDurationSeconds = this.getTargetDurationSeconds(track, buffer);
+    const sourceDurationSeconds = this.getSourceDurationSeconds(track, buffer);
     const playbackRate =
-      mode === "once" ? buffer.duration / targetDurationSeconds : 1;
+      mode === "once" ? sourceDurationSeconds / targetDurationSeconds : 1;
 
     source.buffer = buffer;
     source.loop = mode === "loop";
@@ -355,7 +373,11 @@ class BgmLibrary {
       this.getTrackGain(track),
       startAt + ATTACK_FADE_SECONDS,
     );
-    source.start(startAt);
+    if (mode === "once") {
+      source.start(startAt, 0, sourceDurationSeconds);
+    } else {
+      source.start(startAt);
+    }
 
     this.stopCurrentSource(startAt);
     const stopAt =
@@ -462,8 +484,9 @@ class BgmLibrary {
     const gainNode = this.getAudioContext().createGain();
     const source = this.getAudioContext().createBufferSource();
     const targetDurationSeconds = this.getTargetDurationSeconds(track, buffer);
+    const sourceDurationSeconds = this.getSourceDurationSeconds(track, buffer);
     const playbackRate =
-      mode === "once" ? buffer.duration / targetDurationSeconds : 1;
+      mode === "once" ? sourceDurationSeconds / targetDurationSeconds : 1;
     const stopAt =
       mode === "loop"
         ? Number.POSITIVE_INFINITY
@@ -479,7 +502,11 @@ class BgmLibrary {
       this.getTrackGain(track),
       startAt + ATTACK_FADE_SECONDS,
     );
-    source.start(startAt);
+    if (mode === "once") {
+      source.start(startAt, 0, sourceDurationSeconds);
+    } else {
+      source.start(startAt);
+    }
 
     return {
       gainNode,
@@ -554,6 +581,24 @@ class BgmLibrary {
     }
 
     return BGM_TRACK_BEATS[track] * this.beatDurationSeconds;
+  }
+
+  private getSourceDurationSeconds(track: BgmTrack, buffer: AudioBuffer) {
+    if (track === "gameOver") {
+      return buffer.duration;
+    }
+
+    const sourceBeatDurationSeconds =
+      BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS[track];
+
+    if (!sourceBeatDurationSeconds) {
+      return buffer.duration;
+    }
+
+    return Math.min(
+      buffer.duration,
+      BGM_TRACK_BEATS[track] * sourceBeatDurationSeconds,
+    );
   }
 
   private getTrackGain(track: BgmTrack) {

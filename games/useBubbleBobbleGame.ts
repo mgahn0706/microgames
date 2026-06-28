@@ -39,6 +39,7 @@ const BUBBLE_COOLDOWN_SECONDS = 0.2;
 const PLAYER_LEFT_BOUND = 78;
 const PLAYER_RIGHT_BOUND = 1594;
 const PLATFORM_SNAP_DISTANCE = 5;
+const PLATFORM_DROP_THROUGH_DISTANCE = 10;
 const PLATFORMS = [
   { left: 42, right: 128, top: 374 },
   { left: 240, right: 1426, top: 374 },
@@ -51,6 +52,7 @@ const PLATFORMS = [
   { left: 1538, right: 1626, top: 701 },
   { left: 42, right: 1626, top: 888 },
 ] as const;
+const LOWEST_PLATFORM_TOP = 888;
 const ENEMY_BASE_POINTS = [
   { x: 1040, y: 337 },
   { x: 1308, y: 500 },
@@ -77,6 +79,7 @@ type GameState = {
   bubbles: Bubble[];
   bubbleCooldownSeconds: number;
   direction: Direction;
+  dropRequested: boolean;
   enemies: Enemy[];
   hasCleared: boolean;
   isGrounded: boolean;
@@ -145,6 +148,7 @@ function createInitialState() {
     bubbles: [],
     bubbleCooldownSeconds: 0,
     direction: 1,
+    dropRequested: false,
     enemies: createEnemies(),
     hasCleared: false,
     isGrounded: true,
@@ -186,6 +190,10 @@ function getSupportedPlatform(state: GameState) {
       overlapsPlatform(state.playerX, platform) &&
       Math.abs(playerFeetY - platform.top) <= PLATFORM_SNAP_DISTANCE,
   );
+}
+
+function canDropThroughPlatform(platform: Platform | undefined) {
+  return Boolean(platform && platform.top < LOWEST_PLATFORM_TOP);
 }
 
 function resolvePlatformLanding(state: GameState, previousY: number) {
@@ -374,6 +382,18 @@ function updatePlayer(
   if (state.isGrounded && !getSupportedPlatform(state)) {
     state.isGrounded = false;
   }
+
+  if (state.dropRequested && state.isGrounded) {
+    const supportedPlatform = getSupportedPlatform(state);
+
+    if (canDropThroughPlatform(supportedPlatform)) {
+      state.playerY += PLATFORM_DROP_THROUGH_DISTANCE;
+      state.velocityY = 0;
+      state.isGrounded = false;
+    }
+  }
+
+  state.dropRequested = false;
 
   if (state.jumpRequested && state.isGrounded) {
     state.velocityY = JUMP_VELOCITY * speedScale;
@@ -604,6 +624,9 @@ export function useBubbleBobbleGameCanvas(gameBeatCount: number) {
 
       if (event.key === "ArrowUp" && !event.repeat) {
         stateRef.current.jumpRequested = true;
+      }
+      if (event.key === "ArrowDown" && !event.repeat) {
+        stateRef.current.dropRequested = true;
       }
       stateRef.current.keys.add(event.key);
     };

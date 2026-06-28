@@ -409,6 +409,13 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "wordleBoss") {
+        bgmLibrary.play("wordle", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "superMarioCoins") {
         bgmLibrary.play("superMario", "once", "now").catch((error: unknown) => {
           console.error(error);
@@ -427,6 +434,13 @@ export function GameScreen({
 
       if (microgame.canvas === "suikaGame") {
         bgmLibrary.play("suikaGame", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "starcraftMove") {
+        bgmLibrary.play("starcraft", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
         return;
@@ -468,6 +482,13 @@ export function GameScreen({
           .catch((error: unknown) => {
             console.error(error);
           });
+        return;
+      }
+
+      if (microgame.canvas === "crosswordPuzzle") {
+        bgmLibrary.play("crossword", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
         return;
       }
 

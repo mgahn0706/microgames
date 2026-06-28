@@ -55,6 +55,7 @@ export type MicrogameCanvas =
   | "pokemonTyping"
   | "rhythmHeavenChorus"
   | "snakeApple"
+  | "starcraftMove"
   | "superMarioGalaxyStarBits"
   | "superMarioCoins"
   | "submitAssignment"
@@ -66,6 +67,7 @@ export type MicrogameCanvas =
   | "twoThousandFortyEightBoss"
   | "undertaleMouse"
   | "wiiSportsDualPress"
+  | "wordleBoss"
   | "zeldaCircleDraw"
   | "zeldaOcarinaOfTime";
 
@@ -447,6 +449,22 @@ export const MICROGAMES = [
     id: "sudoku-missing-number",
     startPrompt: "빈칸을 채워라!",
     title: "스도쿠",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "starcraftMove",
+    microscope: {
+      description:
+        "스타크래프트 유닛 조작은 선택하고 명령하는 두 번의 클릭이 기본입니다. 드라군을 선택한 뒤 미네랄로 이동 명령을 내리세요.",
+      imageAlt: "스타크래프트 드라군",
+      imageSrc: "/games/starcraft/images/idle.png",
+    },
+    control: "mouseClick",
+    id: "starcraft-dragoon-mineral",
+    startPrompt: "미네랄로 이동시켜라!",
+    title: "스타크래프트",
     type: "normal",
   },
 
@@ -910,6 +928,22 @@ export const MICROGAMES = [
     id: "squid-game-red-light-green-light",
     startPrompt: "결승선을 통과해라!",
     title: "오징어 게임",
+    type: "boss",
+  },
+
+  {
+    beatCount: 52,
+    canvas: "wordleBoss",
+    microscope: {
+      description:
+        "워들은 여섯 번 안에 다섯 글자 영어 단어를 맞히는 단어 퍼즐입니다. 초록색은 제자리, 노란색은 다른 자리, 회색은 없는 글자입니다.",
+      imageAlt: "워들 5글자 단어 퍼즐 보드",
+      imageSrc: "/games/wordle/images/thumbnail.svg",
+    },
+    control: "koreanKeyboard",
+    id: "wordle-boss",
+    startPrompt: "단어를 맞춰라!",
+    title: "워들",
     type: "boss",
   },
 

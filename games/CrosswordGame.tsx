@@ -25,10 +25,10 @@ export function CrosswordGame({
       <section className="relative flex w-full max-w-5xl flex-col items-center gap-7">
         <div className="grid w-full max-w-3xl grid-cols-1 gap-3 text-center sm:grid-cols-2">
           <p className="rounded-md border border-amber-100/28 bg-black/36 px-4 py-3 text-[clamp(1.25rem,3.2vw,2.75rem)] font-black tracking-normal text-amber-100 shadow-[0_0_20px_rgba(251,191,36,0.12)]">
-            가로 {horizontalClue}
+            {horizontalClue}
           </p>
           <p className="rounded-md border border-cyan-100/28 bg-black/36 px-4 py-3 text-[clamp(1.25rem,3.2vw,2.75rem)] font-black tracking-normal text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,0.12)]">
-            세로 {verticalClue}
+            {verticalClue}
           </p>
         </div>
 
@@ -69,7 +69,6 @@ export function CrosswordGame({
           )}
         </div>
       </section>
-
     </div>
   );
 }
