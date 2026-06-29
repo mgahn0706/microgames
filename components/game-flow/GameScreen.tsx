@@ -335,6 +335,13 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "brainAgeMath") {
+        bgmLibrary.play("brainAge", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "animalFarmReverseTyping") {
         bgmLibrary.play("animalFarm", "once", "now").catch((error: unknown) => {
           console.error(error);
@@ -365,6 +372,20 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "gogunbuntuCoinRun") {
+        bgmLibrary.play("gogunbuntu", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "bindingOfIsaacFlies") {
+        bgmLibrary.play("isaac", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "fireAndIceDance") {
         bgmLibrary.play("fireAndIce", "once", "now").catch((error: unknown) => {
           console.error(error);
@@ -383,6 +404,15 @@ export function GameScreen({
         bgmLibrary.play("pokemon", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
+        return;
+      }
+
+      if (microgame.canvas === "pokemonMysteryDungeon") {
+        bgmLibrary
+          .play("pokemonMysteryDungeon", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
         return;
       }
 

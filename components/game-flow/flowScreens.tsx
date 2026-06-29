@@ -362,27 +362,25 @@ function MicroscopePanel({
   }, [practiceSpeedMultiplier, router, testPracticeMicrogameId]);
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-black leading-none text-white drop-shadow-[0_0_14px_rgba(103,232,249,0.55)] sm:text-4xl">
-            게임 도감
-          </h1>
-        </div>
-        <div className="flex w-full items-stretch gap-2 sm:w-[28rem]">
-          <p className="grid shrink-0 place-items-center whitespace-nowrap rounded-md bg-black/30 px-3 py-2 text-sm font-black text-cyan-50">
+    <div className="space-y-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-lg font-black leading-none text-cyan-50/90 sm:text-xl">
+          게임 도감
+        </h1>
+        <div className="flex w-full items-center gap-2 sm:w-[22rem]">
+          <p className="grid shrink-0 place-items-center whitespace-nowrap rounded border border-cyan-100/15 bg-black/25 px-2 py-1 text-xs font-black text-cyan-50/85">
             {discoveredMicrogameCount}/{MICROGAMES.length}
           </p>
-          <label className="min-w-0 flex-1 rounded-md border border-cyan-100/25 bg-black/35 px-3 py-2">
-            <span className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-100/80">
+          <label className="min-w-0 flex-1 rounded border border-cyan-100/15 bg-black/25 px-2 py-1.5">
+            <span className="flex items-center justify-between gap-2 text-[0.62rem] font-black uppercase tracking-normal text-cyan-100/70">
               <span>연습 속도</span>
-              <span className="text-sm tracking-normal text-white">
+              <span className="text-[0.68rem] text-white/85">
                 x{formatPracticeSpeedMultiplier(practiceSpeedMultiplier)}
               </span>
             </span>
             <input
               aria-label="연습 게임 속도"
-              className="mt-2 w-full accent-cyan-200"
+              className="mt-1 h-1.5 w-full accent-cyan-200"
               max={MAX_PRACTICE_SPEED_MULTIPLIER}
               min={MIN_PRACTICE_SPEED_MULTIPLIER}
               onChange={(event) => {
@@ -399,7 +397,7 @@ function MicroscopePanel({
           </label>
         </div>
       </div>
-      <div className="grid gap-px overflow-hidden rounded-md border border-cyan-100/25 bg-white/10 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-px overflow-hidden rounded border border-cyan-100/15 bg-white/10 sm:grid-cols-4 lg:grid-cols-7">
         {MICROGAMES.map((microgame) => {
           const formInstruction = getMicrogameFormInstruction(microgame);
           const isSeen = seenMicrogameIds.includes(microgame.id);
@@ -412,44 +410,44 @@ function MicroscopePanel({
 
           const card = (
             <article
-              className={`grid h-full min-h-17 grid-cols-[48px_1fr] gap-2.5 p-2.5 ${
+              className={`grid h-full min-h-22 grid-rows-[40px_1fr] gap-0.5 p-1 ${
                 isSeen
                   ? "bg-slate-950/90 transition hover:bg-cyan-950/90"
                   : "bg-black/90 text-white/62"
               }`}
             >
-              <div className="relative size-12 overflow-hidden rounded border border-white/12 bg-slate-950">
+              <div className="relative mx-auto size-10 overflow-hidden rounded border border-white/10 bg-slate-950">
                 <Image
                   alt={microgame.microscope.imageAlt}
                   className={`size-full object-cover ${
                     isSeen ? "opacity-100" : "opacity-20"
                   }`}
                   decoding="async"
-                  height={48}
-                  sizes="48px"
+                  height={40}
+                  sizes="40px"
                   src={microgame.microscope.imageSrc}
-                  width={48}
+                  width={40}
                 />
                 {isSeen ? null : (
                   <div className="absolute inset-0 grid place-items-center bg-black/45">
-                    <span className="rounded border border-white/30 bg-black/70 px-1.5 py-0.5 text-[0.62rem] font-black text-white">
+                    <span className="rounded border border-white/25 bg-black/70 px-1 py-px text-[0.48rem] font-black text-white">
                       잠금
                     </span>
                   </div>
                 )}
               </div>
-              <div className="min-w-0">
-                <div className="flex min-w-0 items-center gap-1.5">
-                  <h2 className="min-w-0 truncate text-sm font-black leading-tight text-white">
+              <div className="min-w-0 text-center">
+                <div className="flex min-w-0 items-baseline justify-center gap-1">
+                  <h2 className="line-clamp-2 min-w-0 text-[0.68rem] font-black leading-[1.05] text-white">
                     {displayTitle}
                   </h2>
                   {microgame.type === "boss" ? (
-                    <span className="shrink-0 rounded border border-amber-200/45 px-1 py-0.5 text-[0.56rem] font-black uppercase tracking-[0.08em] text-amber-50">
+                    <span className="relative -top-px shrink-0 rounded border border-amber-200/40 px-1 py-px text-[0.52rem] font-black uppercase tracking-normal text-amber-50">
                       Boss
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-1 w-fit max-w-full truncate rounded py-0.5 text-[0.64rem] font-black leading-none text-cyan-50/78">
+                <p className="mx-auto mt-0.5 max-w-full truncate text-[0.56rem] font-black leading-none text-cyan-50/62">
                   {displayControlTitle}
                 </p>
               </div>
@@ -608,10 +606,10 @@ export function MainScreen({
     >
       <HomeHeader currentView={homeView} isStarting={isStarting} />
       <div
-        className={`mt-16 rounded-lg border border-cyan-100/70 bg-black/55 p-6 shadow-[0_0_32px_rgba(103,232,249,0.18)] sm:p-8 ${
+        className={`mt-16 rounded-lg border border-cyan-100/70 bg-black/55 shadow-[0_0_32px_rgba(103,232,249,0.18)] ${
           homeView === "microscope"
-            ? "max-h-[calc(100vh-6rem)] overflow-y-auto"
-            : "backdrop-blur-sm"
+            ? "max-h-[calc(100vh-5rem)] overflow-y-auto p-3 sm:p-4"
+            : "p-6 backdrop-blur-sm sm:p-8"
         } ${isStarting ? "main-screen-exit-up" : ""}`}
       >
         {renderHomeView(

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#14bdac" />
+  <g stroke="#0da192" stroke-linecap="round" stroke-width="22">
+    <path d="M187 78v356" />
+    <path d="M325 78v356" />
+    <path d="M78 187h356" />
+    <path d="M78 325h356" />
+  </g>
+  <g stroke="#545454" stroke-linecap="round" stroke-width="26" fill="none">
+    <path d="M95 95l74 74" />
+    <path d="M169 95l-74 74" />
+    <path d="M343 343l74 74" />
+    <path d="M417 343l-74 74" />
+  </g>
+  <circle
+    cx="256"
+    cy="256"
+    r="48"
+    fill="none"
+    stroke="#f2ebd3"
+    stroke-width="24"
+  />
+</svg>

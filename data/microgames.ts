@@ -18,7 +18,9 @@ export type MicrogameCanvas =
   | "appleNumberSum"
   | "amongUsWires"
   | "babaIsYou"
+  | "bindingOfIsaacFlies"
   | "bounceBall"
+  | "brainAgeMath"
   | "brainAcademyBlocks"
   | "bubbleBobble"
   | "chessCapture"
@@ -37,6 +39,7 @@ export type MicrogameCanvas =
   | "flappyBird"
   | "fruitNinja"
   | "geometryDashSpikes"
+  | "gogunbuntuCoinRun"
   | "gomokuWhiteStone"
   | "halliGalliBoss"
   | "hancomTyping"
@@ -53,6 +56,7 @@ export type MicrogameCanvas =
   | "pianoMelody"
   | "pongSurvival"
   | "pokerougeShop"
+  | "pokemonMysteryDungeon"
   | "pokemonTcgPocket"
   | "pokemonTyping"
   | "rhythmHeavenChorus"
@@ -67,6 +71,7 @@ export type MicrogameCanvas =
   | "suikaGame"
   | "tetrisLineClear"
   | "theWorldHardestGame"
+  | "ticTacToe"
   | "twoThousandFortyEightBoss"
   | "undertaleMouse"
   | "wiiSportsDualPress"
@@ -75,7 +80,6 @@ export type MicrogameCanvas =
   | "zeldaOcarinaOfTime";
 
 export type MicrogameMicroscope = Readonly<{
-  description: string;
   imageAlt: string;
   imageSrc: string;
 }>;
@@ -104,11 +108,23 @@ const FORM_INSTRUCTIONS_BY_CONTROL = {
 
 export const MICROGAMES = [
   {
+    beatCount: 10,
+    canvas: "gogunbuntuCoinRun",
+    microscope: {
+      imageAlt: "고군분투 달리는 고양이",
+      imageSrc: "/games/gogunbuntu/images/running-player.png",
+    },
+    control: "space",
+    id: "gogunbuntu-coin-run",
+    startPrompt: "엽전 15개를 모아라!",
+    title: "고군분투",
+    type: "normal",
+  },
+
+  {
     beatCount: 8,
     canvas: "submitAssignment",
     microscope: {
-      description:
-        "과제 마감 직전에 제출해보신 적이 있으신가요? 체크박스 체크를 잊지 마세요.",
       imageAlt: "과제 제출 화면",
       imageSrc: "/games/submit-assignment/images/background.png",
     },
@@ -123,8 +139,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "dobble",
     microscope: {
-      description:
-        "도블은 두 카드에서 똑같은 그림 하나를 누구보다 빨리 찾는 게임입니다. 무조건 하나만 존재해요.",
       imageAlt: "도블 물음표 아이콘",
       imageSrc: "/games/dobble/images/question_mark.png",
     },
@@ -139,8 +153,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "rhythmHeroSpinner",
     microscope: {
-      description:
-        "도와줘! 리듬 히어로에서는 스피너를 빠르게 돌려 게이지를 채워야 합니다. 원을 따라 드래그하면 게이지가 차오릅니다.",
       imageAlt: "도와줘! 리듬 히어로 스피너",
       imageSrc: "/games/rhythm-hero/images/spinner.webp",
     },
@@ -155,8 +167,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "laytonShapeMatch",
     microscope: {
-      description:
-        "레이튼 교수식 문제는 단순해 보여도 꼭 한 번 더 보게 됩니다. 같은 모양을 찾아 번호를 눌러보세요.",
       imageAlt: "레이튼 모양 문제",
       imageSrc: "/games/layton/images/one-A.png",
     },
@@ -171,8 +181,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "leagueChampionBan",
     microscope: {
-      description:
-        "롤 챔피언 선택창은 늘 시간이 부족하죠. 밴해야 할 챔피언을 찾고, 망설이지 말고 눌러야 합니다.",
       imageAlt: "리그 오브 레전드 챔피언 선택 배경",
       imageSrc: "/games/league-of-legend/images/background.webp",
     },
@@ -187,8 +195,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "rhythmHeavenChorus",
     microscope: {
-      description:
-        "리듬 세상의 코러스맨은 앞사람의 노래를 듣고 정확한 순간에 입을 다무는 게임입니다. 두 번째 코러스맨이 멈춘 뒤 마우스를 누르세요.",
       imageAlt: "노래하는 코러스맨",
       imageSrc: "/games/rhythm-heaven/images/chorus-man-singing.png",
     },
@@ -203,8 +209,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "minecraftMining",
     microscope: {
-      description:
-        "마인크래프트에서 다이아몬드 발견하면 괜히 숨이 멎죠. 곡괭이를 놓치지 말고 끝까지 캐야 합니다.",
       imageAlt: "마인크래프트 다이아몬드 광석",
       imageSrc: "/games/minecraft/images/diamond-ore.png",
     },
@@ -217,10 +221,22 @@ export const MICROGAMES = [
 
   {
     beatCount: 12,
+    canvas: "brainAgeMath",
+    microscope: {
+      imageAlt: "닌텐도 DS 두뇌 트레이닝 계산 화면",
+      imageSrc: "/games/brain-age/images/background.png",
+    },
+    control: "numberKeys",
+    id: "brain-age-ds-math",
+    startPrompt: "계산해라!",
+    title: "매일매일 DS 두뇌 트레이닝",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
     canvas: "brainAcademyBlocks",
     microscope: {
-      description:
-        "말랑말랑 두뇌교실 문제는 쉬워 보일 때가 제일 위험합니다. 블록을 얼른 세고 맞는 숫자를 눌러야 해요.",
       imageAlt: "두뇌교실 블록 문제 배경",
       imageSrc: "/games/brain-academy/images/background.webp",
     },
@@ -235,8 +251,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "maplestoryLieDetector",
     microscope: {
-      description:
-        "메이플스토리 거짓말 탐지기, 갑자기 뜨면 심장이 철렁하죠. 몬스터 이름을 보고 그대로 입력해야 합니다.",
       imageAlt: "메이플스토리 몬스터",
       imageSrc: "/games/maplestory-lie-detector/images/slime-stump.png",
     },
@@ -251,8 +265,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "maplestoryRune",
     microscope: {
-      description:
-        "메이플 룬 해방할 때 화살표 놓치면 괜히 민망합니다. 방향을 보고 순서대로 착착 눌러야 해요.",
       imageAlt: "메이플스토리 룬",
       imageSrc: "/games/maple-story-rune/images/rune.png",
     },
@@ -267,8 +279,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "modooMarble",
     microscope: {
-      description:
-        "모두의 마블의 주사위 컨트롤을 아시나요? 꾹 눌러 12를 띄워보세요.",
       imageAlt: "모두의마블 배경",
       imageSrc: "/games/modoo-marble/images/background.webp",
     },
@@ -283,8 +293,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "animalCrossingStamps",
     microscope: {
-      description:
-        "동물의 숲 박물관의 스탬프를 보고 빠르게 쾅쾅 찍어야 합니다. 아, 잘못 찍으면 실패예요!",
       imageAlt: "동물의 숲 스탬프",
       imageSrc: "/games/animal-crossing/images/stamp.webp",
     },
@@ -299,8 +307,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "infiniteStairs",
     microscope: {
-      description:
-        "무한의계단은 좌우 방향을 놓치지 않고 빠르게 올라가는 게임입니다. 계단 방향에 맞춰 화살표를 입력하세요.",
       imageAlt: "무한의계단 계단",
       imageSrc: "/games/infinite-stairs/images/stair-brick.png",
     },
@@ -315,8 +321,6 @@ export const MICROGAMES = [
     beatCount: 16,
     canvas: "minigameExBearMeat",
     microscope: {
-      description:
-        "미니게임EX를 아는 사람이 있으려나 모르겠네요. 세 곰 중 누가 제일 많이 먹었는지 보셨나요?.",
       imageAlt: "미니게임EX 곰",
       imageSrc: "/games/minigame-ex/images/idle-bear.png",
     },
@@ -331,8 +335,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "bounceBall",
     microscope: {
-      description:
-        "바운스볼은 공이 쉬지 않고 튀어 오르는 고전 플랫포머입니다. 화살표로 방향을 조절해 별까지 올라가세요.",
       imageAlt: "바운스볼 노란 공",
       imageSrc: "/games/bounce-ball/images/ball.png",
     },
@@ -347,8 +349,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "bubbleBobble",
     microscope: {
-      description:
-        "버블보블은 버블 드래곤이 발판을 뛰어다니며 방울을 쏴 적을 가두고 무찌르는 게임입니다. 방향키로 이동/점프하고 Space로 버블을 쏘세요.",
       imageAlt: "버블보블 버블 드래곤",
       imageSrc: "/games/bubble-bobble/images/background.webp",
     },
@@ -363,8 +363,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "kirbyInhale",
     microscope: {
-      description:
-        "별의 커비에서는 숨을 크게 들이마시는 순간이 시작입니다. 마우스를 꾹 눌러 적을 끝까지 빨아들이세요.",
       imageAlt: "별의 커비 흡입 자세",
       imageSrc: "/games/kirby/images/kirby-ready.png",
     },
@@ -379,8 +377,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "fireAndIceDance",
     microscope: {
-      description:
-        "불과 얼음의 춤은 두 행성이 박자마다 다음 칸으로 회전하는 리듬 게임입니다. 박자를 한 번 맞춰 목표 타일로 이동하세요.",
       imageAlt: "불과 얼음의 춤 별빛 배경",
       imageSrc: "/games/a-dance-of-fire-and-ice/images/background.png",
     },
@@ -395,8 +391,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "appleNumberSum",
     microscope: {
-      description:
-        "사과게임, 한때 시간 순삭이었죠. 숫자가 적힌 사과들을 드래그해서 딱 10을 만들면 되는데, 급하면 꼭 하나를 더 잡습니다.",
       imageAlt: "사과게임 보드",
       imageSrc: "/games/apple-game/images/apple.png",
     },
@@ -411,8 +405,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "suikaGame",
     microscope: {
-      description:
-        "수박게임은 같은 과일끼리 부딪히면 더 큰 과일로 합쳐집니다. 멜론을 움직여 상자 안의 멜론과 합치고 수박을 만들어보세요.",
       imageAlt: "수박게임 수박",
       imageSrc: "/games/suika-game/images/watermelon.png",
     },
@@ -427,8 +419,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "superMarioCoins",
     microscope: {
-      description:
-        "마리오 하면 역시 점프와 코인이죠. 블록을 치고 코인을 모으는데, 너무 많이 먹어도 안 됩니다.",
       imageAlt: "슈퍼 마리오 코인",
       imageSrc: "/games/supermario/images/coin.png",
     },
@@ -443,8 +433,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "superMarioGalaxyStarBits",
     microscope: {
-      description:
-        "슈퍼마리오 갤럭시에서는 이 스타구슬이 재화에요. 손을 떼지 말고 쭉 끌어서 여섯 개를 모아야 해요.",
       imageAlt: "슈퍼마리오 갤럭시 스타구슬",
       imageSrc: "/games/super-mario-galaxy/images/blue-bits.png",
     },
@@ -459,8 +447,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "snakeApple",
     microscope: {
-      description:
-        "스네이크는 방향을 한 번 잘못 틀면 바로 벽을 만납니다. 초록 뱀을 움직여 빨간 사과를 먹어보세요.",
       imageAlt: "스네이크 게임 썸네일",
       imageSrc: "/games/snake/images/thumbnail.svg",
     },
@@ -475,8 +461,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "sudokuMissingNumber",
     microscope: {
-      description:
-        "3×3 칸에는 1부터 9까지의 숫자가 하나씩 들어갑니다. 비어 있는 칸에 들어갈 숫자를 찾아 숫자키로 입력하세요.",
       imageAlt: "빈칸이 있는 3×3 숫자 퍼즐",
       imageSrc: "/games/sudoku/images/thumbnail.svg",
     },
@@ -491,8 +475,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "starcraftMove",
     microscope: {
-      description:
-        "스타크래프트 유닛 조작은 선택하고 명령하는 두 번의 클릭이 기본입니다. 드라군을 선택한 뒤 미네랄로 이동 명령을 내리세요.",
       imageAlt: "스타크래프트 드라군",
       imageSrc: "/games/starcraft/images/idle.png",
     },
@@ -507,8 +489,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "crosswordPuzzle",
     microscope: {
-      description:
-        "십자말풀이는 가로와 세로 단어가 만나는 한 칸을 찾는 퍼즐입니다. 두 사자성어가 공유하는 빈칸 글자를 빠르게 입력하세요.",
       imageAlt: "십자말풀이 4칸 격자",
       imageSrc: "/games/crossword/images/thumbnail.svg",
     },
@@ -523,8 +503,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "flickingGame",
     microscope: {
-      description:
-        "알까기는 손끝 힘 조절이 전부입니다. 내 돌은 나가도 괜찮지만, 상대 돌은 반드시 판 밖으로 밀어내야 합니다.",
       imageAlt: "알까기 판",
       imageSrc: "/games/flicking-game/images/board.png",
     },
@@ -536,11 +514,23 @@ export const MICROGAMES = [
   },
 
   {
+    beatCount: 12,
+    canvas: "bindingOfIsaacFlies",
+    microscope: {
+      imageAlt: "아이작의 번제 아이작",
+      imageSrc: "/games/the-binding-of-isaac/images/player-down.png",
+    },
+    control: "arrowAndSpace",
+    id: "binding-of-isaac-fly-room",
+    startPrompt: "모두 처치해라!",
+    title: "아이작의 번제",
+    type: "normal",
+  },
+
+  {
     beatCount: 14,
     canvas: "amongUsWires",
     microscope: {
-      description:
-        "어몽어스, 코로나 시절 때 많이 했는데 말이죠. 전선 색깔 맞춰 쭉 연결하면 되는데, 급하면 꼭 손이 꼬입니다.",
       imageAlt: "어몽어스 전선 작업 배경",
       imageSrc: "/games/among-us/images/background.webp",
     },
@@ -555,7 +545,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "undertaleMouse",
     microscope: {
-      description: "언더테일의 샌즈, 아시는구나! 겁.나.어.렵.습.니.다.",
       imageAlt: "언더테일 샌즈",
       imageSrc: "/games/undertale/images/sans.png",
     },
@@ -570,8 +559,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "gomokuWhiteStone",
     microscope: {
-      description:
-        "오목은 한 수만 잘 놓아도 바로 끝납니다. 흰돌 차례예요. 어디에 둬야 다섯 개가 이어질까요?",
       imageAlt: "오목판",
       imageSrc: "/games/gomoku/images/board.png",
     },
@@ -586,8 +573,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "zeldaCircleDraw",
     microscope: {
-      description:
-        "젤다의 전설: 스카이워드 소드입니다. 마스터소드로 여신의 벽에 문양을 그리면 폭탄이 나와요.",
       imageAlt: "젤다 원 그리기 배경",
       imageSrc: "/games/zelda/images/background.webp",
     },
@@ -602,8 +587,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "zeldaOcarinaOfTime",
     microscope: {
-      description:
-        "시간의 오카리나에서는 짧은 멜로디 하나가 문을 열고 날씨도 바꿉니다. 악보를 보고 정확히 연주해보세요.",
       imageAlt: "시간의 오카리나 악보",
       imageSrc: "/games/zelda-ocarina-of-time/images/zeldas_lullaby.png",
     },
@@ -618,8 +601,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "geometryDashSpikes",
     microscope: {
-      description:
-        "지오메트리 대시는 보기엔 단순한데 한 번 삐끗하면 바로 끝입니다. Stereo Madness, 다들 아시나요?",
       imageAlt: "지오메트리 대시 플레이어",
       imageSrc: "/games/geometry-dash/images/player.png",
     },
@@ -634,8 +615,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "chessCapture",
     microscope: {
-      description:
-        "6×6 체스판에서 흑색 룩, 나이트, 비숍 중 하나를 움직여 단 한 수로 백색 킹을 잡아보세요.",
       imageAlt: "6×6 체스판과 흑색 기물",
       imageSrc: "/games/chess/images/chess_board.png",
     },
@@ -650,8 +629,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "cookieClicker",
     microscope: {
-      description:
-        "쿠키 클리커는 커다란 쿠키를 쉬지 않고 눌러 숫자를 올리는 게임입니다. 빠르게 클릭해서 쿠키를 10개 모으세요.",
       imageAlt: "쿠키 클리커 쿠키",
       imageSrc: "/games/cookie-clicker/images/cookie.png",
     },
@@ -666,8 +643,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "cookieRun",
     microscope: {
-      description:
-        "쿠키런은 달리기만 하면 끝이 아니죠. 뛰고, 숙이고, 또 뛰고... 쿠키들의 반란이 시작된다!",
       imageAlt: "쿠키런 배경",
       imageSrc: "/games/cookie-run/images/background.webp",
     },
@@ -682,8 +657,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "cookieRunKingdom",
     microscope: {
-      description:
-        "쿠키런: 킹덤 전투에서는 타이밍에 맞는 쿠키의 스킬을 골라야 합니다. 목표 쿠키를 확인하고 1~5 숫자키를 눌러 스킬을 발동하세요.",
       imageAlt: "쿠키런 킹덤 전투 화면",
       imageSrc: "/games/cookie-run-kingdom/images/background.webp",
     },
@@ -698,8 +671,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "crazyArcade",
     microscope: {
-      description:
-        "크레이지 아케이드 하면 물풍선이죠. 추억이네요. 다들 드림서버였나요, 해피서버였나요?",
       imageAlt: "크레이지 아케이드 배경",
       imageSrc: "/games/crazy-arcade/images/background.webp",
     },
@@ -714,8 +685,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "chromeDinoSpace",
     microscope: {
-      description:
-        "인터넷 안 될 때 나타나는 그 공룡, 다들 한 번쯤 뛰어봤죠? 선인장이 오면 생각보다 빨리 스페이스를 눌러야 해요.",
       imageAlt: "크롬 공룡게임",
       imageSrc: "/games/chrome-dino/images/dinosaur.png",
     },
@@ -730,8 +699,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "tetrisLineClear",
     microscope: {
-      description:
-        "테트리스에서 긴 막대 기다린 적 있나요? 드디어 왔습니다. 이제 제대로 꽂아서 네 줄을 지워야 해요.",
       imageAlt: "테트리스 썸네일",
       imageSrc: "/games/tetris/images/thumbnail.svg",
     },
@@ -744,10 +711,36 @@ export const MICROGAMES = [
 
   {
     beatCount: 12,
+    canvas: "ticTacToe",
+    microscope: {
+      imageAlt: "틱택토 보드",
+      imageSrc: "/games/tic-tac-toe/images/thumbnail.svg",
+    },
+    control: "mouseClick",
+    id: "tic-tac-toe-random-ai",
+    startPrompt: "이겨라!",
+    title: "틱택토",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "pokemonMysteryDungeon",
+    microscope: {
+      imageAlt: "포켓몬 불가사의 던전 계단 타일",
+      imageSrc: "/games/pokemon-mystery-dungeon/images/target-stair-tile.png",
+    },
+    control: "arrowKeys",
+    id: "pokemon-mystery-dungeon-stairs",
+    startPrompt: "계단으로 가라!",
+    title: "포켓몬 불가사의 던전: 어둠의 탐험대",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
     canvas: "pokemonTyping",
     microscope: {
-      description:
-        "피카츄, 라이츄, 파이리, 꼬부기... 다들 포켓몬 아시나요? 빠르게 포켓몬 이름을 맞춰야 해요. 아, 얘 이름이 뭐였더라?",
       imageAlt: "포켓몬 도감 배경",
       imageSrc: "/games/pokemon/images/pokedex-background.webp",
     },
@@ -762,8 +755,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "pokemonTcgPocket",
     microscope: {
-      description:
-        "포켓몬 카드 게임 Pocket에서는 상대와 상황에 맞는 타입의 카드를 골라 내야 합니다. 손패에서 목표 타입을 찾아 전장에 놓아보세요.",
       imageAlt: "포켓몬 카드 게임 Pocket의 파이리 카드",
       imageSrc: "/games/pokemon-tcg-pocket/images/fire-card.png",
     },
@@ -778,8 +769,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "pokerougeShop",
     microscope: {
-      description:
-        "포켓로그 상점에서는 좋은 아이템을 빠르게 골라야 합니다. 커서를 움직여 마스터볼을 선택하세요.",
       imageAlt: "포켓로그 마스터볼",
       imageSrc: "/games/pokerouge/images/master-ball.png",
     },
@@ -794,8 +783,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "pongSurvival",
     microscope: {
-      description:
-        "퐁은 공 하나가 전부인 게임인데, 놓치는 순간 바로 끝입니다. 위아래로 패들을 움직여 짧은 랠리를 버텨보세요.",
       imageAlt: "퐁 게임 화면",
       imageSrc: "/games/pong/images/thumbnail.svg",
     },
@@ -810,8 +797,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "flappyBird",
     microscope: {
-      description:
-        "플래피버드, 너무 어려운 게임입니다. 파이프 사이를 통과하려고 누르다 보면 손이 자꾸 급해져요.",
       imageAlt: "플래피버드",
       imageSrc: "/games/flappy-bird/images/bird.png",
     },
@@ -826,8 +811,6 @@ export const MICROGAMES = [
     beatCount: 10,
     canvas: "pianoMelody",
     microscope: {
-      description:
-        "피아노는 쉬운 음도 순서가 꼬이면 바로 헷갈립니다. 방금 들은 멜로디를 기억해서 숫자키로 다시 눌러보세요.",
       imageAlt: "피아노 배경",
       imageSrc: "/games/piano/images/background.png",
     },
@@ -842,8 +825,6 @@ export const MICROGAMES = [
     beatCount: 12,
     canvas: "hancomTyping",
     microscope: {
-      description:
-        "한컴 타자 연습하던 시절 기억나나요? 단어가 내려오기 전에 빠르게 치면 되는데, 오타 하나가 꽤 아픕니다.",
       imageAlt: "한컴 타자 배경",
       imageSrc: "/games/hancom/images/background.webp",
     },
@@ -858,8 +839,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "fruitNinja",
     microscope: {
-      description:
-        "후르츠 닌자에서는 망설이는 순간 과일이 화면 밖으로 사라집니다. 날아오르는 수박을 마우스로 시원하게 베어보세요.",
       imageAlt: "후르츠 닌자 수박",
       imageSrc: "/games/fruit-ninja/images/watermelon.png",
     },
@@ -874,8 +853,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "babaIsYou",
     microscope: {
-      description:
-        "Baba Is You에서는 규칙과 물체를 직접 밀어 퍼즐을 풉니다. 세로로 길을 막은 바위 하나를 밀어 깃대까지 가는 길을 만들어보세요.",
       imageAlt: "Baba Is You의 Baba 캐릭터",
       imageSrc: "/games/baba-is-you/images/baba.png",
     },
@@ -890,8 +867,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "fireBoyWaterGirl",
     microscope: {
-      description:
-        "파이어보이와 워터걸 중 한 명이 무작위로 등장합니다. 자신의 속성 웅덩이는 건널 수 있지만 반대 속성에 닿으면 쓰러집니다.",
       imageAlt: "파이어보이와 워터걸 캐릭터",
       imageSrc: "/games/fire-boy-and-water-girl/images/fire-boy-idle.png",
     },
@@ -906,8 +881,6 @@ export const MICROGAMES = [
     beatCount: 8,
     canvas: "wiiSportsDualPress",
     microscope: {
-      description:
-        "Wii Sports를 해보셨나요? A와 B를 둘 다 눌러 게임을 시작하세요.",
       imageAlt: "Wii Sports A와 B 버튼 안내",
       imageSrc: "/games/wii-sports/images/backgroud-default.png",
     },
@@ -922,8 +895,6 @@ export const MICROGAMES = [
     beatCount: 36,
     canvas: "twoThousandFortyEightBoss",
     microscope: {
-      description:
-        "2048은 한 번 밀면 판이 확 바뀌죠. 같은 숫자를 합쳐 32를 만들어야 하는데, 판이 꽉 막히면 바로 끝입니다.",
       imageAlt: "2048 보드",
       imageSrc: "/games/two-thousand-forty-eight/images/thumbnail.svg",
     },
@@ -938,8 +909,6 @@ export const MICROGAMES = [
     beatCount: 36,
     canvas: "animalFarmReverseTyping",
     microscope: {
-      description:
-        "다들 동물농장을 아시나요? 샤르릉 뿌뿡 뿍짝뿍짝 사람이 되어라 얍~!",
       imageAlt: "동물농장 배경",
       imageSrc: "/games/animal-farm/images/background.webp",
     },
@@ -954,8 +923,6 @@ export const MICROGAMES = [
     beatCount: 50,
     canvas: "theWorldHardestGame",
     microscope: {
-      description:
-        "세상에서 제일 어려운 게임은 빨간 사각형 하나로 파란 장애물을 피해 목표 구역까지 가는 게임입니다. 죽어도 다시 시작해서 시간 안에 도착하세요.",
       imageAlt: "세상에서 제일 어려운 게임 레벨",
       imageSrc: "/games/the-world-hardest-game/images/background.png",
     },
@@ -970,8 +937,6 @@ export const MICROGAMES = [
     beatCount: 36,
     canvas: "squidGameRedLight",
     microscope: {
-      description:
-        "무궁화 꽃이 피었습니다! 인형이 뒤를 볼 때는 마우스를 꾹 눌러 달리고, 인형이 돌아보면 즉시 손을 떼야 합니다.",
       imageAlt: "무궁화 꽃이 피었습니다 인형",
       imageSrc: "/games/squid-game/images/doll-red-light.png",
     },
@@ -986,8 +951,6 @@ export const MICROGAMES = [
     beatCount: 52,
     canvas: "wordleBoss",
     microscope: {
-      description:
-        "워들은 여섯 번 안에 다섯 글자 영어 단어를 맞히는 단어 퍼즐입니다. 초록색은 제자리, 노란색은 다른 자리, 회색은 없는 글자입니다.",
       imageAlt: "워들 5글자 단어 퍼즐 보드",
       imageSrc: "/games/wordle/images/thumbnail.svg",
     },
@@ -1002,8 +965,6 @@ export const MICROGAMES = [
     beatCount: 36,
     canvas: "kartriderCourse",
     microscope: {
-      description:
-        "카트라이더는 속도보다 라인을 잡는 게 더 어렵죠. 벽에 박지 말고 빌리지 운하 코스를 끝까지 달려야 합니다.",
       imageAlt: "카트라이더 운하 코스",
       imageSrc: "/games/kartrider/images/track.webp",
     },
@@ -1018,8 +979,6 @@ export const MICROGAMES = [
     beatCount: 36,
     canvas: "halliGalliBoss",
     microscope: {
-      description:
-        "할리갈리는 종 치는 손이 빠른 사람이 이깁니다. 과일이 다섯 개가 되는 순간, 고민하지 말고 눌러야 해요.",
       imageAlt: "할리갈리 종",
       imageSrc: "/games/halli-galli/images/bell.webp",
     },

@@ -5,7 +5,9 @@ import { AnimalFarmBossGame } from "@/games/AnimalFarmBossGame";
 import { AppleGame } from "@/games/AppleGame";
 import { AmongUsWireGame } from "@/games/AmongUsWireGame";
 import { BabaIsYouGame } from "@/games/BabaIsYouGame";
+import { BindingOfIsaacGame } from "@/games/BindingOfIsaacGame";
 import { BounceBallGame } from "@/games/BounceBallGame";
+import { BrainAgeMathGame } from "@/games/BrainAgeMathGame";
 import { BrainAcademyBlockGame } from "@/games/BrainAcademyBlockGame";
 import { BubbleBobbleGame } from "@/games/BubbleBobbleGame";
 import { ChessGame } from "@/games/ChessGame";
@@ -24,6 +26,7 @@ import { FlickingGame } from "@/games/FlickingGame";
 import { FlappyBirdGame } from "@/games/FlappyBirdGame";
 import { FruitNinjaGame } from "@/games/FruitNinjaGame";
 import { GeometryDashGame } from "@/games/GeometryDashGame";
+import { GogunbuntuGame } from "@/games/GogunbuntuGame";
 import { GomokuGame } from "@/games/GomokuGame";
 import { HalliGalliBossGame } from "@/games/HalliGalliBossGame";
 import { HancomTypingGame } from "@/games/HancomTypingGame";
@@ -41,6 +44,7 @@ import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
 import { PongGame } from "@/games/PongGame";
 import { PokerougeShopGame } from "@/games/PokerougeShopGame";
+import { PokemonMysteryDungeonGame } from "@/games/PokemonMysteryDungeonGame";
 import { PokemonTcgPocketGame } from "@/games/PokemonTcgPocketGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { RhythmHeavenChorusGame } from "@/games/RhythmHeavenChorusGame";
@@ -55,6 +59,7 @@ import { SuperMarioCoinGame } from "@/games/SuperMarioCoinGame";
 import { SuikaGame } from "@/games/SuikaGame";
 import { TetrisLineClearGame } from "@/games/TetrisLineClearGame";
 import { TheWorldHardestGame } from "@/games/TheWorldHardestGame";
+import { TicTacToeGame } from "@/games/TicTacToeGame";
 import { TwoThousandFortyEightBossGame } from "@/games/TwoThousandFortyEightBossGame";
 import { UndertaleMouseGame } from "@/games/UndertaleMouseGame";
 import { WiiSportsGame } from "@/games/WiiSportsGame";
@@ -93,8 +98,16 @@ function renderGameCanvas(
     return <BabaIsYouGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "bindingOfIsaacFlies") {
+    return <BindingOfIsaacGame isActive={isActive} microgame={microgame} />;
+  }
+
   if (microgame.canvas === "bounceBall") {
     return <BounceBallGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "brainAgeMath") {
+    return <BrainAgeMathGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "brainAcademyBlocks") {
@@ -140,6 +153,16 @@ function renderGameCanvas(
 
   if (microgame.canvas === "pokemonTyping") {
     return <PokemonTypingGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "pokemonMysteryDungeon") {
+    return (
+      <PokemonMysteryDungeonGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
   }
 
   if (microgame.canvas === "pokemonTcgPocket") {
@@ -234,6 +257,10 @@ function renderGameCanvas(
     return <GeometryDashGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "gogunbuntuCoinRun") {
+    return <GogunbuntuGame isActive={isActive} microgame={microgame} />;
+  }
+
   if (microgame.canvas === "flappyBird") {
     return <FlappyBirdGame microgame={microgame} />;
   }
@@ -306,6 +333,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "theWorldHardestGame") {
     return <TheWorldHardestGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "ticTacToe") {
+    return <TicTacToeGame isActive={isActive} microgame={microgame} />;
   }
 
   if (microgame.canvas === "twoThousandFortyEightBoss") {

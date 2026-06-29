@@ -8,6 +8,7 @@ export type BgmTrack =
   | "appleGame"
   | "babaIsYou"
   | "bossStage"
+  | "brainAge"
   | "brainAcademy"
   | "cookieRun"
   | "cookieRunKingdom"
@@ -20,11 +21,13 @@ export type BgmTrack =
   | "fruitNinja"
   | "gameOver"
   | "geometryDash"
+  | "gogunbuntu"
   | "halliGalli"
   | "hancom"
   | "intermission"
   | "intermissionNoControl"
   | "infiniteStairs"
+  | "isaac"
   | "kartrider"
   | "kirby"
   | "layton"
@@ -37,6 +40,7 @@ export type BgmTrack =
   | "oneUp"
   | "pokerouge"
   | "pokemon"
+  | "pokemonMysteryDungeon"
   | "pokemonTcgPocket"
   | "resultsAndMain"
   | "rhythmHero"
@@ -69,6 +73,8 @@ export type SoundEffectTrack =
   | "halliGalliCard"
   | "fruitNinjaImpact"
   | "infiniteStairsStep"
+  | "isaacTearFire"
+  | "isaacTearImpact"
   | "minecraftDig1"
   | "minecraftDig2"
   | "modooDiceRoll"
@@ -87,6 +93,7 @@ const BGM_TRACK_PATHS = {
   appleGame: "/games/apple-game/sounds/apple-game-bgm.mp3",
   babaIsYou: "/games/baba-is-you/sounds/baba-is-you.mp3",
   bossStage: "/games/game-flow/sounds/boss-stage.mp3",
+  brainAge: "/games/brain-age/sounds/brain-age-bgm.mp3",
   brainAcademy: "/games/brain-academy/sounds/brain-academy-bgm.mp3",
   cookieRun: "/games/cookie-run/sounds/cookie-run-bgm.mp3",
   cookieRunKingdom:
@@ -100,11 +107,13 @@ const BGM_TRACK_PATHS = {
   fruitNinja: "/games/fruit-ninja/sounds/Game-start.wav",
   gameOver: "/games/game-flow/sounds/game-over.mp3",
   geometryDash: "/games/geometry-dash/sounds/geometry-dash-bgm.mp3",
+  gogunbuntu: "/games/gogunbuntu/sounds/gogunbuntu-bgm.mp3",
   halliGalli: "/games/halli-galli/sounds/halli-galli-bgm.mp3",
   hancom: "/games/hancom/sounds/hancom-bgm.mp3",
   intermission: "/games/game-flow/sounds/intermission.mp3",
   intermissionNoControl: "/games/game-flow/sounds/intermission-no-control.mp3",
   infiniteStairs: "/games/infinite-stairs/sounds/infinite-stair-bgm.mp3",
+  isaac: "/games/the-binding-of-isaac/sounds/isaac-bgm.mp3",
   kartrider: "/games/kartrider/sounds/kartrider-bgm.mp3",
   kirby: "/games/kirby/sounds/kirby-bgm.mp3",
   layton: "/games/layton/sounds/layton-bgm.mp3",
@@ -117,6 +126,8 @@ const BGM_TRACK_PATHS = {
   oneUp: "/games/game-flow/sounds/1-up.mp3",
   pokerouge: "/games/pokerouge/sounds/pokegoruge-bgm.flac",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
+  pokemonMysteryDungeon:
+    "/games/pokemon-mystery-dungeon/sounds/bgm-mystery-dungeon.mp3",
   pokemonTcgPocket:
     "/games/pokemon-tcg-pocket/sounds/pokemon-card-pocket-bgm.mp3",
   resultsAndMain: "/games/game-flow/sounds/results-and-main.mp3",
@@ -153,6 +164,8 @@ const SOUND_EFFECT_TRACK_PATHS = {
   halliGalliCard: "/games/halli-galli/sounds/card-draw.mp3",
   fruitNinjaImpact: "/games/fruit-ninja/sounds/Impact-Watermelon.wav",
   infiniteStairsStep: "/games/infinite-stairs/sounds/button-click.mp3",
+  isaacTearFire: "/games/the-binding-of-isaac/sounds/tear-fire.mp3",
+  isaacTearImpact: "/games/the-binding-of-isaac/sounds/tear-impacts.mp3",
   leagueChampionSelect: "/games/league-of-legend/sounds/champ-select.mp3",
   minecraftDig1: "/games/minecraft/sounds/dig-1.mp3",
   minecraftDig2: "/games/minecraft/sounds/dig-2.mp3",
@@ -198,6 +211,7 @@ const BGM_TRACK_BEATS = {
   appleGame: 12,
   babaIsYou: 8,
   bossStage: 8,
+  brainAge: 12,
   brainAcademy: 12,
   cookieRun: 12,
   cookieRunKingdom: 8,
@@ -209,11 +223,13 @@ const BGM_TRACK_BEATS = {
   fireAndIce: 8,
   fruitNinja: 8,
   geometryDash: 12,
+  gogunbuntu: 10,
   halliGalli: 36,
   hancom: 12,
   intermission: 8,
   intermissionNoControl: 4,
   infiniteStairs: 8,
+  isaac: 12,
   kartrider: 36,
   kirby: 8,
   layton: 8,
@@ -226,6 +242,7 @@ const BGM_TRACK_BEATS = {
   oneUp: 8,
   pokerouge: 8,
   pokemon: 12,
+  pokemonMysteryDungeon: 8,
   pokemonTcgPocket: 12,
   resultsAndMain: 83,
   rhythmHero: 8,
@@ -245,13 +262,17 @@ const BGM_TRACK_BEATS = {
   zelda: 12,
 } satisfies Record<Exclude<BgmTrack, "gameOver">, number>;
 
-const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<Record<BgmTrack, number>> =
-  {
-    crossword: DEFAULT_BEAT_DURATION_SECONDS,
-    infiniteStairs: DEFAULT_BEAT_DURATION_SECONDS,
-    pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
-    wordle: DEFAULT_BEAT_DURATION_SECONDS,
-  };
+const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<
+  Record<BgmTrack, number>
+> = {
+  crossword: DEFAULT_BEAT_DURATION_SECONDS,
+  brainAge: DEFAULT_BEAT_DURATION_SECONDS,
+  gogunbuntu: DEFAULT_BEAT_DURATION_SECONDS,
+  infiniteStairs: DEFAULT_BEAT_DURATION_SECONDS,
+  pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
+  pokemonMysteryDungeon: DEFAULT_BEAT_DURATION_SECONDS,
+  wordle: DEFAULT_BEAT_DURATION_SECONDS,
+};
 
 export const GAME_OVER_DURATION_MS = 5208;
 
