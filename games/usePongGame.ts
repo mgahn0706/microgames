@@ -11,6 +11,10 @@ const BALL_SIZE = 12;
 const COURT_HEIGHT = 360;
 const COURT_WIDTH = 640;
 const DEFAULT_BEAT_DURATION_MS = 500;
+const DEGREE_TO_RADIAN = Math.PI / 180;
+const INITIAL_BALL_SPEED = Math.hypot(252, 84);
+const MAX_INITIAL_ANGLE_DEGREE = 28;
+const MIN_INITIAL_ANGLE_DEGREE = 12;
 const MAX_DELTA_MS = 48;
 const MAX_PHYSICS_STEP_MS = 8;
 const MIN_CANVAS_HEIGHT = 360;
@@ -47,10 +51,25 @@ function dispatchFailure() {
   window.dispatchEvent(new CustomEvent(MICROGAME_FAILURE_EVENT));
 }
 
-function createInitialState() {
+function getRandomInitialBallVelocity() {
+  const angleDegree =
+    MIN_INITIAL_ANGLE_DEGREE +
+    Math.random() * (MAX_INITIAL_ANGLE_DEGREE - MIN_INITIAL_ANGLE_DEGREE);
+  const direction = Math.random() < 0.5 ? -1 : 1;
+  const angleRadian = angleDegree * direction * DEGREE_TO_RADIAN;
+
   return {
-    ballVX: 252,
-    ballVY: 84,
+    ballVX: Math.cos(angleRadian) * INITIAL_BALL_SPEED,
+    ballVY: Math.sin(angleRadian) * INITIAL_BALL_SPEED,
+  };
+}
+
+function createInitialState() {
+  const initialBallVelocity = getRandomInitialBallVelocity();
+
+  return {
+    ballVX: initialBallVelocity.ballVX,
+    ballVY: initialBallVelocity.ballVY,
     ballX: 198,
     ballY: 112,
     elapsedMs: 0,
