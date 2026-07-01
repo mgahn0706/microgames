@@ -326,6 +326,13 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "anipangMatchThree") {
+        bgmLibrary.play("anipang", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
       if (microgame.canvas === "brainAcademyBlocks") {
         bgmLibrary
           .play("brainAcademy", "once", "now")
@@ -346,6 +353,15 @@ export function GameScreen({
         bgmLibrary.play("animalFarm", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
+        return;
+      }
+
+      if (microgame.canvas === "animalCrossingNewLeafTyping") {
+        bgmLibrary
+          .play("animalCrossingNewLeaf", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
         return;
       }
 
@@ -432,8 +448,24 @@ export function GameScreen({
         return;
       }
 
+      if (microgame.canvas === "poppyPlaytimeScanner") {
+        bgmLibrary
+          .play("poppyPlaytime", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
+        return;
+      }
+
       if (microgame.canvas === "rhythmHeroSpinner") {
         bgmLibrary.play("rhythmHero", "once", "now").catch((error: unknown) => {
+          console.error(error);
+        });
+        return;
+      }
+
+      if (microgame.canvas === "rummikubAttach") {
+        bgmLibrary.play("rummikub", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
         return;
@@ -549,6 +581,15 @@ export function GameScreen({
         bgmLibrary.play("dobble", "once", "now").catch((error: unknown) => {
           console.error(error);
         });
+        return;
+      }
+
+      if (microgame.canvas === "daveTheDiverGig") {
+        bgmLibrary
+          .play("daveTheDiver", "once", "now")
+          .catch((error: unknown) => {
+            console.error(error);
+          });
         return;
       }
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { AnipangGame } from "@/games/AnipangGame";
+import { AnimalCrossingNewLeafGame } from "@/games/AnimalCrossingNewLeafGame";
 import { AnimalCrossingStampGame } from "@/games/AnimalCrossingStampGame";
 import { AnimalFarmBossGame } from "@/games/AnimalFarmBossGame";
 import { AppleGame } from "@/games/AppleGame";
@@ -18,6 +20,7 @@ import { CookieRunKingdomGame } from "@/games/CookieRunKingdomGame";
 import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGame";
 import { CrosswordGame } from "@/games/CrosswordGame";
 import { CrazyArcadeGame } from "@/games/CrazyArcadeGame";
+import { DaveTheDiverGame } from "@/games/DaveTheDiverGame";
 import { DefaultMicrogameCanvas } from "@/games/DefaultMicrogameCanvas";
 import { DobbleGame } from "@/games/DobbleGame";
 import { FireAndIceDanceGame } from "@/games/FireAndIceDanceGame";
@@ -38,17 +41,21 @@ import { LeagueChampionBanGame } from "@/games/LeagueChampionBanGame";
 import { MaplestoryLieDetectorGame } from "@/games/MaplestoryLieDetectorGame";
 import { MaplestoryRuneGame } from "@/games/MaplestoryRuneGame";
 import { MinecraftMiningGame } from "@/games/MinecraftMiningGame";
+import { MinesweeperGame } from "@/games/MinesweeperGame";
 import { MinigameExGame } from "@/games/MinigameExGame";
 import { ModooMarbleGame } from "@/games/ModooMarbleGame";
 import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
+import { PinballGame } from "@/games/PinballGame";
 import { PongGame } from "@/games/PongGame";
+import { PoppyPlaytimeGame } from "@/games/PoppyPlaytimeGame";
 import { PokerougeShopGame } from "@/games/PokerougeShopGame";
 import { PokemonMysteryDungeonGame } from "@/games/PokemonMysteryDungeonGame";
 import { PokemonTcgPocketGame } from "@/games/PokemonTcgPocketGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { RhythmHeavenChorusGame } from "@/games/RhythmHeavenChorusGame";
 import { RhythmHeroGame } from "@/games/RhythmHeroGame";
+import { RummikubGame } from "@/games/RummikubGame";
 import { SnakeGame } from "@/games/SnakeGame";
 import { StarcraftMoveGame } from "@/games/StarcraftMoveGame";
 import { SquidGameBossGame } from "@/games/SquidGameBossGame";
@@ -80,6 +87,14 @@ function renderGameCanvas(
 ) {
   if (microgame.canvas === "animalCrossingStamps") {
     return <AnimalCrossingStampGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "animalCrossingNewLeafTyping") {
+    return <AnimalCrossingNewLeafGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "anipangMatchThree") {
+    return <AnipangGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "animalFarmReverseTyping") {
@@ -120,6 +135,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "chessCapture") {
     return <ChessGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "daveTheDiverGig") {
+    return <DaveTheDiverGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "undertaleMouse") {
@@ -179,8 +198,16 @@ function renderGameCanvas(
     );
   }
 
+  if (microgame.canvas === "rummikubAttach") {
+    return <RummikubGame microgame={microgame} />;
+  }
+
   if (microgame.canvas === "minecraftMining") {
     return <MinecraftMiningGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "minesweeperMineClick") {
+    return <MinesweeperGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "modooMarble") {
@@ -211,8 +238,16 @@ function renderGameCanvas(
     return <PianoMelodyGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "pinballSurvival") {
+    return <PinballGame microgame={microgame} />;
+  }
+
   if (microgame.canvas === "pongSurvival") {
     return <PongGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "poppyPlaytimeScanner") {
+    return <PoppyPlaytimeGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "pokerougeShop") {

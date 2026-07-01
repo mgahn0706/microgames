@@ -13,6 +13,8 @@ export type MicrogameControl =
 
 export type MicrogameType = "boss" | "normal";
 export type MicrogameCanvas =
+  | "anipangMatchThree"
+  | "animalCrossingNewLeafTyping"
   | "animalCrossingStamps"
   | "animalFarmReverseTyping"
   | "appleNumberSum"
@@ -31,6 +33,7 @@ export type MicrogameCanvas =
   | "courseRegistrationNumber"
   | "crosswordPuzzle"
   | "crazyArcade"
+  | "daveTheDiverGig"
   | "default"
   | "dobble"
   | "fireAndIceDance"
@@ -52,15 +55,19 @@ export type MicrogameCanvas =
   | "maplestoryRune"
   | "minigameExBearMeat"
   | "minecraftMining"
+  | "minesweeperMineClick"
   | "modooMarble"
   | "pianoMelody"
+  | "pinballSurvival"
   | "pongSurvival"
+  | "poppyPlaytimeScanner"
   | "pokerougeShop"
   | "pokemonMysteryDungeon"
   | "pokemonTcgPocket"
   | "pokemonTyping"
   | "rhythmHeavenChorus"
   | "rhythmHeroSpinner"
+  | "rummikubAttach"
   | "snakeApple"
   | "starcraftMove"
   | "superMarioGalaxyStarBits"
@@ -116,7 +123,7 @@ export const MICROGAMES = [
     },
     control: "space",
     id: "gogunbuntu-coin-run",
-    startPrompt: "엽전 15개를 모아라!",
+    startPrompt: "15개를 모아라!",
     title: "고군분투",
     type: "normal",
   },
@@ -132,6 +139,34 @@ export const MICROGAMES = [
     id: "submit-assignment",
     startPrompt: "제출해라!",
     title: "과제 제출",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "animalCrossingNewLeafTyping",
+    microscope: {
+      imageAlt: "놀러와요 동물의 숲 키보드 화면",
+      imageSrc: "/games/animal-crossing-new-leaf/images/background.png",
+    },
+    control: "koreanKeyboard",
+    id: "animal-crossing-new-leaf-apology-typing",
+    startPrompt: "입력해라!",
+    title: "놀러와요 동물의 숲",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "daveTheDiverGig",
+    microscope: {
+      imageAlt: "데이브 더 다이버 클라운피시",
+      imageSrc: "/games/dave-the-diver/images/clownfish.png",
+    },
+    control: "mouseHold",
+    id: "dave-the-diver-clownfish",
+    startPrompt: "사냥해라!",
+    title: "데이브 더 다이버",
     type: "normal",
   },
 
@@ -202,6 +237,20 @@ export const MICROGAMES = [
     id: "rhythm-heaven-chorus",
     startPrompt: "제때 멈춰라!",
     title: "리듬 세상",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "rummikubAttach",
+    microscope: {
+      imageAlt: "루미큐브 숫자 타일",
+      imageSrc: "/games/rummikub/images/tile.png",
+    },
+    control: "mouseDrag",
+    id: "rummikub-attach-tile",
+    startPrompt: "타일을 붙여라!",
+    title: "루미큐브",
     type: "normal",
   },
 
@@ -528,6 +577,20 @@ export const MICROGAMES = [
   },
 
   {
+    beatCount: 8,
+    canvas: "anipangMatchThree",
+    microscope: {
+      imageAlt: "애니팡 고양이 동물 블록",
+      imageSrc: "/games/anipang/images/cat.png",
+    },
+    control: "mouseDrag",
+    id: "anipang-match-three",
+    startPrompt: "세 마리를 맞춰라!",
+    title: "애니팡",
+    type: "normal",
+  },
+
+  {
     beatCount: 14,
     canvas: "amongUsWires",
     microscope: {
@@ -594,6 +657,20 @@ export const MICROGAMES = [
     id: "zelda-ocarina-song",
     startPrompt: "연주해라!",
     title: "젤다의 전설: 시간의 오카리나",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "minesweeperMineClick",
+    microscope: {
+      imageAlt: "지뢰찾기 숨겨진 칸",
+      imageSrc: "/games/minesweeper/images/TileUnknown.png",
+    },
+    control: "mouseClick",
+    id: "minesweeper-click-mine",
+    startPrompt: "터뜨려라!",
+    title: "지뢰찾기",
     type: "normal",
   },
 
@@ -725,6 +802,20 @@ export const MICROGAMES = [
 
   {
     beatCount: 8,
+    canvas: "poppyPlaytimeScanner",
+    microscope: {
+      imageAlt: "파피 플레이타임 파란 손 스캐너",
+      imageSrc: "/games/poppy-playtime/images/hand-scanner.png",
+    },
+    control: "mouseHold",
+    id: "poppy-playtime-hand-scan",
+    startPrompt: "스캔해라!",
+    title: "파피 플레이타임",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
     canvas: "pokemonMysteryDungeon",
     microscope: {
       imageAlt: "포켓몬 불가사의 던전 계단 타일",
@@ -818,6 +909,20 @@ export const MICROGAMES = [
     id: "piano-melody-repeat",
     startPrompt: "연주해라!",
     title: "피아노",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "pinballSurvival",
+    microscope: {
+      imageAlt: "핀볼 테이블과 플리퍼",
+      imageSrc: "/games/pinball/images/background.png",
+    },
+    control: "space",
+    id: "pinball-survival",
+    startPrompt: "떨어뜨리지 마라!",
+    title: "핀볼",
     type: "normal",
   },
 

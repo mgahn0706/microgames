@@ -3,7 +3,9 @@
 import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 
 export type BgmTrack =
+  | "anipang"
   | "animalCrossing"
+  | "animalCrossingNewLeaf"
   | "animalFarm"
   | "appleGame"
   | "babaIsYou"
@@ -14,6 +16,7 @@ export type BgmTrack =
   | "cookieRunKingdom"
   | "crossword"
   | "crazyArcade"
+  | "daveTheDiver"
   | "dobble"
   | "fail"
   | "failNoControl"
@@ -38,12 +41,14 @@ export type BgmTrack =
   | "minecraft"
   | "modooMarble"
   | "oneUp"
+  | "poppyPlaytime"
   | "pokerouge"
   | "pokemon"
   | "pokemonMysteryDungeon"
   | "pokemonTcgPocket"
   | "resultsAndMain"
   | "rhythmHero"
+  | "rummikub"
   | "setup"
   | "speedUp"
   | "starcraft"
@@ -65,10 +70,14 @@ export type SoundEffectTrack =
   | "clear3"
   | "clear4"
   | "clear5"
+  | "anipangMatch"
+  | "anipangSwipe"
   | "animalCrossingStamp"
+  | "animalCrossingNewLeafType"
   | "cookieRunJump"
   | "cookieRunSlide"
   | "crazyArcadeBombInstall"
+  | "daveTheDiverGig"
   | "halliGalliBell"
   | "halliGalliCard"
   | "fruitNinjaImpact"
@@ -77,18 +86,31 @@ export type SoundEffectTrack =
   | "isaacTearImpact"
   | "minecraftDig1"
   | "minecraftDig2"
+  | "minesweeperClick"
+  | "minesweeperExplosion"
+  | "minesweeperStart"
   | "modooDiceRoll"
+  | "pinballBounce"
+  | "pinballFlipper"
+  | "pinballGameOver"
+  | "pinballStart"
+  | "poppyPlaytimeHandExtended"
   | "pongHit"
+  | "poppyPlaytimeScanning"
   | "leagueChampionSelect"
   | "pokerougeBuy"
   | "pokerougeSelect"
   | "rhythmHeroSpin"
+  | "rummikubTilePlaced"
   | "runeEffect"
   | "starcraftMove"
   | "twentyFortyEightSwipe";
 
 const BGM_TRACK_PATHS = {
+  anipang: "/games/anipang/sounds/anipang-bgm.mp3",
   animalCrossing: "/games/animal-crossing/sounds/animal-crossing-bgm.mp3",
+  animalCrossingNewLeaf:
+    "/games/animal-crossing-new-leaf/sounds/animal-crossing-bgm.mp3",
   animalFarm: "/games/animal-farm/sounds/animal-farm-bgm.mp3",
   appleGame: "/games/apple-game/sounds/apple-game-bgm.mp3",
   babaIsYou: "/games/baba-is-you/sounds/baba-is-you.mp3",
@@ -100,6 +122,7 @@ const BGM_TRACK_PATHS = {
     "/games/cookie-run-kingdom/sounds/cookie-run-kingdom-bgm.mp3",
   crossword: "/games/crossword/sounds/turkey-bgm.mp3",
   crazyArcade: "/games/crazy-arcade/sounds/crazy-arcade-bgm.mp3",
+  daveTheDiver: "/games/dave-the-diver/sounds/dave-the-diver-bgm.mp3",
   dobble: "/games/dobble/sounds/dobble-bgm.mp3",
   fail: "/games/game-flow/sounds/fail.mp3",
   failNoControl: "/games/game-flow/sounds/fail-no-control.mp3",
@@ -124,6 +147,7 @@ const BGM_TRACK_PATHS = {
   minecraft: "/games/minecraft/sounds/minecraft-bgm.mp3",
   modooMarble: "/games/modoo-marble/sounds/modoo-bgm.mp3",
   oneUp: "/games/game-flow/sounds/1-up.mp3",
+  poppyPlaytime: "/games/poppy-playtime/sounds/poppy-playtime-bgm.mp3",
   pokerouge: "/games/pokerouge/sounds/pokegoruge-bgm.flac",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
   pokemonMysteryDungeon:
@@ -132,6 +156,7 @@ const BGM_TRACK_PATHS = {
     "/games/pokemon-tcg-pocket/sounds/pokemon-card-pocket-bgm.mp3",
   resultsAndMain: "/games/game-flow/sounds/results-and-main.mp3",
   rhythmHero: "/games/rhythm-hero/sounds/rhythm-hero-bgm.mp3",
+  rummikub: "/games/rummikub/sounds/rummikub-bgm.mp3",
   setup: "/games/game-flow/sounds/setup.mp3",
   speedUp: "/games/game-flow/sounds/speed-up.mp3",
   starcraft: "/games/starcraft/sounds/starcraft-bgm.mp3",
@@ -155,11 +180,15 @@ const SOUND_EFFECT_TRACK_PATHS = {
   clear3: "/games/game-flow/sounds/clear-3.mp3",
   clear4: "/games/game-flow/sounds/clear-4.mp3",
   clear5: "/games/game-flow/sounds/clear-5.mp3",
+  anipangMatch: "/games/anipang/sounds/anipang-animal-matched.mp3",
+  anipangSwipe: "/games/anipang/sounds/anipang-swipe.mp3",
   animalCrossingStamp: "/games/animal-crossing/sounds/stamp.mp3",
+  animalCrossingNewLeafType: "/games/animal-crossing-new-leaf/sounds/type.wav",
   cookieRunJump: "/games/cookie-run/sounds/cookie-jump.mp3",
   cookieRunSlide: "/games/cookie-run/sounds/cookie-slide.mp3",
   crazyArcadeBombInstall:
     "/games/crazy-arcade/sounds/crazy-arcade-bomb-install.mp3",
+  daveTheDiverGig: "/games/dave-the-diver/sounds/gig-used.mp3",
   halliGalliBell: "/games/halli-galli/sounds/bell-chime.mp3",
   halliGalliCard: "/games/halli-galli/sounds/card-draw.mp3",
   fruitNinjaImpact: "/games/fruit-ninja/sounds/Impact-Watermelon.wav",
@@ -169,11 +198,22 @@ const SOUND_EFFECT_TRACK_PATHS = {
   leagueChampionSelect: "/games/league-of-legend/sounds/champ-select.mp3",
   minecraftDig1: "/games/minecraft/sounds/dig-1.mp3",
   minecraftDig2: "/games/minecraft/sounds/dig-2.mp3",
+  minesweeperClick: "/games/minesweeper/sounds/01. Click.mp3",
+  minesweeperExplosion: "/games/minesweeper/sounds/05. Lose Minesweeper.mp3",
+  minesweeperStart: "/games/minesweeper/sounds/06. Start.mp3",
   modooDiceRoll: "/games/modoo-marble/sounds/dice-roll.mp3",
+  pinballBounce: "/games/pinball/sounds/bounced-electronic.mp3",
+  pinballFlipper: "/games/pinball/sounds/flipper-hand.mp3",
+  pinballGameOver: "/games/pinball/sounds/game-over.mp3",
+  pinballStart: "/games/pinball/sounds/start.mp3",
+  poppyPlaytimeHandExtended:
+    "/games/poppy-playtime/sounds/hand-extended.mp3",
   pongHit: "/games/pong/sounds/pong-hit.mp3",
+  poppyPlaytimeScanning: "/games/poppy-playtime/sounds/scanning.mp3",
   pokerougeBuy: "/games/pokerouge/sounds/buy.wav",
   pokerougeSelect: "/games/pokerouge/sounds/select.wav",
   rhythmHeroSpin: "/games/rhythm-hero/sounds/spinning-sound.mp3",
+  rummikubTilePlaced: "/games/rummikub/sounds/tile-placed.mp3",
   runeEffect: "/games/maple-story-rune/sounds/rune-effect.mp3",
   starcraftMove: "/games/starcraft/sounds/moving-voice.wav",
   twentyFortyEightSwipe: "/games/two-thousand-forty-eight/sounds/swipe.mp3",
@@ -194,8 +234,10 @@ const AUDIO_PRELOAD_SKIP_TRACKS: ReadonlySet<BgmTrack | SoundEffectTrack> =
 const DEFAULT_BEAT_DURATION_SECONDS = RHYTHM_DURATION_MS / 1000;
 const BGM_GAIN = 0.72;
 const BGM_TRACK_GAINS: Partial<Record<BgmTrack, number>> = {
+  anipang: 1.12,
   kartrider: 0.94,
   mapleRune: 0.94,
+  poppyPlaytime: 1.08,
   undertale: 0.52,
 };
 const SOUND_EFFECT_GAIN = 0.86;
@@ -206,7 +248,9 @@ const ATTACK_FADE_SECONDS = 0.012;
 const RELEASE_FADE_SECONDS = 0.045;
 
 const BGM_TRACK_BEATS = {
+  anipang: 8,
   animalCrossing: 8,
+  animalCrossingNewLeaf: 12,
   animalFarm: 36,
   appleGame: 12,
   babaIsYou: 8,
@@ -217,6 +261,7 @@ const BGM_TRACK_BEATS = {
   cookieRunKingdom: 8,
   crossword: 8,
   crazyArcade: 12,
+  daveTheDiver: 8,
   dobble: 12,
   fail: 4,
   failNoControl: 4,
@@ -240,12 +285,14 @@ const BGM_TRACK_BEATS = {
   minecraft: 8,
   modooMarble: 8,
   oneUp: 8,
+  poppyPlaytime: 8,
   pokerouge: 8,
   pokemon: 12,
   pokemonMysteryDungeon: 8,
   pokemonTcgPocket: 12,
   resultsAndMain: 83,
   rhythmHero: 8,
+  rummikub: 12,
   setup: 4,
   speedUp: 8,
   starcraft: 8,
@@ -265,13 +312,23 @@ const BGM_TRACK_BEATS = {
 const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<
   Record<BgmTrack, number>
 > = {
+  anipang: DEFAULT_BEAT_DURATION_SECONDS,
+  animalCrossingNewLeaf: DEFAULT_BEAT_DURATION_SECONDS,
   crossword: DEFAULT_BEAT_DURATION_SECONDS,
   brainAge: DEFAULT_BEAT_DURATION_SECONDS,
+  daveTheDiver: DEFAULT_BEAT_DURATION_SECONDS,
   gogunbuntu: DEFAULT_BEAT_DURATION_SECONDS,
   infiniteStairs: DEFAULT_BEAT_DURATION_SECONDS,
+  poppyPlaytime: DEFAULT_BEAT_DURATION_SECONDS,
   pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
   pokemonMysteryDungeon: DEFAULT_BEAT_DURATION_SECONDS,
+  rummikub: DEFAULT_BEAT_DURATION_SECONDS,
   wordle: DEFAULT_BEAT_DURATION_SECONDS,
+};
+
+const BGM_TRACK_SOURCE_START_SECONDS: Partial<Record<BgmTrack, number>> = {
+  anipang: 6,
+  poppyPlaytime: 8,
 };
 
 export const GAME_OVER_DURATION_MS = 5208;
@@ -399,6 +456,7 @@ class BgmLibrary {
     const gainNode = audioContext.createGain();
     const source = audioContext.createBufferSource();
     const targetDurationSeconds = this.getTargetDurationSeconds(track, buffer);
+    const sourceStartSeconds = this.getSourceStartSeconds(track, buffer);
     const sourceDurationSeconds = this.getSourceDurationSeconds(track, buffer);
     const playbackRate =
       mode === "once" ? sourceDurationSeconds / targetDurationSeconds : 1;
@@ -414,7 +472,7 @@ class BgmLibrary {
       startAt + ATTACK_FADE_SECONDS,
     );
     if (mode === "once") {
-      source.start(startAt, 0, sourceDurationSeconds);
+      source.start(startAt, sourceStartSeconds, sourceDurationSeconds);
     } else {
       source.start(startAt);
     }
@@ -524,6 +582,7 @@ class BgmLibrary {
     const gainNode = this.getAudioContext().createGain();
     const source = this.getAudioContext().createBufferSource();
     const targetDurationSeconds = this.getTargetDurationSeconds(track, buffer);
+    const sourceStartSeconds = this.getSourceStartSeconds(track, buffer);
     const sourceDurationSeconds = this.getSourceDurationSeconds(track, buffer);
     const playbackRate =
       mode === "once" ? sourceDurationSeconds / targetDurationSeconds : 1;
@@ -543,7 +602,7 @@ class BgmLibrary {
       startAt + ATTACK_FADE_SECONDS,
     );
     if (mode === "once") {
-      source.start(startAt, 0, sourceDurationSeconds);
+      source.start(startAt, sourceStartSeconds, sourceDurationSeconds);
     } else {
       source.start(startAt);
     }
@@ -628,17 +687,22 @@ class BgmLibrary {
       return buffer.duration;
     }
 
+    const sourceStartSeconds = this.getSourceStartSeconds(track, buffer);
     const sourceBeatDurationSeconds =
       BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS[track];
 
     if (!sourceBeatDurationSeconds) {
-      return buffer.duration;
+      return buffer.duration - sourceStartSeconds;
     }
 
     return Math.min(
-      buffer.duration,
+      buffer.duration - sourceStartSeconds,
       BGM_TRACK_BEATS[track] * sourceBeatDurationSeconds,
     );
+  }
+
+  private getSourceStartSeconds(track: BgmTrack, buffer: AudioBuffer) {
+    return Math.min(BGM_TRACK_SOURCE_START_SECONDS[track] ?? 0, buffer.duration);
   }
 
   private getTrackGain(track: BgmTrack) {

@@ -9,6 +9,7 @@ import {
   bgmLibrary,
   type BgmTrack,
   type SoundEffectTrack,
+  unlockBgmLibrary,
 } from "@/lib/bgmLibrary";
 import { formatPracticeSpeedMultiplier } from "@/lib/practiceSpeed";
 
@@ -26,6 +27,8 @@ const CLEAR_SOUND_EFFECTS = [
 ] satisfies SoundEffectTrack[];
 
 const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
+  anipangMatchThree: "anipang",
+  animalCrossingNewLeafTyping: "animalCrossingNewLeaf",
   animalCrossingStamps: "animalCrossing",
   animalFarmReverseTyping: "animalFarm",
   appleNumberSum: "appleGame",
@@ -37,6 +40,7 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
   cookieRunKingdom: "cookieRunKingdom",
   crosswordPuzzle: "crossword",
   crazyArcade: "crazyArcade",
+  daveTheDiverGig: "daveTheDiver",
   dobble: "dobble",
   fireAndIceDance: "fireAndIce",
   fruitNinja: "fruitNinja",
@@ -54,11 +58,13 @@ const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
   minigameExBearMeat: "minigameEx",
   minecraftMining: "minecraft",
   modooMarble: "modooMarble",
+  poppyPlaytimeScanner: "poppyPlaytime",
   pokerougeShop: "pokerouge",
   pokemonMysteryDungeon: "pokemonMysteryDungeon",
   pokemonTcgPocket: "pokemonTcgPocket",
   pokemonTyping: "pokemon",
   rhythmHeroSpinner: "rhythmHero",
+  rummikubAttach: "rummikub",
   sudokuMissingNumber: "sudoku",
   starcraftMove: "starcraft",
   superMarioCoins: "superMario",
@@ -154,6 +160,23 @@ export function usePracticeMicrogame(
   useEffect(() => {
     latestPhaseRef.current = phase;
   }, [phase]);
+
+  useEffect(() => {
+    const unlockPracticeBgm = () => {
+      unlockBgmLibrary().catch((error: unknown) => {
+        console.error(error);
+      });
+    };
+
+    unlockPracticeBgm();
+    window.addEventListener("pointerdown", unlockPracticeBgm);
+    window.addEventListener("keydown", unlockPracticeBgm);
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockPracticeBgm);
+      window.removeEventListener("keydown", unlockPracticeBgm);
+    };
+  }, []);
 
   useEffect(() => {
     if (phase !== "instruction") {
