@@ -38,6 +38,7 @@ type Tear = {
   direction: Direction;
   distance: number;
   point: Point;
+  previousPoint: Point;
 };
 
 type HitEffect = {
@@ -78,9 +79,9 @@ const BACKGROUND_HEIGHT = 941;
 const BACKGROUND_WIDTH = 1672;
 const FIRE_COOLDOWN_MS = 170;
 const FLY_DRAW_SIZE = 42;
-const FLY_HIT_RADIUS = 32;
-const FLY_SPEED_BLACK = 145;
-const FLY_SPEED_RED = 178;
+const FLY_HIT_RADIUS = 38;
+const FLY_SPEED_BLACK = 118;
+const FLY_SPEED_RED = 146;
 const HIT_EFFECT_DURATION_MS = 260;
 const MAX_DELTA_MS = 48;
 const PLAYER_DRAW_HEIGHT = 118;
@@ -94,6 +95,7 @@ const ROOM_BOUNDS = {
   top: 128,
 } as const;
 const TEAR_DRAW_SIZE = 34;
+const TEAR_HIT_RADIUS = 12;
 const TEAR_MAX_DISTANCE = 760;
 const TEAR_SPEED = 780;
 const PLAYER_IMAGE_BY_DIRECTION = {
@@ -200,6 +202,34 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
+function getDistanceToSegment(
+  point: Point,
+  segmentStart: Point,
+  segmentEnd: Point,
+) {
+  const segmentX = segmentEnd.x - segmentStart.x;
+  const segmentY = segmentEnd.y - segmentStart.y;
+  const segmentLengthSquared = segmentX * segmentX + segmentY * segmentY;
+
+  if (segmentLengthSquared === 0) {
+    return Math.hypot(point.x - segmentStart.x, point.y - segmentStart.y);
+  }
+
+  const segmentProgress = clamp(
+    ((point.x - segmentStart.x) * segmentX +
+      (point.y - segmentStart.y) * segmentY) /
+      segmentLengthSquared,
+    0,
+    1,
+  );
+  const closestPoint = {
+    x: segmentStart.x + segmentX * segmentProgress,
+    y: segmentStart.y + segmentY * segmentProgress,
+  };
+
+  return Math.hypot(point.x - closestPoint.x, point.y - closestPoint.y);
+}
+
 function getRoomLayout(width: number, height: number) {
   const scale = Math.min(width / BACKGROUND_WIDTH, height / BACKGROUND_HEIGHT);
   const drawWidth = BACKGROUND_WIDTH * scale;
@@ -278,6 +308,10 @@ function fireTear(state: GameState, tearAudio: HTMLAudioElement | null) {
   }
 
   const directionVector = getDirectionVector(state.direction);
+  const origin = {
+    x: state.player.x,
+    y: state.player.y - 12,
+  };
 
   state.tears = [
     ...state.tears,
@@ -288,6 +322,7 @@ function fireTear(state: GameState, tearAudio: HTMLAudioElement | null) {
         x: state.player.x + directionVector.x * 48,
         y: state.player.y + directionVector.y * 48 - 12,
       },
+      previousPoint: origin,
     },
   ];
   state.fireCooldownMs = FIRE_COOLDOWN_MS;
@@ -321,6 +356,7 @@ function moveTears(state: GameState, deltaSeconds: number) {
       return {
         ...tear,
         distance,
+        previousPoint: tear.point,
         point: {
           x: tear.point.x + directionVector.x * TEAR_SPEED * deltaSeconds,
           y: tear.point.y + directionVector.y * TEAR_SPEED * deltaSeconds,
@@ -394,8 +430,8 @@ function resolveTearHits(
         }
 
         return (
-          Math.hypot(tear.point.x - fly.point.x, tear.point.y - fly.point.y) <
-          FLY_HIT_RADIUS
+          getDistanceToSegment(fly.point, tear.previousPoint, tear.point) <
+          FLY_HIT_RADIUS + TEAR_HIT_RADIUS
         );
       });
 
