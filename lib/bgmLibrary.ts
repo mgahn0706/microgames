@@ -562,6 +562,8 @@ class BgmLibrary {
   }
 
   stop() {
+    this.desiredPlayback = null;
+
     if (!this.audioContext) {
       return;
     }

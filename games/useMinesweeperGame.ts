@@ -138,12 +138,16 @@ function getPointerPoint(
   canvas: HTMLCanvasElement,
   event: PointerEvent,
   layout: DrawLayout,
+  width: number,
+  height: number,
 ) {
   const bounds = canvas.getBoundingClientRect();
+  const canvasX = (event.clientX - bounds.left) * (width / bounds.width);
+  const canvasY = (event.clientY - bounds.top) * (height / bounds.height);
 
   return {
-    x: (event.clientX - bounds.left - layout.offsetX) / layout.scale,
-    y: (event.clientY - bounds.top - layout.offsetY) / layout.scale,
+    x: (canvasX - layout.offsetX) / layout.scale,
+    y: (canvasY - layout.offsetY) / layout.scale,
   } satisfies Point;
 }
 
@@ -467,7 +471,9 @@ export function useMinesweeperGameCanvas(gameBeatCount: number) {
         return;
       }
 
-      const cell = getCellAtPoint(getPointerPoint(canvas, event, layout));
+      const cell = getCellAtPoint(
+        getPointerPoint(canvas, event, layout, canvasWidth, canvasHeight),
+      );
 
       if (!cell) {
         return;

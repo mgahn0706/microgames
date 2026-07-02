@@ -43,12 +43,14 @@ export function useAnimalCrossingNewLeafGame(): Readonly<{
   inputHandlers: AnimalCrossingInputHandlers;
   inputRef: RefObject<HTMLInputElement | null>;
   targetSentence: string;
+  typedValue: string;
 }> {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const hasClearedRef = useRef(false);
   const isComposingRef = useRef(false);
   const lastInputValueRef = useRef("");
   const [targetSentence] = useState(createTargetSentence);
+  const [typedValue, setTypedValue] = useState("");
 
   const updateTypedValue = (value: string) => {
     const nextTypedValue = sanitizeAnimalCrossingInput(value).slice(
@@ -60,6 +62,8 @@ export function useAnimalCrossingNewLeafGame(): Readonly<{
     if (input && input.value !== nextTypedValue) {
       input.value = nextTypedValue;
     }
+
+    setTypedValue(nextTypedValue);
 
     if (lastInputValueRef.current !== nextTypedValue) {
       playTypeSound();
@@ -88,6 +92,12 @@ export function useAnimalCrossingNewLeafGame(): Readonly<{
   const inputHandlers = {
     onChange: (event) => {
       if (isComposingRef.current) {
+        setTypedValue(
+          sanitizeAnimalCrossingInput(event.currentTarget.value).slice(
+            0,
+            targetSentence.length,
+          ),
+        );
         return;
       }
 
@@ -136,5 +146,6 @@ export function useAnimalCrossingNewLeafGame(): Readonly<{
     inputHandlers,
     inputRef,
     targetSentence,
+    typedValue,
   };
 }

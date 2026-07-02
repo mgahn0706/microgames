@@ -9,8 +9,10 @@ export function AnimalCrossingNewLeafGame({
 }: Readonly<{ microgame: Microgame }>) {
   void microgame;
 
-  const { inputHandlers, inputRef, targetSentence } =
+  const { inputHandlers, inputRef, targetSentence, typedValue } =
     useAnimalCrossingNewLeafGame();
+  const textLayerClassName =
+    "pointer-events-none absolute inset-0 flex items-center px-[2.4%] font-black leading-none [font-size:clamp(1.35rem,2.75vw,2.9rem)]";
 
   return (
     <div className="relative grid h-screen w-screen place-items-center overflow-hidden bg-[#fff1a8]">
@@ -27,9 +29,15 @@ export function AnimalCrossingNewLeafGame({
         <div className="absolute left-[31.2%] top-[23.8%] h-[7.4%] w-[41.6%] overflow-hidden">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 flex items-center px-[2.4%] font-black text-[#0018b8]/50 [font-size:clamp(1.35rem,2.75vw,2.9rem)]"
+            className={`${textLayerClassName} text-[#0018b8]/50`}
           >
             {targetSentence}
+          </div>
+          <div
+            aria-hidden
+            className={`${textLayerClassName} text-[#0018b8]`}
+          >
+            {typedValue}
           </div>
           <input
             ref={inputRef}
@@ -37,7 +45,7 @@ export function AnimalCrossingNewLeafGame({
             autoCapitalize="off"
             autoComplete="off"
             autoFocus
-            className="absolute inset-0 h-full w-full border-0 bg-transparent px-[2.4%] font-black text-[#0018b8] caret-[#0018b8] outline-none [font-size:clamp(1.35rem,2.75vw,2.9rem)]"
+            className="absolute inset-0 h-full w-full border-0 bg-transparent px-[2.4%] font-black text-transparent caret-[#0018b8] outline-none [font-size:clamp(1.35rem,2.75vw,2.9rem)]"
             inputMode="text"
             lang="ko"
             spellCheck={false}

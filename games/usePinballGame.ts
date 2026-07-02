@@ -20,9 +20,6 @@ const BUMPER_FLASH_MS = 150;
 const CANVAS_HEIGHT = 540;
 const CANVAS_WIDTH = 962;
 const DEFAULT_BEAT_DURATION_MS = 500;
-const DRAIN_LEFT = 438;
-const DRAIN_RIGHT = 524;
-const DRAIN_Y = 407;
 const FLIPPER_HEIGHT = 42;
 const FLIPPER_LENGTH = 118;
 const FLIPPER_MIN_COLLISION_LIFT = 0.18;
@@ -109,10 +106,10 @@ function createInitialState() {
   const startsOnLeft = Math.random() < 0.5;
 
   return {
-    ballVX: startsOnLeft ? 92 : -92,
-    ballVY: 138,
-    ballX: startsOnLeft ? 432 : 530,
-    ballY: 205,
+    ballVX: startsOnLeft ? -40 : 40,
+    ballVY: 140,
+    ballX: startsOnLeft ? 360 : 602,
+    ballY: 280,
     elapsedMs: 0,
     flipperLift: 0,
     flipperPressed: false,
@@ -298,24 +295,13 @@ function bounceOffWalls(state: GameState) {
     state.ballVY = Math.abs(state.ballVY) * 0.86 + 32;
     playSoundEffect("pinballBounce");
   }
-
-  if (
-    state.ballY + BALL_RADIUS >= PLAYFIELD_BOTTOM_Y &&
-    (state.ballX < DRAIN_LEFT || state.ballX > DRAIN_RIGHT)
-  ) {
-    state.ballY = PLAYFIELD_BOTTOM_Y - BALL_RADIUS;
-    state.ballVY = -Math.abs(state.ballVY) * 0.5;
-    state.ballVX *= 0.86;
-  }
 }
 
 function checkDrainFailure(state: GameState) {
-  const isInDrain =
-    state.ballY + BALL_RADIUS >= DRAIN_Y &&
-    state.ballX >= DRAIN_LEFT &&
-    state.ballX <= DRAIN_RIGHT;
-
-  if (isInDrain || state.ballY - BALL_RADIUS > CANVAS_HEIGHT) {
+  if (
+    state.ballY + BALL_RADIUS >= PLAYFIELD_BOTTOM_Y ||
+    state.ballY - BALL_RADIUS > CANVAS_HEIGHT
+  ) {
     state.hasFailed = true;
     playSoundEffect("pinballGameOver");
     dispatchFailure();
