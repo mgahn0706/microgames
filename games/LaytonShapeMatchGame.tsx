@@ -16,7 +16,7 @@ export function LaytonShapeMatchGame({
 }: Readonly<{ microgame: Microgame }>) {
   void microgame;
 
-  const { chooseAnswer, hasFailed, lastWrongAnswer, puzzle } =
+  const { chooseAnswer, hasCleared, hasFailed, lastWrongAnswer, puzzle } =
     useLaytonShapeMatchGame();
 
   return (
@@ -34,7 +34,8 @@ export function LaytonShapeMatchGame({
         />
         {ANSWER_HOTSPOTS.map(({ answer, left }) => {
           const isWrongAnswer = lastWrongAnswer === answer;
-          const isCorrectAnswer = hasFailed && puzzle.answer === answer;
+          const isCorrectAnswer =
+            (hasFailed || hasCleared) && puzzle.answer === answer;
 
           return (
             <button
@@ -43,10 +44,10 @@ export function LaytonShapeMatchGame({
                 isWrongAnswer
                   ? "animate-[layton-wrong-shake_180ms_ease-in-out_2] bg-red-500/34 shadow-[inset_0_0_0_4px_rgba(248,113,113,0.92),0_0_26px_rgba(248,113,113,0.72)]"
                   : isCorrectAnswer
-                    ? "bg-emerald-400/24 shadow-[inset_0_0_0_4px_rgba(110,231,183,0.86),0_0_24px_rgba(52,211,153,0.55)]"
+                    ? "animate-[layton-correct-pop_420ms_cubic-bezier(0.16,0.9,0.22,1.18)_both] bg-emerald-400/28 shadow-[inset_0_0_0_5px_rgba(110,231,183,0.96),0_0_34px_rgba(52,211,153,0.72)]"
                     : "bg-transparent"
               }`}
-              disabled={hasFailed}
+              disabled={hasFailed || hasCleared}
               key={answer}
               onPointerDown={(event) => {
                 event.preventDefault();
@@ -57,6 +58,11 @@ export function LaytonShapeMatchGame({
             />
           );
         })}
+        {hasCleared ? (
+          <div className="pointer-events-none absolute left-1/2 top-[18%] z-20 -translate-x-1/2 animate-[layton-correct-text_500ms_ease-out_both] rounded-md border-2 border-emerald-100/70 bg-emerald-500/78 px-8 py-4 text-[clamp(1.8rem,4vw,4rem)] font-black text-white shadow-[0_0_36px_rgba(52,211,153,0.58)]">
+            정답!
+          </div>
+        ) : null}
       </div>
       <style jsx>{`
         @keyframes layton-wrong-shake {
@@ -69,6 +75,29 @@ export function LaytonShapeMatchGame({
           }
           75% {
             transform: translateX(calc(-50% + 0.42rem));
+          }
+        }
+
+        @keyframes layton-correct-pop {
+          0% {
+            transform: translateX(-50%) scale(1);
+          }
+          55% {
+            transform: translateX(-50%) scale(1.08);
+          }
+          100% {
+            transform: translateX(-50%) scale(1.03);
+          }
+        }
+
+        @keyframes layton-correct-text {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, 14px) scale(0.9);
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
           }
         }
       `}</style>

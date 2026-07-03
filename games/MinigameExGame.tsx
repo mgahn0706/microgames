@@ -23,8 +23,14 @@ export function MinigameExGame({
 }: Readonly<{ microgame: Microgame }>) {
   void microgame;
 
-  const { activeEatingBears, containerRef, hasFailed, isChoosing, wrongBear } =
-    useMinigameExGame();
+  const {
+    activeEatingBears,
+    containerRef,
+    correctBear,
+    hasFailed,
+    isChoosing,
+    wrongBear,
+  } = useMinigameExGame();
 
   return (
     <div
@@ -48,13 +54,18 @@ export function MinigameExGame({
       ) : null}
       {BEAR_LAYOUT.map((bear) => {
         const isEating = activeEatingBears.includes(bear.number);
+        const isCorrect = correctBear === bear.number;
         const isWrong = wrongBear === bear.number;
 
         return (
           <div
             aria-label={`${bear.number}번 곰 선택`}
             className={`pointer-events-none absolute z-10 aspect-[3/2] w-[clamp(17rem,38vw,32rem)] -translate-x-1/2 -translate-y-1/2 transition duration-150 ${
-              isChoosing ? "scale-105" : ""
+              isCorrect
+                ? "animate-[minigame-ex-correct-pop_420ms_cubic-bezier(0.16,0.9,0.22,1.2)_both] scale-110"
+                : isChoosing
+                  ? "scale-105"
+                  : ""
             } ${hasFailed ? "opacity-55 grayscale" : ""} ${
               isWrong ? "scale-95" : ""
             }`}
@@ -76,7 +87,9 @@ export function MinigameExGame({
             />
             <span
               className={`absolute left-1/2 top-full mt-1 grid size-10 -translate-x-1/2 place-items-center rounded-full border text-xl font-black shadow-[0_0_16px_rgba(251,191,36,0.22)] ${
-                isChoosing
+                isCorrect
+                  ? "border-emerald-50 bg-emerald-300 text-stone-950 shadow-[0_0_30px_rgba(52,211,153,0.78)]"
+                  : isChoosing
                   ? "border-amber-100 bg-amber-300 text-stone-950"
                   : "border-white/35 bg-black/45 text-white/80"
               }`}
@@ -86,6 +99,38 @@ export function MinigameExGame({
           </div>
         );
       })}
+      {correctBear ? (
+        <div className="pointer-events-none absolute left-1/2 top-[14%] z-30 -translate-x-1/2 animate-[minigame-ex-correct-text_520ms_ease-out_both] rounded-md border-2 border-emerald-100/70 bg-emerald-500/78 px-8 py-4 text-[clamp(1.8rem,4vw,4rem)] font-black text-white shadow-[0_0_36px_rgba(52,211,153,0.58)]">
+          정답!
+        </div>
+      ) : null}
+      <style jsx>{`
+        @keyframes minigame-ex-correct-pop {
+          0% {
+            filter: brightness(1);
+            transform: translate(-50%, -50%) scale(1.05);
+          }
+          55% {
+            filter: brightness(1.25);
+            transform: translate(-50%, -50%) scale(1.18);
+          }
+          100% {
+            filter: brightness(1.12);
+            transform: translate(-50%, -50%) scale(1.1);
+          }
+        }
+
+        @keyframes minigame-ex-correct-text {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, 16px) scale(0.88);
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -154,6 +154,7 @@ export function useMinigameExGame(): Readonly<{
   activeEatingBears: readonly BearNumber[];
   chooseBear: (bearNumber: BearNumber) => void;
   containerRef: RefObject<HTMLDivElement | null>;
+  correctBear: BearNumber | null;
   hasFailed: boolean;
   isChoosing: boolean;
   wrongBear: BearNumber | null;
@@ -164,6 +165,7 @@ export function useMinigameExGame(): Readonly<{
   const [activeEatingBears, setActiveEatingBears] = useState<
     readonly BearNumber[]
   >([]);
+  const [correctBear, setCorrectBear] = useState<BearNumber | null>(null);
   const [gamePlan] = useState(createGamePlan);
   const [hasFailed, setHasFailed] = useState(false);
   const [isChoosing, setIsChoosing] = useState(false);
@@ -178,6 +180,7 @@ export function useMinigameExGame(): Readonly<{
       hasResolvedRef.current = true;
 
       if (bearNumber === gamePlan.answer) {
+        setCorrectBear(bearNumber);
         dispatchClear();
         return;
       }
@@ -266,6 +269,7 @@ export function useMinigameExGame(): Readonly<{
     activeEatingBears,
     chooseBear,
     containerRef,
+    correctBear,
     hasFailed,
     isChoosing,
     wrongBear,

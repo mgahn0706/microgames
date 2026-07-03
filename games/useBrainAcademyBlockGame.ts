@@ -224,6 +224,34 @@ function drawScene(
       "#ef4444",
     );
   }
+
+  if (state.hasCleared) {
+    const progress = 1 - state.feedbackMs / FEEDBACK_DURATION_MS;
+    const pulse = 1 + Math.sin(progress * Math.PI) * 0.12;
+    const badgeRadius = Math.min(width, height) * 0.12 * pulse;
+    const badgeX = width / 2;
+    const badgeY = Math.min(height * 0.86, puzzleY + puzzleSize + 72);
+
+    context.save();
+    context.globalAlpha = 0.92;
+    context.fillStyle = "rgba(16, 185, 129, 0.9)";
+    context.shadowColor = "rgba(52, 211, 153, 0.78)";
+    context.shadowBlur = 34;
+    context.beginPath();
+    context.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
+    context.fill();
+    context.shadowBlur = 0;
+    context.strokeStyle = "#ecfdf5";
+    context.lineWidth = Math.max(8, badgeRadius * 0.12);
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.beginPath();
+    context.moveTo(badgeX - badgeRadius * 0.42, badgeY - badgeRadius * 0.02);
+    context.lineTo(badgeX - badgeRadius * 0.12, badgeY + badgeRadius * 0.3);
+    context.lineTo(badgeX + badgeRadius * 0.48, badgeY - badgeRadius * 0.34);
+    context.stroke();
+    context.restore();
+  }
 }
 
 export function useBrainAcademyBlockGameCanvas() {

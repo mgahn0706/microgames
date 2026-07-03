@@ -136,6 +136,9 @@ function drawScene(
 ) {
   drawBackground(context, width, height);
 
+  const hasCorrectAnswer =
+    state.hasAnswered && state.selectedNumber === state.puzzle.answer;
+
   const boardSize = Math.min(width * 0.58, height * 0.7, 620);
   const cellSize = boardSize / GRID_SIZE;
   const boardX = (width - boardSize) / 2;
@@ -168,8 +171,20 @@ function drawScene(
     if (isMissing) {
       const pulse = (Math.sin(performance.now() / 180) + 1) / 2;
 
-      context.fillStyle = `rgba(34, 211, 238, ${0.22 + pulse * 0.18})`;
+      context.fillStyle = hasCorrectAnswer
+        ? `rgba(52, 211, 153, ${0.28 + pulse * 0.26})`
+        : `rgba(34, 211, 238, ${0.22 + pulse * 0.18})`;
       context.fillRect(x + 5, y + 5, cellSize - 10, cellSize - 10);
+
+      if (hasCorrectAnswer) {
+        context.save();
+        context.strokeStyle = "rgba(167, 243, 208, 0.96)";
+        context.lineWidth = Math.max(5, cellSize * 0.055);
+        context.shadowColor = "rgba(52, 211, 153, 0.85)";
+        context.shadowBlur = 24;
+        context.strokeRect(x + 9, y + 9, cellSize - 18, cellSize - 18);
+        context.restore();
+      }
     } else {
       context.fillStyle =
         (row + column) % 2 === 0
@@ -233,6 +248,18 @@ function drawScene(
   context.shadowBlur = 18;
   context.fillText("1부터 9까지, 빠진 숫자는?", width / 2, height * 0.105);
   context.shadowBlur = 0;
+
+  if (hasCorrectAnswer) {
+    context.save();
+    context.fillStyle = "#bbf7d0";
+    context.font = `900 ${Math.max(30, Math.min(58, height * 0.075))}px Arial, sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.shadowColor = "rgba(52, 211, 153, 0.86)";
+    context.shadowBlur = 28;
+    context.fillText("정답!", width / 2, height * 0.91);
+    context.restore();
+  }
 }
 
 export function useSudokuGameCanvas() {

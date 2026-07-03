@@ -152,6 +152,7 @@ export function useCrosswordGame(): Readonly<{
   inputHandlers: CrosswordInputHandlers;
   inputRef: RefObject<HTMLInputElement | null>;
   isMistake: boolean;
+  isSolved: boolean;
   verticalClue: string;
 }> {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -160,6 +161,7 @@ export function useCrosswordGame(): Readonly<{
   const mistakeTimerRef = useRef<number | null>(null);
   const [targetCase] = useState(createTargetCase);
   const [isMistake, setIsMistake] = useState(false);
+  const [isSolved, setIsSolved] = useState(false);
   const answer = getAnswer(targetCase);
   const grid = useMemo(() => createGrid(targetCase), [targetCase]);
 
@@ -201,7 +203,11 @@ export function useCrosswordGame(): Readonly<{
     hasClearedRef.current = true;
     clearMistakeTimer();
     setIsMistake(false);
-    inputRef.current?.blur();
+    setIsSolved(true);
+    if (inputRef.current) {
+      inputRef.current.value = answer;
+      inputRef.current.blur();
+    }
     dispatchClear();
   };
 
@@ -264,6 +270,7 @@ export function useCrosswordGame(): Readonly<{
     inputHandlers,
     inputRef,
     isMistake,
+    isSolved,
     verticalClue: maskWord(targetCase.vertical, targetCase.verticalIndex),
   };
 }

@@ -184,12 +184,19 @@ function getBoardLayout(width: number, height: number) {
   } satisfies BoardLayout;
 }
 
-function getPointerPoint(canvas: HTMLCanvasElement, event: PointerEvent) {
+function getPointerPoint(
+  canvas: HTMLCanvasElement,
+  event: PointerEvent,
+  canvasWidth: number,
+  canvasHeight: number,
+) {
   const bounds = canvas.getBoundingClientRect();
+  const scaleX = bounds.width > 0 ? canvasWidth / bounds.width : 1;
+  const scaleY = bounds.height > 0 ? canvasHeight / bounds.height : 1;
 
   return {
-    x: event.clientX - bounds.left,
-    y: event.clientY - bounds.top,
+    x: (event.clientX - bounds.left) * scaleX,
+    y: (event.clientY - bounds.top) * scaleY,
   };
 }
 
@@ -412,15 +419,24 @@ export function useAppleGameCanvas() {
     let canvasHeight = MIN_CANVAS_HEIGHT;
     let canvasWidth = MIN_CANVAS_WIDTH;
     let isDisposed = false;
-    const pixelRatio = window.devicePixelRatio || 1;
 
     const resizeCanvas = () => {
       const bounds = canvas.getBoundingClientRect();
+      const pixelRatio = window.devicePixelRatio || 1;
 
       canvasWidth = Math.max(bounds.width, MIN_CANVAS_WIDTH);
       canvasHeight = Math.max(bounds.height, MIN_CANVAS_HEIGHT);
-      canvas.width = Math.floor(canvasWidth * pixelRatio);
-      canvas.height = Math.floor(canvasHeight * pixelRatio);
+      const nextCanvasWidth = Math.floor(canvasWidth * pixelRatio);
+      const nextCanvasHeight = Math.floor(canvasHeight * pixelRatio);
+
+      if (canvas.width !== nextCanvasWidth) {
+        canvas.width = nextCanvasWidth;
+      }
+
+      if (canvas.height !== nextCanvasHeight) {
+        canvas.height = nextCanvasHeight;
+      }
+
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     };
 
@@ -429,7 +445,14 @@ export function useAppleGameCanvas() {
         return;
       }
 
-      const pointer = getPointerPoint(canvas, event);
+      resizeCanvas();
+
+      const pointer = getPointerPoint(
+        canvas,
+        event,
+        canvasWidth,
+        canvasHeight,
+      );
 
       event.preventDefault();
       stateRef.current.drag = {
@@ -448,7 +471,7 @@ export function useAppleGameCanvas() {
       event.preventDefault();
       state.drag = {
         ...state.drag,
-        current: getPointerPoint(canvas, event),
+        current: getPointerPoint(canvas, event, canvasWidth, canvasHeight),
       };
     };
 
@@ -462,7 +485,7 @@ export function useAppleGameCanvas() {
       const layout = getBoardLayout(canvasWidth, canvasHeight);
       const drag = {
         ...state.drag,
-        current: getPointerPoint(canvas, event),
+        current: getPointerPoint(canvas, event, canvasWidth, canvasHeight),
       };
       const selectionRect = getSelectionRect(drag);
       const selectedApples = getSelectedApples(
@@ -489,6 +512,7 @@ export function useAppleGameCanvas() {
     };
 
     const render = () => {
+      resizeCanvas();
       drawScene(
         context,
         stateRef.current,

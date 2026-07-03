@@ -11,10 +11,11 @@ export const DEFAULT_CHALLENGE_MODES = {
 } satisfies ChallengeModes;
 
 export const CHALLENGE_MODE_UNLOCK_ROUND = 13;
+export const FAST_START_INITIAL_SPEED_MULTIPLIER = 2;
 
 export const CHALLENGE_MODE_OPTIONS = [
   {
-    description: "첫 라운드부터 기본 속도의 1.8배로 시작합니다.",
+    description: `첫 라운드부터 기본 속도의 ${FAST_START_INITIAL_SPEED_MULTIPLIER}배로 시작합니다.`,
     key: "fastStart",
     title: "완전빠름",
   },

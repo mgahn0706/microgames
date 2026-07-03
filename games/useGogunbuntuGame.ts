@@ -61,6 +61,7 @@ const SOUNDS = {
 type AssetKey = keyof typeof ASSETS;
 
 const COIN_COUNT_TO_CLEAR = 15;
+const COIN_HIT_RADIUS_X = 58;
 const COIN_RADIUS = 28;
 const DEFAULT_BEAT_DURATION_MS = RHYTHM_DURATION_MS;
 const GRAVITY = 2850;
@@ -84,6 +85,10 @@ const PLATFORM_SCROLL_PER_BEAT = 760;
 const SPARKLE_DURATION_MS = 360;
 const SPARKLE_COUNT = 8;
 const WORLD_SCROLL_PER_BEAT = 430;
+const BASE_PLATFORM_SPEED =
+  PLATFORM_SCROLL_PER_BEAT / (DEFAULT_BEAT_DURATION_MS / 1000);
+const BASE_WORLD_SPEED =
+  WORLD_SCROLL_PER_BEAT / (DEFAULT_BEAT_DURATION_MS / 1000);
 
 function dispatchClear() {
   window.dispatchEvent(new CustomEvent(MICROGAME_CLEAR_EVENT));
@@ -182,6 +187,14 @@ function getBeatDurationMs(canvas: HTMLCanvasElement) {
   return Number.isFinite(parsedDuration) && parsedDuration > 0
     ? parsedDuration
     : DEFAULT_BEAT_DURATION_MS;
+}
+
+function getSpeedScale(beatDurationMs: number) {
+  return DEFAULT_BEAT_DURATION_MS / beatDurationMs;
+}
+
+function getCoinHitRadiusX(speedScale: number) {
+  return Math.min(COIN_HIT_RADIUS_X * Math.max(1, speedScale), 174);
 }
 
 function getCoverLayout(
@@ -456,6 +469,7 @@ function collectCoins(
   groundY: number,
   coinAudio: HTMLAudioElement | null,
   worldSpeed: number,
+  coinHitRadiusX: number,
   layout: ImageLayout,
 ) {
   state.coins.forEach((coin) => {
@@ -475,7 +489,7 @@ function collectCoins(
       playerPoint.y - PLAYER_CENTER_Y_OFFSET - coinPoint.y,
     );
 
-    if (xDistance > 58 || yDistance > 64) {
+    if (xDistance > coinHitRadiusX || yDistance > 64) {
       return;
     }
 
@@ -581,8 +595,9 @@ export function useGogunbuntuGameCanvas({
       const { height, width } = resizeCanvas(canvas, context);
 
       const beatDurationMs = getBeatDurationMs(canvas);
-      const worldSpeed = WORLD_SCROLL_PER_BEAT / (beatDurationMs / 1000);
-      const platformSpeed = PLATFORM_SCROLL_PER_BEAT / (beatDurationMs / 1000);
+      const speedScale = getSpeedScale(beatDurationMs);
+      const worldSpeed = BASE_WORLD_SPEED;
+      const coinHitRadiusX = getCoinHitRadiusX(speedScale);
       const backgroundLayout = getBackgroundLayout(
         imagesRef.current.background,
         width,
@@ -599,12 +614,14 @@ export function useGogunbuntuGameCanvas({
           ? 0
           : Math.min(timestamp - state.lastTimestamp, MAX_DELTA_MS);
       const deltaSeconds = deltaMs / 1000;
+      const scaledDeltaMs = deltaMs * speedScale;
+      const scaledDeltaSeconds = deltaSeconds * speedScale;
 
       state.lastTimestamp = timestamp;
 
       if (isActiveRef.current) {
-        state.elapsedMs += deltaMs;
-        state.platformOffset += platformSpeed * deltaSeconds;
+        state.elapsedMs += scaledDeltaMs;
+        state.platformOffset += BASE_PLATFORM_SPEED * scaledDeltaSeconds;
         state.sparkles = state.sparkles
           .map((sparkle) => ({
             ...sparkle,
@@ -614,10 +631,10 @@ export function useGogunbuntuGameCanvas({
       }
 
       if (isActiveRef.current) {
-        state.playerVelocityY += GRAVITY * deltaSeconds;
+        state.playerVelocityY += GRAVITY * scaledDeltaSeconds;
         state.playerY = Math.min(
           0,
-          state.playerY + state.playerVelocityY * deltaSeconds,
+          state.playerY + state.playerVelocityY * scaledDeltaSeconds,
         );
 
         if (state.playerY === 0) {
@@ -640,6 +657,7 @@ export function useGogunbuntuGameCanvas({
           groundY,
           coinAudioRef.current,
           worldSpeed,
+          coinHitRadiusX,
           backgroundLayout,
         );
       }

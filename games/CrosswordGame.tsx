@@ -14,6 +14,7 @@ export function CrosswordGame({
     inputHandlers,
     inputRef,
     isMistake,
+    isSolved,
     verticalClue,
   } = useCrosswordGame();
 
@@ -40,7 +41,11 @@ export function CrosswordGame({
                   cell.isFilled
                     ? cell.isAnswer
                       ? `border-amber-100 bg-amber-200 text-slate-950 shadow-[0_0_22px_rgba(251,191,36,0.45)] ${
-                          isMistake ? "animate-pulse" : ""
+                          isSolved
+                            ? "animate-[crossword-correct-pop_460ms_cubic-bezier(0.16,0.9,0.22,1.18)_both] shadow-[0_0_36px_rgba(52,211,153,0.72)]"
+                            : isMistake
+                              ? "animate-pulse"
+                              : ""
                         }`
                       : "border-cyan-100/34 bg-slate-50 text-slate-950"
                     : "border-white/8 bg-slate-950/70"
@@ -64,11 +69,45 @@ export function CrosswordGame({
                     {...inputHandlers}
                   />
                 ) : null}
+                {cell.isAnswer && isSolved ? (
+                  <span className="pointer-events-none absolute -right-3 -top-3 grid size-10 place-items-center rounded-full bg-emerald-400 text-xl font-black text-emerald-950 shadow-[0_0_24px_rgba(52,211,153,0.72)]">
+                    ✓
+                  </span>
+                ) : null}
               </div>
             )),
           )}
         </div>
       </section>
+      {isSolved ? (
+        <div className="pointer-events-none absolute bottom-[8%] left-1/2 z-20 -translate-x-1/2 animate-[crossword-correct-text_500ms_ease-out_both] rounded-md border border-emerald-100/70 bg-emerald-500/78 px-8 py-4 text-[clamp(1.8rem,4vw,4rem)] font-black text-white shadow-[0_0_34px_rgba(52,211,153,0.58)]">
+          정답!
+        </div>
+      ) : null}
+      <style jsx>{`
+        @keyframes crossword-correct-pop {
+          0% {
+            transform: scale(1);
+          }
+          55% {
+            transform: scale(1.13);
+          }
+          100% {
+            transform: scale(1.05);
+          }
+        }
+
+        @keyframes crossword-correct-text {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, 14px) scale(0.9);
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

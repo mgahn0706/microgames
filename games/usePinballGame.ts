@@ -27,8 +27,9 @@ const GRAVITY = 610;
 const MAX_BALL_SPEED = 740;
 const MAX_DELTA_MS = 44;
 const MAX_PHYSICS_STEP_MS = 7;
-const PLAYFIELD_BOTTOM_Y = 422;
+const PLAYFIELD_BOTTOM_Y = 448;
 const PLAYFIELD_TOP_Y = 54;
+const START_DRAIN_GRACE_MS = 900;
 const WALL_LEFT = 66;
 const WALL_RIGHT = 896;
 
@@ -103,13 +104,11 @@ function createImage(src: string) {
 }
 
 function createInitialState() {
-  const startsOnLeft = Math.random() < 0.5;
-
   return {
-    ballVX: startsOnLeft ? -40 : 40,
-    ballVY: 140,
-    ballX: startsOnLeft ? 360 : 602,
-    ballY: 280,
+    ballVX: 0,
+    ballVY: 90,
+    ballX: 430,
+    ballY: 72,
     elapsedMs: 0,
     flipperLift: 0,
     flipperPressed: false,
@@ -190,7 +189,7 @@ function getClosestPointOnSegment(point: Point, segment: LineSegment) {
 }
 
 function handleFlipperCollision(state: GameState, segment: Segment) {
-  if (state.flipperLift < FLIPPER_MIN_COLLISION_LIFT) {
+  if (state.hasCleared || state.flipperLift < FLIPPER_MIN_COLLISION_LIFT) {
     return;
   }
 
@@ -214,7 +213,9 @@ function handleFlipperCollision(state: GameState, segment: Segment) {
   state.ballY = closestPoint.y - BALL_RADIUS - 8;
   state.ballVX = segment.side === "left" ? lateralSpeed : -lateralSpeed;
   state.ballVY = -340 - 210 * liftBoost;
+  state.hasCleared = true;
   playSoundEffect("pinballBounce");
+  dispatchClear();
 }
 
 function handleCircleCollision(
@@ -298,6 +299,14 @@ function bounceOffWalls(state: GameState) {
 }
 
 function checkDrainFailure(state: GameState) {
+  if (state.hasCleared) {
+    return;
+  }
+
+  if (state.elapsedMs < START_DRAIN_GRACE_MS) {
+    return;
+  }
+
   if (
     state.ballY + BALL_RADIUS >= PLAYFIELD_BOTTOM_Y ||
     state.ballY - BALL_RADIUS > CANVAS_HEIGHT
@@ -359,7 +368,7 @@ function stepState(
   for (let index = 0; index < stepCount; index += 1) {
     stepPhysics(state, stepDeltaMs, speedScale);
 
-    if (state.hasFailed) {
+    if (state.hasCleared || state.hasFailed) {
       return;
     }
   }

@@ -61,12 +61,14 @@ function getRandomPuzzle() {
 
 export function useLaytonShapeMatchGame(): Readonly<{
   chooseAnswer: (answer: LaytonAnswer) => void;
+  hasCleared: boolean;
   hasFailed: boolean;
   lastWrongAnswer: LaytonAnswer | null;
   puzzle: LaytonPuzzle;
 }> {
   const hasClearedRef = useRef(false);
   const hasFailedRef = useRef(false);
+  const [hasCleared, setHasCleared] = useState(false);
   const [hasFailed, setHasFailed] = useState(false);
   const [lastWrongAnswer, setLastWrongAnswer] = useState<LaytonAnswer | null>(
     null,
@@ -81,6 +83,7 @@ export function useLaytonShapeMatchGame(): Readonly<{
 
       if (answer === puzzle.answer) {
         hasClearedRef.current = true;
+        setHasCleared(true);
         dispatchClear();
         return;
       }
@@ -112,6 +115,7 @@ export function useLaytonShapeMatchGame(): Readonly<{
 
   return {
     chooseAnswer,
+    hasCleared,
     hasFailed,
     lastWrongAnswer,
     puzzle,

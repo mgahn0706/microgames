@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ChallengeModes } from "@/data/challengeModes";
+import {
+  FAST_START_INITIAL_SPEED_MULTIPLIER,
+  type ChallengeModes,
+} from "@/data/challengeModes";
 import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
 import { getMicrogamePoolForRound, type Microgame } from "@/data/microgames";
 import { useBeatGameRound } from "@/hooks/useBeatGameRound";
@@ -235,7 +238,9 @@ export function GameScreen({
   } = useBeatGameRound({
     getGameBeatCount: (nextRoundNumber) =>
       getMicrogameForRound(nextRoundNumber).beatCount,
-    initialSpeedMultiplier: challengeModes.fastStart ? 1.8 : 1,
+    initialSpeedMultiplier: challengeModes.fastStart
+      ? FAST_START_INITIAL_SPEED_MULTIPLIER
+      : 1,
     noControlHints: challengeModes.noControlHints,
     onFailure: onLoseLife,
     onFinish,

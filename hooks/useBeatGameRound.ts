@@ -15,7 +15,7 @@ const SPEED_UP_INTERVAL_ROUNDS = 4;
 const BOSS_STAGE_INTERVAL_ROUNDS = 12;
 const EARLY_SUCCESS_RESULT_BEAT_INTERVAL = 4;
 const EARLY_SUCCESS_RESULT_DELAY_MS = 500;
-const SPEED_UP_BEAT_DURATION_MULTIPLIER = 0.94;
+const SPEED_UP_BEAT_DURATION_MULTIPLIER = 1 / 1.2;
 const BEAT_PROGRESS_INTERVAL_MS = 50;
 
 export type GameRoundPhase =
@@ -93,6 +93,10 @@ function getBeatDurationMs(speedLevel: number, initialSpeedMultiplier: number) {
 
 function getBossStageSpeedLevel(roundNumber: number) {
   return Math.max(roundNumber / BOSS_STAGE_INTERVAL_ROUNDS - 1, 0);
+}
+
+function getPostBossGameSpeedLevel(roundNumber: number) {
+  return getBossStageSpeedLevel(roundNumber - 1) + 1;
 }
 
 function isBossGameRound(roundNumber: number) {
@@ -236,14 +240,14 @@ export function useBeatGameRound({
 
       if (phase === "result" && shouldOneUpAfterResult) {
         setShouldOneUpAfterResult(false);
-        setSpeedLevel((currentSpeedLevel) => currentSpeedLevel + 1);
+        setSpeedLevel(getPostBossGameSpeedLevel(roundNumber));
         setRoundNumber((currentRoundNumber) => currentRoundNumber + 1);
         beginInstruction();
         return;
       }
 
       if (phase === "result" && isBossGameRound(roundNumber)) {
-        setSpeedLevel((currentSpeedLevel) => currentSpeedLevel + 1);
+        setSpeedLevel(getPostBossGameSpeedLevel(roundNumber));
         setRoundNumber((currentRoundNumber) => currentRoundNumber + 1);
         beginInstruction();
         return;
@@ -278,7 +282,7 @@ export function useBeatGameRound({
       }
 
       if (phase === "oneUp") {
-        setSpeedLevel((currentSpeedLevel) => currentSpeedLevel + 1);
+        setSpeedLevel(getPostBossGameSpeedLevel(roundNumber));
         setRoundNumber((currentRoundNumber) => currentRoundNumber + 1);
         beginInstruction();
         return;
