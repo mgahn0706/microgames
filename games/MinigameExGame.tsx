@@ -62,7 +62,7 @@ export function MinigameExGame({
             aria-label={`${bear.number}번 곰 선택`}
             className={`pointer-events-none absolute z-10 aspect-[3/2] w-[clamp(17rem,38vw,32rem)] -translate-x-1/2 -translate-y-1/2 transition duration-150 ${
               isCorrect
-                ? "animate-[minigame-ex-correct-pop_420ms_cubic-bezier(0.16,0.9,0.22,1.2)_both] scale-110"
+                ? "scale-105 drop-shadow-[0_0_24px_rgba(52,211,153,0.58)]"
                 : isChoosing
                   ? "scale-105"
                   : ""
@@ -88,10 +88,10 @@ export function MinigameExGame({
             <span
               className={`absolute left-1/2 top-full mt-1 grid size-10 -translate-x-1/2 place-items-center rounded-full border text-xl font-black shadow-[0_0_16px_rgba(251,191,36,0.22)] ${
                 isCorrect
-                  ? "border-emerald-50 bg-emerald-300 text-stone-950 shadow-[0_0_30px_rgba(52,211,153,0.78)]"
+                  ? "animate-[minigame-ex-correct-badge_420ms_cubic-bezier(0.16,0.9,0.22,1.2)_both] border-emerald-50 bg-emerald-300 text-stone-950 shadow-[0_0_30px_rgba(52,211,153,0.78)]"
                   : isChoosing
-                  ? "border-amber-100 bg-amber-300 text-stone-950"
-                  : "border-white/35 bg-black/45 text-white/80"
+                    ? "border-amber-100 bg-amber-300 text-stone-950"
+                    : "border-white/35 bg-black/45 text-white/80"
               }`}
             >
               {bear.number}
@@ -105,18 +105,15 @@ export function MinigameExGame({
         </div>
       ) : null}
       <style jsx>{`
-        @keyframes minigame-ex-correct-pop {
+        @keyframes minigame-ex-correct-badge {
           0% {
-            filter: brightness(1);
-            transform: translate(-50%, -50%) scale(1.05);
+            transform: translateX(-50%) scale(1);
           }
           55% {
-            filter: brightness(1.25);
-            transform: translate(-50%, -50%) scale(1.18);
+            transform: translateX(-50%) scale(1.28);
           }
           100% {
-            filter: brightness(1.12);
-            transform: translate(-50%, -50%) scale(1.1);
+            transform: translateX(-50%) scale(1.12);
           }
         }
 

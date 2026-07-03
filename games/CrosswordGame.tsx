@@ -3,6 +3,38 @@
 import type { Microgame } from "@/data/microgames";
 import { useCrosswordGame } from "@/games/useCrosswordGame";
 
+const CLUE_CHIP_STYLES = {
+  horizontal:
+    "border-amber-100/28 text-amber-100 shadow-[0_0_20px_rgba(251,191,36,0.12)]",
+  vertical:
+    "border-cyan-100/28 text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,0.12)]",
+} as const;
+
+function ClueChip({
+  tone,
+  value,
+}: Readonly<{
+  tone: keyof typeof CLUE_CHIP_STYLES;
+  value: string;
+}>) {
+  return (
+    <div
+      aria-label={value}
+      className={`grid grid-cols-4 rounded-md border bg-black/36 px-4 py-3 text-[clamp(1.25rem,3.2vw,2.75rem)] font-black tracking-normal ${CLUE_CHIP_STYLES[tone]}`}
+    >
+      {Array.from(value).map((character, index) => (
+        <span
+          aria-hidden="true"
+          className="grid min-w-0 place-items-center leading-none"
+          key={`${character}-${index}`}
+        >
+          {character}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function CrosswordGame({
   microgame,
 }: Readonly<{ microgame: Microgame }>) {
@@ -25,12 +57,8 @@ export function CrosswordGame({
 
       <section className="relative flex w-full max-w-5xl flex-col items-center gap-7">
         <div className="grid w-full max-w-3xl grid-cols-1 gap-3 text-center sm:grid-cols-2">
-          <p className="rounded-md border border-amber-100/28 bg-black/36 px-4 py-3 text-[clamp(1.25rem,3.2vw,2.75rem)] font-black tracking-normal text-amber-100 shadow-[0_0_20px_rgba(251,191,36,0.12)]">
-            {horizontalClue}
-          </p>
-          <p className="rounded-md border border-cyan-100/28 bg-black/36 px-4 py-3 text-[clamp(1.25rem,3.2vw,2.75rem)] font-black tracking-normal text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,0.12)]">
-            {verticalClue}
-          </p>
+          <ClueChip tone="horizontal" value={horizontalClue} />
+          <ClueChip tone="vertical" value={verticalClue} />
         </div>
 
         <div className="grid aspect-square w-[min(78vw,58vh,31rem)] grid-cols-4 grid-rows-4 gap-1.5 rounded-lg border border-white/18 bg-black/45 p-2 shadow-[0_0_36px_rgba(34,211,238,0.18)]">

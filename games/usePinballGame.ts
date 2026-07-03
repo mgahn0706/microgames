@@ -20,6 +20,7 @@ const BUMPER_FLASH_MS = 150;
 const CANVAS_HEIGHT = 540;
 const CANVAS_WIDTH = 962;
 const DEFAULT_BEAT_DURATION_MS = 500;
+const FLIPPER_CLEAR_DELAY_MS = 550;
 const FLIPPER_HEIGHT = 42;
 const FLIPPER_LENGTH = 118;
 const FLIPPER_MIN_COLLISION_LIFT = 0.18;
@@ -83,6 +84,7 @@ type GameState = {
   hasFailed: boolean;
   lastTimestamp: number | null;
   leftBumperFlashUntil: number;
+  pendingClearAtMs: number | null;
   rightBumperFlashUntil: number;
 };
 type PinballImages = Record<keyof typeof PINBALL_IMAGES, HTMLImageElement>;
@@ -116,6 +118,7 @@ function createInitialState() {
     hasFailed: false,
     lastTimestamp: null,
     leftBumperFlashUntil: 0,
+    pendingClearAtMs: null,
     rightBumperFlashUntil: 0,
   } satisfies GameState;
 }
@@ -141,7 +144,11 @@ function getBeatDurationMs(canvas: HTMLCanvasElement) {
 }
 
 function playSoundEffect(
-  track: "pinballBounce" | "pinballFlipper" | "pinballGameOver" | "pinballStart",
+  track:
+    | "pinballBounce"
+    | "pinballFlipper"
+    | "pinballGameOver"
+    | "pinballStart",
 ) {
   bgmLibrary.playSoundEffect(track).catch((error: unknown) => {
     console.error(error);
@@ -189,7 +196,11 @@ function getClosestPointOnSegment(point: Point, segment: LineSegment) {
 }
 
 function handleFlipperCollision(state: GameState, segment: Segment) {
-  if (state.hasCleared || state.flipperLift < FLIPPER_MIN_COLLISION_LIFT) {
+  if (
+    state.hasCleared ||
+    state.pendingClearAtMs !== null ||
+    state.flipperLift < FLIPPER_MIN_COLLISION_LIFT
+  ) {
     return;
   }
 
@@ -213,9 +224,8 @@ function handleFlipperCollision(state: GameState, segment: Segment) {
   state.ballY = closestPoint.y - BALL_RADIUS - 8;
   state.ballVX = segment.side === "left" ? lateralSpeed : -lateralSpeed;
   state.ballVY = -340 - 210 * liftBoost;
-  state.hasCleared = true;
+  state.pendingClearAtMs = state.elapsedMs + FLIPPER_CLEAR_DELAY_MS;
   playSoundEffect("pinballBounce");
-  dispatchClear();
 }
 
 function handleCircleCollision(
@@ -299,7 +309,7 @@ function bounceOffWalls(state: GameState) {
 }
 
 function checkDrainFailure(state: GameState) {
-  if (state.hasCleared) {
+  if (state.hasCleared || state.pendingClearAtMs !== null) {
     return;
   }
 
@@ -315,6 +325,18 @@ function checkDrainFailure(state: GameState) {
     playSoundEffect("pinballGameOver");
     dispatchFailure();
   }
+}
+
+function checkPendingClear(state: GameState) {
+  if (
+    state.pendingClearAtMs === null ||
+    state.elapsedMs < state.pendingClearAtMs
+  ) {
+    return;
+  }
+
+  state.hasCleared = true;
+  dispatchClear();
 }
 
 function stepPhysics(state: GameState, deltaMs: number, speedScale: number) {
@@ -340,6 +362,7 @@ function stepPhysics(state: GameState, deltaMs: number, speedScale: number) {
   handleFlipperCollision(state, getFlipperSegment("left", state.flipperLift));
   handleFlipperCollision(state, getFlipperSegment("right", state.flipperLift));
   bounceOffWalls(state);
+  checkPendingClear(state);
 
   const speed = Math.hypot(state.ballVX, state.ballVY);
 
@@ -353,11 +376,7 @@ function stepPhysics(state: GameState, deltaMs: number, speedScale: number) {
   checkDrainFailure(state);
 }
 
-function stepState(
-  state: GameState,
-  deltaMs: number,
-  beatDurationMs: number,
-) {
+function stepState(state: GameState, deltaMs: number, beatDurationMs: number) {
   const speedScale = getSpeedScale(beatDurationMs);
   const stepCount = Math.max(
     1,

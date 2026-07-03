@@ -132,10 +132,7 @@ export function usePracticeMicrogame(
 
     hasClearedRef.current = true;
 
-    if (
-      microgame.canvas === "babaIsYou" ||
-      microgame.canvas === "sudokuMissingNumber"
-    ) {
+    if (microgame.canvas === "babaIsYou") {
       return;
     }
 
