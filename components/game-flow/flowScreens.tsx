@@ -17,6 +17,7 @@ import {
 } from "@/data/microgames";
 import type { PreloadStatus } from "@/hooks/useGameScreenFlow";
 import { useBgmTrack } from "@/hooks/useBgmTrack";
+import { useBgmThemeSelection } from "@/hooks/useBgmThemeSelection";
 import { useGameSetupTransition } from "@/hooks/useGameSetupTransition";
 import { useLoadingScreenCarousel } from "@/hooks/useLoadingScreenCarousel";
 import { usePracticeSpeedMultiplierState } from "@/hooks/usePracticeSpeedMultiplierState";
@@ -561,7 +562,9 @@ export function MainScreen({
   onStart: () => void;
   seenMicrogameIds: readonly string[];
 }>) {
-  useBgmTrack("resultsAndMain", "loop", "now");
+  useBgmThemeSelection();
+
+  useBgmTrack("mainLoop", "loop", "now");
   const [isStarting, setIsStarting] = useState(false);
   const { rhythmStyle } = useSynchronizedRhythm();
 
@@ -661,7 +664,9 @@ export function LoadingScreen({
   onRetry: () => void;
   preloadStatus: PreloadStatus;
 }>) {
-  useBgmTrack("resultsAndMain", "loop", "now");
+  useBgmThemeSelection();
+
+  useBgmTrack("mainLoop", "loop", "now");
   const isFailed = preloadStatus.phase === "failed";
   const { cartoonIndex, messageIndex } = useLoadingScreenCarousel({
     cartoonCount: LOADING_CARTOONS.length,
@@ -764,17 +769,17 @@ export function GameOverScreen({
   highestReachedRound: number;
   onReturnToMain: () => void;
 }>) {
+  useBgmThemeSelection();
+
   useEffect(() => {
     bgmLibrary.play("gameOver", "once").catch((error: unknown) => {
       console.error(error);
     });
 
     const resultMusicTimer = window.setTimeout(() => {
-      bgmLibrary
-        .play("resultsAndMain", "loop", "now")
-        .catch((error: unknown) => {
-          console.error(error);
-        });
+      bgmLibrary.play("mainLoop", "loop", "now").catch((error: unknown) => {
+        console.error(error);
+      });
     }, GAME_OVER_DURATION_MS);
 
     return () => {

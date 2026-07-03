@@ -15,7 +15,7 @@ const SPEED_UP_INTERVAL_ROUNDS = 4;
 const BOSS_STAGE_INTERVAL_ROUNDS = 12;
 const EARLY_SUCCESS_RESULT_BEAT_INTERVAL = 4;
 const EARLY_SUCCESS_RESULT_DELAY_MS = 500;
-const SPEED_UP_BEAT_DURATION_MULTIPLIER = 1 / 1.2;
+const SPEED_UP_BEAT_DURATION_MULTIPLIER = 1 / 1.1;
 const BEAT_PROGRESS_INTERVAL_MS = 50;
 
 export type GameRoundPhase =
@@ -404,10 +404,7 @@ export function useBeatGameRound({
       beatsLeft % EARLY_SUCCESS_RESULT_BEAT_INTERVAL === 0 &&
       (canShowSuccessfulResultEarly || canShowFailureResultEarly);
 
-    if (
-      !canShowResultEarly ||
-      earlySuccessResultTimerRef.current !== null
-    ) {
+    if (!canShowResultEarly || earlySuccessResultTimerRef.current !== null) {
       return;
     }
 

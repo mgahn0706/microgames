@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  BGM_THEME_TRACK_PATHS,
+  DEFAULT_BGM_THEME_OPTION,
+  getBgmThemeOption,
+  type BgmThemeId,
+  type BgmThemeTrack,
+} from "@/data/bgmThemes";
 import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 
 export type BgmTrack =
@@ -9,7 +16,6 @@ export type BgmTrack =
   | "animalFarm"
   | "appleGame"
   | "babaIsYou"
-  | "bossStage"
   | "brainAge"
   | "brainAcademy"
   | "cookieRun"
@@ -18,16 +24,13 @@ export type BgmTrack =
   | "crazyArcade"
   | "daveTheDiver"
   | "dobble"
-  | "fail"
   | "failNoControl"
   | "fireAndIce"
   | "fruitNinja"
-  | "gameOver"
   | "geometryDash"
   | "gogunbuntu"
   | "halliGalli"
   | "hancom"
-  | "intermission"
   | "intermissionNoControl"
   | "infiniteStairs"
   | "isaac"
@@ -40,29 +43,25 @@ export type BgmTrack =
   | "minigameEx"
   | "minecraft"
   | "modooMarble"
-  | "oneUp"
   | "poppyPlaytime"
   | "pokerouge"
   | "pokemon"
   | "pokemonMysteryDungeon"
   | "pokemonTcgPocket"
-  | "resultsAndMain"
   | "rhythmHero"
   | "rummikub"
-  | "setup"
-  | "speedUp"
   | "starcraft"
   | "sudoku"
   | "superMarioGalaxy"
   | "superMario"
-  | "success"
   | "successNoControl"
   | "suikaGame"
   | "tetris"
   | "undertale"
   | "wiiSports"
   | "wordle"
-  | "zelda";
+  | "zelda"
+  | BgmThemeTrack;
 
 export type SoundEffectTrack =
   | "clear1"
@@ -106,7 +105,25 @@ export type SoundEffectTrack =
   | "starcraftMove"
   | "twentyFortyEightSwipe";
 
-const BGM_TRACK_PATHS = {
+const BGM_THEME_TRACKS: ReadonlySet<BgmTrack> = new Set([
+  "bossStage",
+  "fail",
+  "gameOver",
+  "intermission",
+  "mainLoop",
+  "oneUp",
+  "setup",
+  "speedUp",
+  "success",
+]);
+
+function isBgmThemeTrack(
+  track: BgmTrack | SoundEffectTrack,
+): track is BgmThemeTrack {
+  return BGM_THEME_TRACKS.has(track as BgmTrack);
+}
+
+const STATIC_BGM_TRACK_PATHS = {
   anipang: "/games/anipang/sounds/anipang-bgm.mp3",
   animalCrossing: "/games/animal-crossing/sounds/animal-crossing-bgm.mp3",
   animalCrossingNewLeaf:
@@ -114,7 +131,6 @@ const BGM_TRACK_PATHS = {
   animalFarm: "/games/animal-farm/sounds/animal-farm-bgm.mp3",
   appleGame: "/games/apple-game/sounds/apple-game-bgm.mp3",
   babaIsYou: "/games/baba-is-you/sounds/baba-is-you.mp3",
-  bossStage: "/games/game-flow/sounds/boss-stage.mp3",
   brainAge: "/games/brain-age/sounds/brain-age-bgm.mp3",
   brainAcademy: "/games/brain-academy/sounds/brain-academy-bgm.mp3",
   cookieRun: "/games/cookie-run/sounds/cookie-run-bgm.mp3",
@@ -124,16 +140,13 @@ const BGM_TRACK_PATHS = {
   crazyArcade: "/games/crazy-arcade/sounds/crazy-arcade-bgm.mp3",
   daveTheDiver: "/games/dave-the-diver/sounds/dave-the-diver-bgm.mp3",
   dobble: "/games/dobble/sounds/dobble-bgm.mp3",
-  fail: "/games/game-flow/sounds/fail.mp3",
   failNoControl: "/games/game-flow/sounds/fail-no-control.mp3",
   fireAndIce: "/games/a-dance-of-fire-and-ice/sounds/fire-and-ice-bgm.mp3",
   fruitNinja: "/games/fruit-ninja/sounds/Game-start.wav",
-  gameOver: "/games/game-flow/sounds/game-over.mp3",
   geometryDash: "/games/geometry-dash/sounds/geometry-dash-bgm.mp3",
   gogunbuntu: "/games/gogunbuntu/sounds/gogunbuntu-bgm.mp3",
   halliGalli: "/games/halli-galli/sounds/halli-galli-bgm.mp3",
   hancom: "/games/hancom/sounds/hancom-bgm.mp3",
-  intermission: "/games/game-flow/sounds/intermission.mp3",
   intermissionNoControl: "/games/game-flow/sounds/intermission-no-control.mp3",
   infiniteStairs: "/games/infinite-stairs/sounds/infinite-stair-bgm.mp3",
   isaac: "/games/the-binding-of-isaac/sounds/isaac-bgm.mp3",
@@ -146,7 +159,6 @@ const BGM_TRACK_PATHS = {
   minigameEx: "/games/minigame-ex/sounds/minigame-ex-bgm.mp3",
   minecraft: "/games/minecraft/sounds/minecraft-bgm.mp3",
   modooMarble: "/games/modoo-marble/sounds/modoo-bgm.mp3",
-  oneUp: "/games/game-flow/sounds/1-up.mp3",
   poppyPlaytime: "/games/poppy-playtime/sounds/poppy-playtime-bgm.mp3",
   pokerouge: "/games/pokerouge/sounds/pokegoruge-bgm.flac",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
@@ -154,17 +166,13 @@ const BGM_TRACK_PATHS = {
     "/games/pokemon-mystery-dungeon/sounds/bgm-mystery-dungeon.mp3",
   pokemonTcgPocket:
     "/games/pokemon-tcg-pocket/sounds/pokemon-card-pocket-bgm.mp3",
-  resultsAndMain: "/games/game-flow/sounds/results-and-main.mp3",
   rhythmHero: "/games/rhythm-hero/sounds/rhythm-hero-bgm.mp3",
   rummikub: "/games/rummikub/sounds/rummikub-bgm.mp3",
-  setup: "/games/game-flow/sounds/setup.mp3",
-  speedUp: "/games/game-flow/sounds/speed-up.mp3",
   starcraft: "/games/starcraft/sounds/starcraft-bgm.mp3",
   sudoku: "/games/sudoku/sounds/sudoku-bgm.mp3",
   superMarioGalaxy:
     "/games/super-mario-galaxy/sounds/super-mario-galaxy-bgm.mp3",
   superMario: "/games/supermario/sounds/overworld-theme.mp3",
-  success: "/games/game-flow/sounds/success.mp3",
   successNoControl: "/games/game-flow/sounds/success-no-control.mp3",
   suikaGame: "/games/suika-game/sounds/suika-game-bgm.mp3",
   tetris: "/games/tetris/sounds/tetris-bgm.mp3",
@@ -172,7 +180,7 @@ const BGM_TRACK_PATHS = {
   wiiSports: "/games/wii-sports/sounds/wii-sports-bgm.mp3",
   wordle: "/games/wordle/sounds/wordle-bgm.mp3",
   zelda: "/games/zelda/sounds/zelda-bgm.mp3",
-} satisfies Record<BgmTrack, string>;
+} satisfies Record<Exclude<BgmTrack, BgmThemeTrack>, string>;
 
 const SOUND_EFFECT_TRACK_PATHS = {
   clear1: "/games/game-flow/sounds/clear-1.mp3",
@@ -206,8 +214,7 @@ const SOUND_EFFECT_TRACK_PATHS = {
   pinballFlipper: "/games/pinball/sounds/flipper-hand.mp3",
   pinballGameOver: "/games/pinball/sounds/game-over.mp3",
   pinballStart: "/games/pinball/sounds/start.mp3",
-  poppyPlaytimeHandExtended:
-    "/games/poppy-playtime/sounds/hand-extended.mp3",
+  poppyPlaytimeHandExtended: "/games/poppy-playtime/sounds/hand-extended.mp3",
   pongHit: "/games/pong/sounds/pong-hit.mp3",
   poppyPlaytimeScanning: "/games/poppy-playtime/sounds/scanning.mp3",
   pokerougeBuy: "/games/pokerouge/sounds/buy.wav",
@@ -219,17 +226,20 @@ const SOUND_EFFECT_TRACK_PATHS = {
   twentyFortyEightSwipe: "/games/two-thousand-forty-eight/sounds/swipe.mp3",
 } satisfies Record<SoundEffectTrack, string>;
 
-const AUDIO_TRACK_PATHS = {
-  ...BGM_TRACK_PATHS,
+const STATIC_AUDIO_TRACK_PATHS = {
+  ...STATIC_BGM_TRACK_PATHS,
   ...SOUND_EFFECT_TRACK_PATHS,
 };
 
-export const BGM_LIBRARY_PRELOAD_ASSET_PATHS: ReadonlySet<string> = new Set(
-  Object.values(AUDIO_TRACK_PATHS),
-);
+export const BGM_LIBRARY_PRELOAD_ASSET_PATHS: ReadonlySet<string> = new Set([
+  ...Object.values(STATIC_AUDIO_TRACK_PATHS),
+  ...Object.values(BGM_THEME_TRACK_PATHS).flatMap((tracks) =>
+    Object.values(tracks),
+  ),
+]);
 
 const AUDIO_PRELOAD_SKIP_TRACKS: ReadonlySet<BgmTrack | SoundEffectTrack> =
-  new Set(["resultsAndMain"]);
+  new Set(["mainLoop"]);
 
 const DEFAULT_BEAT_DURATION_SECONDS = RHYTHM_DURATION_MS / 1000;
 const BGM_GAIN = 0.72;
@@ -290,7 +300,7 @@ const BGM_TRACK_BEATS = {
   pokemon: 12,
   pokemonMysteryDungeon: 8,
   pokemonTcgPocket: 12,
-  resultsAndMain: 83,
+  mainLoop: 83,
   rhythmHero: 8,
   rummikub: 12,
   setup: 4,
@@ -342,6 +352,7 @@ type PlayingSource = Readonly<{
   source: AudioBufferSourceNode;
   stopAt: number;
   track: BgmTrack;
+  trackPath: string;
 }>;
 
 type ScheduledSource = Readonly<{
@@ -350,6 +361,7 @@ type ScheduledSource = Readonly<{
   source: AudioBufferSourceNode;
   stopAt: number;
   track: BgmTrack;
+  trackPath: string;
 }>;
 
 type DesiredPlayback = Readonly<{
@@ -360,11 +372,9 @@ type DesiredPlayback = Readonly<{
 
 class BgmLibrary {
   private audioContext: AudioContext | null = null;
-  private buffers = new Map<BgmTrack | SoundEffectTrack, AudioBuffer>();
-  private loadingBuffers = new Map<
-    BgmTrack | SoundEffectTrack,
-    Promise<AudioBuffer>
-  >();
+  private bgmThemeId: BgmThemeId = DEFAULT_BGM_THEME_OPTION.id;
+  private buffers = new Map<string, AudioBuffer>();
+  private loadingBuffers = new Map<string, Promise<AudioBuffer>>();
   private currentSource: PlayingSource | null = null;
   private desiredPlayback: DesiredPlayback | null = null;
   private playRequestId = 0;
@@ -386,9 +396,37 @@ class BgmLibrary {
     }
   }
 
+  setBgmTheme(themeId: string) {
+    const nextTheme = getBgmThemeOption(themeId);
+
+    if (this.bgmThemeId === nextTheme.id) {
+      return;
+    }
+
+    this.bgmThemeId = nextTheme.id;
+
+    if (!this.desiredPlayback || !isBgmThemeTrack(this.desiredPlayback.track)) {
+      return;
+    }
+
+    this.play(
+      this.desiredPlayback.track,
+      this.desiredPlayback.mode,
+      this.desiredPlayback.startPolicy,
+    ).catch((error: unknown) => {
+      console.error(error);
+    });
+  }
+
   async preloadAll() {
     await Promise.all(
-      (Object.keys(AUDIO_TRACK_PATHS) as (BgmTrack | SoundEffectTrack)[])
+      [
+        ...(Object.keys(STATIC_AUDIO_TRACK_PATHS) as (
+          | BgmTrack
+          | SoundEffectTrack
+        )[]),
+        ...(Array.from(BGM_THEME_TRACKS) as BgmTrack[]),
+      ]
         .filter((track) => !AUDIO_PRELOAD_SKIP_TRACKS.has(track))
         .map((track) => this.loadTrack(track)),
     );
@@ -431,6 +469,7 @@ class BgmLibrary {
     this.playRequestId = requestId;
 
     const audioContext = this.getAudioContext();
+    const trackPath = this.getTrackPath(track);
     const buffer = await this.loadTrack(track);
 
     if (requestId !== this.playRequestId) {
@@ -439,11 +478,15 @@ class BgmLibrary {
 
     this.clearScheduledTransitionTimer();
 
-    if (this.isCurrentSource(track, mode, audioContext.currentTime)) {
+    if (
+      this.isCurrentSource(track, mode, trackPath, audioContext.currentTime)
+    ) {
       return;
     }
 
-    if (this.isScheduledSource(track, mode, audioContext.currentTime)) {
+    if (
+      this.isScheduledSource(track, mode, trackPath, audioContext.currentTime)
+    ) {
       return;
     }
 
@@ -489,6 +532,7 @@ class BgmLibrary {
       source,
       stopAt,
       track,
+      trackPath,
     };
 
     if (mode === "once") {
@@ -528,6 +572,8 @@ class BgmLibrary {
     this.clearScheduledSources();
 
     const firstStartAt = audioContext.currentTime;
+    const firstTrackPath = this.getTrackPath(firstTrack);
+    const nextTrackPath = this.getTrackPath(nextTrack);
     const firstTargetDurationSeconds = this.getTargetDurationSeconds(
       firstTrack,
       firstBuffer,
@@ -539,12 +585,14 @@ class BgmLibrary {
       firstMode,
       firstBuffer,
       firstStartAt,
+      firstTrackPath,
     );
     const nextSource = this.createSource(
       nextTrack,
       nextMode,
       nextBuffer,
       nextStartAt,
+      nextTrackPath,
     );
 
     this.stopCurrentSource(firstStartAt);
@@ -580,6 +628,7 @@ class BgmLibrary {
     mode: BgmPlaybackMode,
     buffer: AudioBuffer,
     startAt: number,
+    trackPath: string,
   ) {
     const gainNode = this.getAudioContext().createGain();
     const source = this.getAudioContext().createBufferSource();
@@ -615,6 +664,7 @@ class BgmLibrary {
       source,
       stopAt,
       track,
+      trackPath,
     };
   }
 
@@ -630,19 +680,20 @@ class BgmLibrary {
   }
 
   private async loadTrack(track: BgmTrack | SoundEffectTrack) {
-    const decodedBuffer = this.buffers.get(track);
+    const trackPath = this.getTrackPath(track);
+    const decodedBuffer = this.buffers.get(trackPath);
 
     if (decodedBuffer) {
       return decodedBuffer;
     }
 
-    const loadingBuffer = this.loadingBuffers.get(track);
+    const loadingBuffer = this.loadingBuffers.get(trackPath);
 
     if (loadingBuffer) {
       return loadingBuffer;
     }
 
-    const nextLoadingBuffer = fetch(AUDIO_TRACK_PATHS[track])
+    const nextLoadingBuffer = fetch(trackPath)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to load BGM track: ${track}`);
@@ -654,19 +705,27 @@ class BgmLibrary {
         this.getAudioContext().decodeAudioData(arrayBuffer),
       )
       .then((audioBuffer) => {
-        this.buffers.set(track, audioBuffer);
-        this.loadingBuffers.delete(track);
+        this.buffers.set(trackPath, audioBuffer);
+        this.loadingBuffers.delete(trackPath);
 
         return audioBuffer;
       })
       .catch((error: unknown) => {
-        this.loadingBuffers.delete(track);
+        this.loadingBuffers.delete(trackPath);
         throw error;
       });
 
-    this.loadingBuffers.set(track, nextLoadingBuffer);
+    this.loadingBuffers.set(trackPath, nextLoadingBuffer);
 
     return nextLoadingBuffer;
+  }
+
+  private getTrackPath(track: BgmTrack | SoundEffectTrack) {
+    if (isBgmThemeTrack(track)) {
+      return BGM_THEME_TRACK_PATHS[this.bgmThemeId][track];
+    }
+
+    return STATIC_AUDIO_TRACK_PATHS[track];
   }
 
   private getNextBeatTime(currentTime: number) {
@@ -704,7 +763,10 @@ class BgmLibrary {
   }
 
   private getSourceStartSeconds(track: BgmTrack, buffer: AudioBuffer) {
-    return Math.min(BGM_TRACK_SOURCE_START_SECONDS[track] ?? 0, buffer.duration);
+    return Math.min(
+      BGM_TRACK_SOURCE_START_SECONDS[track] ?? 0,
+      buffer.duration,
+    );
   }
 
   private getTrackGain(track: BgmTrack) {
@@ -718,10 +780,12 @@ class BgmLibrary {
   private isCurrentSource(
     track: BgmTrack,
     mode: BgmPlaybackMode,
+    trackPath: string,
     currentTime: number,
   ) {
     return (
       this.currentSource?.track === track &&
+      this.currentSource.trackPath === trackPath &&
       this.currentSource.mode === mode &&
       this.currentSource.stopAt > currentTime
     );
@@ -730,11 +794,13 @@ class BgmLibrary {
   private isScheduledSource(
     track: BgmTrack,
     mode: BgmPlaybackMode,
+    trackPath: string,
     currentTime: number,
   ) {
     return this.scheduledSources.some(
       (scheduledSource) =>
         scheduledSource.track === track &&
+        scheduledSource.trackPath === trackPath &&
         scheduledSource.mode === mode &&
         scheduledSource.stopAt > currentTime,
     );

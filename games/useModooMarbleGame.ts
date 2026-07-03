@@ -10,6 +10,7 @@ import { bgmLibrary } from "@/lib/bgmLibrary";
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
 const MAX_DELTA_MS = 50;
+const DEFAULT_BEAT_DURATION_MS = 500;
 const GAUGE_CYCLE_MS = 1180;
 const RESULT_POPUP_DELAY_MS = 620;
 const SEGMENT_RESULTS = [2, 7, 9, 12] as const;
@@ -114,6 +115,22 @@ function getGaugeProgress(elapsedMs: number) {
   const phase = (elapsedMs % GAUGE_CYCLE_MS) / GAUGE_CYCLE_MS;
 
   return phase <= 0.5 ? phase * 2 : (1 - phase) * 2;
+}
+
+function getBeatDurationMs(canvas: HTMLCanvasElement) {
+  const rawDuration = window
+    .getComputedStyle(canvas)
+    .getPropertyValue("--game-rhythm-duration")
+    .trim();
+  const parsedDuration = Number.parseFloat(rawDuration);
+
+  return Number.isFinite(parsedDuration) && parsedDuration > 0
+    ? parsedDuration
+    : DEFAULT_BEAT_DURATION_MS;
+}
+
+function getSpeedScale(beatDurationMs: number) {
+  return DEFAULT_BEAT_DURATION_MS / beatDurationMs;
 }
 
 function getSegmentIndex(progress: number) {
@@ -427,6 +444,7 @@ export function useModooMarbleGameCanvas() {
 
     let canvasWidth = MIN_CANVAS_WIDTH;
     let canvasHeight = MIN_CANVAS_HEIGHT;
+    let beatDurationMs = getBeatDurationMs(canvas);
 
     const resizeCanvas = () => {
       const width = Math.max(window.innerWidth, MIN_CANVAS_WIDTH);
@@ -435,6 +453,7 @@ export function useModooMarbleGameCanvas() {
 
       canvasWidth = width;
       canvasHeight = height;
+      beatDurationMs = getBeatDurationMs(canvas);
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
       canvas.style.width = `${width}px`;
@@ -513,11 +532,12 @@ export function useModooMarbleGameCanvas() {
         state.lastTimestamp === null
           ? 0
           : Math.min(timestamp - state.lastTimestamp, MAX_DELTA_MS);
+      const gaugeDeltaMs = deltaMs * getSpeedScale(beatDurationMs);
 
       stateRef.current = {
         ...state,
         gaugeElapsedMs: state.isHolding
-          ? state.gaugeElapsedMs + deltaMs
+          ? state.gaugeElapsedMs + gaugeDeltaMs
           : state.gaugeElapsedMs,
         lastTimestamp: timestamp,
       };

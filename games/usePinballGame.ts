@@ -23,7 +23,8 @@ const DEFAULT_BEAT_DURATION_MS = 500;
 const FLIPPER_CLEAR_DELAY_MS = 550;
 const FLIPPER_HEIGHT = 42;
 const FLIPPER_LENGTH = 118;
-const FLIPPER_MIN_COLLISION_LIFT = 0.18;
+const FLIPPER_COLLISION_PADDING = 24;
+const FLIPPER_MIN_COLLISION_LIFT = 0.08;
 const GRAVITY = 610;
 const MAX_BALL_SPEED = 740;
 const MAX_DELTA_MS = 44;
@@ -213,7 +214,10 @@ function handleFlipperCollision(state: GameState, segment: Segment) {
     state.ballY - closestPoint.y,
   );
 
-  if (distance > BALL_RADIUS + 12 || state.ballVY < -80) {
+  if (
+    distance > BALL_RADIUS + FLIPPER_COLLISION_PADDING ||
+    state.ballVY < -120
+  ) {
     return;
   }
 
