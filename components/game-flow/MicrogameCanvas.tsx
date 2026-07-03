@@ -1,5 +1,6 @@
 "use client";
 
+import { AngryBirdGame } from "@/games/AngryBirdGame";
 import { AnipangGame } from "@/games/AnipangGame";
 import { AnimalCrossingNewLeafGame } from "@/games/AnimalCrossingNewLeafGame";
 import { AnimalCrossingStampGame } from "@/games/AnimalCrossingStampGame";
@@ -38,9 +39,11 @@ import { KartriderBossGame } from "@/games/KartriderBossGame";
 import { KirbyInhaleGame } from "@/games/KirbyInhaleGame";
 import { LaytonShapeMatchGame } from "@/games/LaytonShapeMatchGame";
 import { LeagueChampionBanGame } from "@/games/LeagueChampionBanGame";
+import { LuigiMansionGame } from "@/games/LuigiMansionGame";
 import { MaplestoryLieDetectorGame } from "@/games/MaplestoryLieDetectorGame";
 import { MaplestoryRuneGame } from "@/games/MaplestoryRuneGame";
 import { MinecraftMiningGame } from "@/games/MinecraftMiningGame";
+import { MiniMetroGame } from "@/games/MiniMetroGame";
 import { MinesweeperGame } from "@/games/MinesweeperGame";
 import { MinigameExGame } from "@/games/MinigameExGame";
 import { ModooMarbleGame } from "@/games/ModooMarbleGame";
@@ -60,6 +63,7 @@ import { SnakeGame } from "@/games/SnakeGame";
 import { StarcraftMoveGame } from "@/games/StarcraftMoveGame";
 import { SquidGameBossGame } from "@/games/SquidGameBossGame";
 import { SubmitAssignmentGame } from "@/games/SubmitAssignmentGame";
+import { SurviveMolaMolaGame } from "@/games/SurviveMolaMolaGame";
 import { SudokuGame } from "@/games/SudokuGame";
 import { SuperMarioGalaxyGame } from "@/games/SuperMarioGalaxyGame";
 import { SuperMarioCoinGame } from "@/games/SuperMarioCoinGame";
@@ -85,6 +89,10 @@ function renderGameCanvas(
   beatDurationMs: number,
   isActive: boolean,
 ) {
+  if (microgame.canvas === "angryBirdLaunch") {
+    return <AngryBirdGame microgame={microgame} />;
+  }
+
   if (microgame.canvas === "animalCrossingStamps") {
     return <AnimalCrossingStampGame microgame={microgame} />;
   }
@@ -206,6 +214,10 @@ function renderGameCanvas(
     return <MinecraftMiningGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "miniMetroLine") {
+    return <MiniMetroGame microgame={microgame} />;
+  }
+
   if (microgame.canvas === "minesweeperMineClick") {
     return <MinesweeperGame microgame={microgame} />;
   }
@@ -232,6 +244,12 @@ function renderGameCanvas(
 
   if (microgame.canvas === "leagueChampionBan") {
     return <LeagueChampionBanGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "luigiMansionHide") {
+    return (
+      <LuigiMansionGame beatDurationMs={beatDurationMs} microgame={microgame} />
+    );
   }
 
   if (microgame.canvas === "pianoMelody") {
@@ -352,6 +370,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "submitAssignment") {
     return <SubmitAssignmentGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "surviveMolaMolaShrimp") {
+    return <SurviveMolaMolaGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "sudokuMissingNumber") {

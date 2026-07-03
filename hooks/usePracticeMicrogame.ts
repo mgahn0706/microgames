@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Microgame, MicrogameCanvas } from "@/data/microgames";
+import { MICROGAME_BGM_BY_CANVAS } from "@/data/microgameBgmTracks";
+import type { Microgame } from "@/data/microgames";
 import type { InstructionStep } from "@/hooks/useBeatGameRound";
 import { useMicrogameInput } from "@/hooks/useMicrogameInput";
 import {
   bgmLibrary,
-  type BgmTrack,
   type SoundEffectTrack,
   unlockBgmLibrary,
 } from "@/lib/bgmLibrary";
@@ -25,57 +25,6 @@ const CLEAR_SOUND_EFFECTS = [
   "clear4",
   "clear5",
 ] satisfies SoundEffectTrack[];
-
-const PRACTICE_BGM_BY_CANVAS: Partial<Record<MicrogameCanvas, BgmTrack>> = {
-  anipangMatchThree: "anipang",
-  animalCrossingNewLeafTyping: "animalCrossingNewLeaf",
-  animalCrossingStamps: "animalCrossing",
-  animalFarmReverseTyping: "animalFarm",
-  appleNumberSum: "appleGame",
-  babaIsYou: "babaIsYou",
-  bindingOfIsaacFlies: "isaac",
-  brainAgeMath: "brainAge",
-  brainAcademyBlocks: "brainAcademy",
-  cookieRun: "cookieRun",
-  cookieRunKingdom: "cookieRunKingdom",
-  crosswordPuzzle: "crossword",
-  crazyArcade: "crazyArcade",
-  daveTheDiverGig: "daveTheDiver",
-  dobble: "dobble",
-  fireAndIceDance: "fireAndIce",
-  fruitNinja: "fruitNinja",
-  geometryDashSpikes: "geometryDash",
-  gogunbuntuCoinRun: "gogunbuntu",
-  halliGalliBoss: "halliGalli",
-  hancomTyping: "hancom",
-  infiniteStairs: "infiniteStairs",
-  kartriderCourse: "kartrider",
-  kirbyInhale: "kirby",
-  laytonShapeMatch: "layton",
-  leagueChampionBan: "leagueOfLegend",
-  maplestoryLieDetector: "maplestory",
-  maplestoryRune: "mapleRune",
-  minigameExBearMeat: "minigameEx",
-  minecraftMining: "minecraft",
-  modooMarble: "modooMarble",
-  poppyPlaytimeScanner: "poppyPlaytime",
-  pokerougeShop: "pokerouge",
-  pokemonMysteryDungeon: "pokemonMysteryDungeon",
-  pokemonTcgPocket: "pokemonTcgPocket",
-  pokemonTyping: "pokemon",
-  rhythmHeroSpinner: "rhythmHero",
-  rummikubAttach: "rummikub",
-  sudokuMissingNumber: "sudoku",
-  starcraftMove: "starcraft",
-  superMarioCoins: "superMario",
-  superMarioGalaxyStarBits: "superMarioGalaxy",
-  suikaGame: "suikaGame",
-  tetrisLineClear: "tetris",
-  undertaleMouse: "undertale",
-  wiiSportsDualPress: "wiiSports",
-  wordleBoss: "wordle",
-  zeldaCircleDraw: "zelda",
-};
 
 export type PracticeResult = "failure" | "success";
 export type PracticePhase = "instruction" | "playing" | "result";
@@ -277,7 +226,7 @@ export function usePracticeMicrogame(
     }
 
     if (phase === "playing") {
-      const track = PRACTICE_BGM_BY_CANVAS[microgame.canvas];
+      const track = MICROGAME_BGM_BY_CANVAS[microgame.canvas];
 
       if (!track) {
         bgmLibrary.stop();

@@ -10,6 +10,7 @@ import {
 import { RHYTHM_DURATION_MS } from "@/hooks/useSynchronizedRhythm";
 
 export type BgmTrack =
+  | "angryBird"
   | "anipang"
   | "animalCrossing"
   | "animalCrossingNewLeaf"
@@ -38,11 +39,13 @@ export type BgmTrack =
   | "kirby"
   | "layton"
   | "leagueOfLegend"
+  | "luigiMansion"
   | "maplestory"
   | "mapleRune"
   | "minigameEx"
   | "minecraft"
   | "modooMarble"
+  | "molaMolaSuddenDeath"
   | "poppyPlaytime"
   | "pokerouge"
   | "pokemon"
@@ -55,6 +58,7 @@ export type BgmTrack =
   | "superMarioGalaxy"
   | "superMario"
   | "successNoControl"
+  | "surviveMolaMola"
   | "suikaGame"
   | "tetris"
   | "undertale"
@@ -73,6 +77,8 @@ export type SoundEffectTrack =
   | "anipangSwipe"
   | "animalCrossingStamp"
   | "animalCrossingNewLeafType"
+  | "angryBirdFlying"
+  | "angryBirdSlingshot"
   | "cookieRunJump"
   | "cookieRunSlide"
   | "crazyArcadeBombInstall"
@@ -85,10 +91,14 @@ export type SoundEffectTrack =
   | "isaacTearImpact"
   | "minecraftDig1"
   | "minecraftDig2"
+  | "miniMetroSelectedStation"
+  | "miniMetroSuccess"
   | "minesweeperClick"
   | "minesweeperExplosion"
   | "minesweeperStart"
   | "modooDiceRoll"
+  | "molaMolaDeath"
+  | "molaMolaEat"
   | "pinballBounce"
   | "pinballFlipper"
   | "pinballGameOver"
@@ -97,6 +107,8 @@ export type SoundEffectTrack =
   | "pongHit"
   | "poppyPlaytimeScanning"
   | "leagueChampionSelect"
+  | "luigiMansionGhost"
+  | "luigiMansionSuccess"
   | "pokerougeBuy"
   | "pokerougeSelect"
   | "rhythmHeroSpin"
@@ -124,6 +136,7 @@ function isBgmThemeTrack(
 }
 
 const STATIC_BGM_TRACK_PATHS = {
+  angryBird: "/games/angry-bird/sounds/angry-bird-bgm.mp3",
   anipang: "/games/anipang/sounds/anipang-bgm.mp3",
   animalCrossing: "/games/animal-crossing/sounds/animal-crossing-bgm.mp3",
   animalCrossingNewLeaf:
@@ -154,11 +167,13 @@ const STATIC_BGM_TRACK_PATHS = {
   kirby: "/games/kirby/sounds/kirby-bgm.mp3",
   layton: "/games/layton/sounds/layton-bgm.mp3",
   leagueOfLegend: "/games/league-of-legend/sounds/league-of-legend-ban-bgm.mp3",
+  luigiMansion: "/games/luigi-mansion/sounds/luigi-mansion-bgm.mp3",
   maplestory: "/games/maplestory-lie-detector/sounds/maplestory-bgm.mp3",
   mapleRune: "/games/maple-story-rune/sounds/maple-rune-bgm.mp3",
   minigameEx: "/games/minigame-ex/sounds/minigame-ex-bgm.mp3",
   minecraft: "/games/minecraft/sounds/minecraft-bgm.mp3",
   modooMarble: "/games/modoo-marble/sounds/modoo-bgm.mp3",
+  molaMolaSuddenDeath: "/games/survive-mola-mola/sounds/sudden-death-bgm.mp3",
   poppyPlaytime: "/games/poppy-playtime/sounds/poppy-playtime-bgm.mp3",
   pokerouge: "/games/pokerouge/sounds/pokegoruge-bgm.flac",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
@@ -174,6 +189,7 @@ const STATIC_BGM_TRACK_PATHS = {
     "/games/super-mario-galaxy/sounds/super-mario-galaxy-bgm.mp3",
   superMario: "/games/supermario/sounds/overworld-theme.mp3",
   successNoControl: "/games/game-flow/sounds/success-no-control.mp3",
+  surviveMolaMola: "/games/survive-mola-mola/sounds/mola-mola-bgm.mp3",
   suikaGame: "/games/suika-game/sounds/suika-game-bgm.mp3",
   tetris: "/games/tetris/sounds/tetris-bgm.mp3",
   undertale: "/games/undertale/sounds/undertale-bgm.mp3",
@@ -192,6 +208,8 @@ const SOUND_EFFECT_TRACK_PATHS = {
   anipangSwipe: "/games/anipang/sounds/anipang-swipe.mp3",
   animalCrossingStamp: "/games/animal-crossing/sounds/stamp.mp3",
   animalCrossingNewLeafType: "/games/animal-crossing-new-leaf/sounds/type.wav",
+  angryBirdFlying: "/games/angry-bird/sounds/angry-birds-flying.mp3",
+  angryBirdSlingshot: "/games/angry-bird/sounds/angry-birds-slingshot.mp3",
   cookieRunJump: "/games/cookie-run/sounds/cookie-jump.mp3",
   cookieRunSlide: "/games/cookie-run/sounds/cookie-slide.mp3",
   crazyArcadeBombInstall:
@@ -204,12 +222,18 @@ const SOUND_EFFECT_TRACK_PATHS = {
   isaacTearFire: "/games/the-binding-of-isaac/sounds/tear-fire.mp3",
   isaacTearImpact: "/games/the-binding-of-isaac/sounds/tear-impacts.mp3",
   leagueChampionSelect: "/games/league-of-legend/sounds/champ-select.mp3",
+  luigiMansionGhost: "/games/luigi-mansion/sounds/ghost-sfx.mp3",
+  luigiMansionSuccess: "/games/luigi-mansion/sounds/luigi-success.mp3",
   minecraftDig1: "/games/minecraft/sounds/dig-1.mp3",
   minecraftDig2: "/games/minecraft/sounds/dig-2.mp3",
+  miniMetroSelectedStation: "/games/mini-metro/sounds/selected-station.mp3",
+  miniMetroSuccess: "/games/mini-metro/sounds/mini-metro-success.mp3",
   minesweeperClick: "/games/minesweeper/sounds/01. Click.mp3",
   minesweeperExplosion: "/games/minesweeper/sounds/05. Lose Minesweeper.mp3",
   minesweeperStart: "/games/minesweeper/sounds/06. Start.mp3",
   modooDiceRoll: "/games/modoo-marble/sounds/dice-roll.mp3",
+  molaMolaDeath: "/games/survive-mola-mola/sounds/death-sfx.mp3",
+  molaMolaEat: "/games/survive-mola-mola/sounds/eat-sfx.mp3",
   pinballBounce: "/games/pinball/sounds/bounced-electronic.mp3",
   pinballFlipper: "/games/pinball/sounds/flipper-hand.mp3",
   pinballGameOver: "/games/pinball/sounds/game-over.mp3",
@@ -258,6 +282,7 @@ const ATTACK_FADE_SECONDS = 0.012;
 const RELEASE_FADE_SECONDS = 0.045;
 
 const BGM_TRACK_BEATS = {
+  angryBird: 8,
   anipang: 8,
   animalCrossing: 8,
   animalCrossingNewLeaf: 12,
@@ -289,11 +314,13 @@ const BGM_TRACK_BEATS = {
   kirby: 8,
   layton: 8,
   leagueOfLegend: 12,
+  luigiMansion: 12,
   maplestory: 12,
   mapleRune: 8,
   minigameEx: 16,
   minecraft: 8,
   modooMarble: 8,
+  molaMolaSuddenDeath: 4,
   oneUp: 8,
   poppyPlaytime: 8,
   pokerouge: 8,
@@ -311,6 +338,7 @@ const BGM_TRACK_BEATS = {
   superMario: 8,
   success: 4,
   successNoControl: 4,
+  surviveMolaMola: 8,
   suikaGame: 8,
   tetris: 12,
   undertale: 8,
@@ -322,6 +350,7 @@ const BGM_TRACK_BEATS = {
 const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<
   Record<BgmTrack, number>
 > = {
+  angryBird: DEFAULT_BEAT_DURATION_SECONDS,
   anipang: DEFAULT_BEAT_DURATION_SECONDS,
   animalCrossingNewLeaf: DEFAULT_BEAT_DURATION_SECONDS,
   crossword: DEFAULT_BEAT_DURATION_SECONDS,
@@ -329,15 +358,18 @@ const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<
   daveTheDiver: DEFAULT_BEAT_DURATION_SECONDS,
   gogunbuntu: DEFAULT_BEAT_DURATION_SECONDS,
   infiniteStairs: DEFAULT_BEAT_DURATION_SECONDS,
+  luigiMansion: DEFAULT_BEAT_DURATION_SECONDS,
   poppyPlaytime: DEFAULT_BEAT_DURATION_SECONDS,
   pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
   pokemonMysteryDungeon: DEFAULT_BEAT_DURATION_SECONDS,
   rummikub: DEFAULT_BEAT_DURATION_SECONDS,
+  surviveMolaMola: DEFAULT_BEAT_DURATION_SECONDS,
   wordle: DEFAULT_BEAT_DURATION_SECONDS,
 };
 
 const BGM_TRACK_SOURCE_START_SECONDS: Partial<Record<BgmTrack, number>> = {
   anipang: 6,
+  luigiMansion: 8,
   poppyPlaytime: 8,
 };
 
@@ -404,6 +436,11 @@ class BgmLibrary {
     }
 
     this.bgmThemeId = nextTheme.id;
+    this.preloadTheme(nextTheme.id, { includeSkippedTracks: true }).catch(
+      (error: unknown) => {
+        console.error(error);
+      },
+    );
 
     if (!this.desiredPlayback || !isBgmThemeTrack(this.desiredPlayback.track)) {
       return;
@@ -419,17 +456,19 @@ class BgmLibrary {
   }
 
   async preloadAll() {
-    await Promise.all(
-      [
-        ...(Object.keys(STATIC_AUDIO_TRACK_PATHS) as (
-          | BgmTrack
-          | SoundEffectTrack
-        )[]),
-        ...(Array.from(BGM_THEME_TRACKS) as BgmTrack[]),
-      ]
-        .filter((track) => !AUDIO_PRELOAD_SKIP_TRACKS.has(track))
-        .map((track) => this.loadTrack(track)),
+    const staticTrackPreloads = (
+      Object.keys(STATIC_AUDIO_TRACK_PATHS) as (BgmTrack | SoundEffectTrack)[]
+    )
+      .filter((track) => !AUDIO_PRELOAD_SKIP_TRACKS.has(track))
+      .map((track) => this.loadTrack(track));
+    const themeTrackPreloads = Object.values(BGM_THEME_TRACK_PATHS).flatMap(
+      (tracks) =>
+        (Object.entries(tracks) as [BgmThemeTrack, string][])
+          .filter(([track]) => !AUDIO_PRELOAD_SKIP_TRACKS.has(track))
+          .map(([track, trackPath]) => this.loadTrackPath(track, trackPath)),
     );
+
+    await Promise.all([...staticTrackPreloads, ...themeTrackPreloads]);
   }
 
   setBeatDurationMs(beatDurationMs: number) {
@@ -681,6 +720,14 @@ class BgmLibrary {
 
   private async loadTrack(track: BgmTrack | SoundEffectTrack) {
     const trackPath = this.getTrackPath(track);
+
+    return this.loadTrackPath(track, trackPath);
+  }
+
+  private async loadTrackPath(
+    track: BgmTrack | SoundEffectTrack,
+    trackPath: string,
+  ) {
     const decodedBuffer = this.buffers.get(trackPath);
 
     if (decodedBuffer) {
@@ -718,6 +765,23 @@ class BgmLibrary {
     this.loadingBuffers.set(trackPath, nextLoadingBuffer);
 
     return nextLoadingBuffer;
+  }
+
+  private async preloadTheme(
+    themeId: BgmThemeId,
+    options: Readonly<{ includeSkippedTracks?: boolean }> = {},
+  ) {
+    const tracks = BGM_THEME_TRACK_PATHS[themeId];
+
+    await Promise.all(
+      (Object.entries(tracks) as [BgmThemeTrack, string][])
+        .filter(
+          ([track]) =>
+            options.includeSkippedTracks ||
+            !AUDIO_PRELOAD_SKIP_TRACKS.has(track),
+        )
+        .map(([track, trackPath]) => this.loadTrackPath(track, trackPath)),
+    );
   }
 
   private getTrackPath(track: BgmTrack | SoundEffectTrack) {

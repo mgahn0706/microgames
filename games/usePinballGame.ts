@@ -23,10 +23,10 @@ const DEFAULT_BEAT_DURATION_MS = 500;
 const FLIPPER_CLEAR_DELAY_MS = 550;
 const FLIPPER_HEIGHT = 42;
 const FLIPPER_LENGTH = 118;
-const FLIPPER_COLLISION_PADDING = 24;
-const FLIPPER_MIN_COLLISION_LIFT = 0.08;
+const FLIPPER_COLLISION_PADDING = 32;
+const FLIPPER_MIN_COLLISION_LIFT = 0.04;
 const GRAVITY = 610;
-const MAX_BALL_SPEED = 740;
+const MAX_BALL_SPEED = 920;
 const MAX_DELTA_MS = 44;
 const MAX_PHYSICS_STEP_MS = 7;
 const PLAYFIELD_BOTTOM_Y = 448;
@@ -221,13 +221,13 @@ function handleFlipperCollision(state: GameState, segment: Segment) {
     return;
   }
 
-  const liftBoost = 0.62 + state.flipperLift * 0.72;
+  const liftBoost = 0.9 + state.flipperLift * 0.95;
   const edgeBoost = closestPoint.t;
-  const lateralSpeed = 190 + edgeBoost * 190 + state.flipperLift * 90;
+  const lateralSpeed = 245 + edgeBoost * 260 + state.flipperLift * 135;
 
   state.ballY = closestPoint.y - BALL_RADIUS - 8;
   state.ballVX = segment.side === "left" ? lateralSpeed : -lateralSpeed;
-  state.ballVY = -340 - 210 * liftBoost;
+  state.ballVY = -500 - 300 * liftBoost;
   state.pendingClearAtMs = state.elapsedMs + FLIPPER_CLEAR_DELAY_MS;
   playSoundEffect("pinballBounce");
 }
@@ -247,12 +247,12 @@ function handleCircleCollision(
 
   const normalX = dx / distance;
   const normalY = dy / distance;
-  const speed = clamp(Math.hypot(state.ballVX, state.ballVY) + 86, 330, 620);
+  const speed = clamp(Math.hypot(state.ballVX, state.ballVY) + 130, 430, 780);
 
   state.ballX = circle.x + normalX * collisionDistance;
   state.ballY = circle.y + normalY * collisionDistance;
   state.ballVX = normalX * speed;
-  state.ballVY = normalY * speed - 70;
+  state.ballVY = normalY * speed - 120;
 
   if (circle.side === "left") {
     state.leftBumperFlashUntil = state.elapsedMs + BUMPER_FLASH_MS;
@@ -287,27 +287,27 @@ function handleRailCollision(state: GameState, segment: LineSegment) {
 
   state.ballX = closestPoint.x + normalX * collisionDistance;
   state.ballY = closestPoint.y + normalY * collisionDistance;
-  state.ballVX = (state.ballVX - 1.82 * velocityIntoRail * normalX) * 0.95;
-  state.ballVY = (state.ballVY - 1.82 * velocityIntoRail * normalY) * 0.95;
+  state.ballVX = (state.ballVX - 2.04 * velocityIntoRail * normalX) * 1.04;
+  state.ballVY = (state.ballVY - 2.04 * velocityIntoRail * normalY) * 1.04;
   playSoundEffect("pinballBounce");
 }
 
 function bounceOffWalls(state: GameState) {
   if (state.ballX - BALL_RADIUS <= WALL_LEFT) {
     state.ballX = WALL_LEFT + BALL_RADIUS;
-    state.ballVX = Math.abs(state.ballVX) * 0.92 + 28;
+    state.ballVX = Math.abs(state.ballVX) * 1.02 + 42;
     playSoundEffect("pinballBounce");
   }
 
   if (state.ballX + BALL_RADIUS >= WALL_RIGHT) {
     state.ballX = WALL_RIGHT - BALL_RADIUS;
-    state.ballVX = -Math.abs(state.ballVX) * 0.92 - 28;
+    state.ballVX = -Math.abs(state.ballVX) * 1.02 - 42;
     playSoundEffect("pinballBounce");
   }
 
   if (state.ballY - BALL_RADIUS <= PLAYFIELD_TOP_Y) {
     state.ballY = PLAYFIELD_TOP_Y + BALL_RADIUS;
-    state.ballVY = Math.abs(state.ballVY) * 0.86 + 32;
+    state.ballVY = Math.abs(state.ballVY) * 0.98 + 48;
     playSoundEffect("pinballBounce");
   }
 }

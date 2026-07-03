@@ -13,6 +13,7 @@ export type MicrogameControl =
 
 export type MicrogameType = "boss" | "normal";
 export type MicrogameCanvas =
+  | "angryBirdLaunch"
   | "anipangMatchThree"
   | "animalCrossingNewLeafTyping"
   | "animalCrossingStamps"
@@ -51,8 +52,10 @@ export type MicrogameCanvas =
   | "kirbyInhale"
   | "laytonShapeMatch"
   | "leagueChampionBan"
+  | "luigiMansionHide"
   | "maplestoryLieDetector"
   | "maplestoryRune"
+  | "miniMetroLine"
   | "minigameExBearMeat"
   | "minecraftMining"
   | "minesweeperMineClick"
@@ -73,6 +76,7 @@ export type MicrogameCanvas =
   | "superMarioGalaxyStarBits"
   | "superMarioCoins"
   | "submitAssignment"
+  | "surviveMolaMolaShrimp"
   | "sudokuMissingNumber"
   | "squidGameRedLight"
   | "suikaGame"
@@ -242,6 +246,20 @@ export const MICROGAMES = [
 
   {
     beatCount: 12,
+    canvas: "luigiMansionHide",
+    microscope: {
+      imageAlt: "루이지 맨션 어두운 홀",
+      imageSrc: "/games/luigi-mansion/images/background.png",
+    },
+    control: "mouseClick",
+    id: "luigi-mansion-hidden-ghost",
+    startPrompt: "숨어든 곳을 찾아라!",
+    title: "루이지 맨션",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
     canvas: "rummikubAttach",
     microscope: {
       imageAlt: "루미큐브 숫자 타일",
@@ -382,6 +400,20 @@ export const MICROGAMES = [
 
   {
     beatCount: 8,
+    canvas: "miniMetroLine",
+    microscope: {
+      imageAlt: "미니 메트로 노선도",
+      imageSrc: "/games/mini-metro/images/background.png",
+    },
+    control: "mouseDrag",
+    id: "mini-metro-green-line",
+    startPrompt: "노선을 연결해라!",
+    title: "미니 메트로",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
     canvas: "bounceBall",
     microscope: {
       imageAlt: "바운스볼 노란 공",
@@ -447,6 +479,20 @@ export const MICROGAMES = [
     id: "apple-game-number-sum",
     startPrompt: "10을 만들어라!",
     title: "사과게임",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "surviveMolaMolaShrimp",
+    microscope: {
+      imageAlt: "살아남아라! 개복치",
+      imageSrc: "/games/survive-mola-mola/images/mola-mola.png",
+    },
+    control: "mouseClick",
+    id: "survive-mola-mola-shrimp",
+    startPrompt: "새우를 먹어라!",
+    title: "살아남아라! 개복치",
     type: "normal",
   },
 
@@ -587,6 +633,20 @@ export const MICROGAMES = [
     id: "anipang-match-three",
     startPrompt: "세 마리를 맞춰라!",
     title: "애니팡",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "angryBirdLaunch",
+    microscope: {
+      imageAlt: "앵그리버드 빨간 새",
+      imageSrc: "/games/angry-bird/images/angry-bird.png",
+    },
+    control: "mouseDrag",
+    id: "angry-bird-launch",
+    startPrompt: "날려라!",
+    title: "앵그리버드",
     type: "normal",
   },
 
