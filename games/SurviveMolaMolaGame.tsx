@@ -15,10 +15,14 @@ const SHRIMP_LAYOUT = [
 ] as const;
 
 export function SurviveMolaMolaGame({
+  beatDurationMs,
+  isActive,
   microgame,
-}: Readonly<{ microgame: Microgame }>) {
-  void microgame;
-
+}: Readonly<{
+  beatDurationMs: number;
+  isActive: boolean;
+  microgame: Microgame;
+}>) {
   const {
     activeShrimpId,
     eatenShrimpIds,
@@ -28,7 +32,11 @@ export function SurviveMolaMolaGame({
     isEating,
     molaMotion,
     targetShrimpCount,
-  } = useSurviveMolaMolaGame();
+  } = useSurviveMolaMolaGame({
+    beatCount: microgame.beatCount,
+    beatDurationMs,
+    isActive,
+  });
   const isCleared = eatenShrimpIds.length >= targetShrimpCount;
 
   return (

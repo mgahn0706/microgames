@@ -36,6 +36,7 @@ export type MicrogameCanvas =
   | "crazyArcade"
   | "daveTheDiverGig"
   | "default"
+  | "dancingBehindTeacher"
   | "dobble"
   | "fireAndIceDance"
   | "fireBoyWaterGirl"
@@ -60,6 +61,7 @@ export type MicrogameCanvas =
   | "minecraftMining"
   | "minesweeperMineClick"
   | "modooMarble"
+  | "nanaimoBulletHell"
   | "pianoMelody"
   | "pinballSurvival"
   | "pongSurvival"
@@ -70,6 +72,7 @@ export type MicrogameCanvas =
   | "pokemonTyping"
   | "rhythmHeavenChorus"
   | "rhythmHeroSpinner"
+  | "rhythmStar"
   | "rummikubAttach"
   | "snakeApple"
   | "starcraftMove"
@@ -162,6 +165,20 @@ export const MICROGAMES = [
 
   {
     beatCount: 8,
+    canvas: "nanaimoBulletHell",
+    microscope: {
+      imageAlt: "나나이모 숲속 탄막 전투",
+      imageSrc: "/games/nana-imo/images/player.png",
+    },
+    control: "arrowAndSpace",
+    id: "nanaimo-bullet-hell",
+    startPrompt: "피하고 공격해라!",
+    title: "나나이모",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
     canvas: "daveTheDiverGig",
     microscope: {
       imageAlt: "데이브 더 다이버 클라운피시",
@@ -241,6 +258,20 @@ export const MICROGAMES = [
     id: "rhythm-heaven-chorus",
     startPrompt: "제때 멈춰라!",
     title: "리듬 세상",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
+    canvas: "rhythmStar",
+    microscope: {
+      imageAlt: "리듬스타 노트 레인",
+      imageSrc: "/games/rhythm-star/images/background.png",
+    },
+    control: "numberKeys",
+    id: "rhythm-star-note-lanes",
+    startPrompt: "박자에 맞춰 눌러라!",
+    title: "리듬스타",
     type: "normal",
   },
 
@@ -497,6 +528,20 @@ export const MICROGAMES = [
   },
 
   {
+    beatCount: 12,
+    canvas: "dancingBehindTeacher",
+    microscope: {
+      imageAlt: "선생님이 칠판을 보는 교실",
+      imageSrc: "/games/dancing-behind-the-teacher/images/background.png",
+    },
+    control: "space",
+    id: "dancing-behind-the-teacher",
+    startPrompt: "안 볼 때 춤춰라!",
+    title: "선생님 안 볼 때 춤추기",
+    type: "normal",
+  },
+
+  {
     beatCount: 8,
     canvas: "suikaGame",
     microscope: {
@@ -631,7 +676,7 @@ export const MICROGAMES = [
     },
     control: "mouseDrag",
     id: "anipang-match-three",
-    startPrompt: "세 마리를 맞춰라!",
+    startPrompt: "동물을 없애라!",
     title: "애니팡",
     type: "normal",
   },

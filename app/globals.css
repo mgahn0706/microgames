@@ -1,5 +1,170 @@
 @import "tailwindcss";
 
+@keyframes dance-behind-teacher-jump {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+
+  25% {
+    transform: translate(-50%, -50%) translateY(-18%);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) translateY(3%);
+  }
+
+  75% {
+    transform: translate(-50%, -50%) translateY(-24%);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+}
+
+@keyframes dance-behind-teacher-jump-side {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0);
+  }
+
+  20% {
+    transform: translate(-50%, -50%) translate(-7%, -14%);
+  }
+
+  45% {
+    transform: translate(-50%, -50%) translate(6%, 2%);
+  }
+
+  70% {
+    transform: translate(-50%, -50%) translate(9%, -20%);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translate(0, 0);
+  }
+}
+
+@keyframes dance-behind-teacher-jump-stomp {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+
+  35% {
+    transform: translate(-50%, -50%) translateY(-30%);
+  }
+
+  48% {
+    transform: translate(-50%, -50%) translateY(8%);
+  }
+
+  68% {
+    transform: translate(-50%, -50%) translateY(-10%);
+  }
+}
+
+@keyframes dance-behind-teacher-jump-shuffle {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0);
+  }
+
+  25% {
+    transform: translate(-50%, -50%) translate(8%, -9%);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) translate(-8%, -18%);
+  }
+
+  75% {
+    transform: translate(-50%, -50%) translate(5%, 4%);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translate(0, 0);
+  }
+}
+
+@keyframes dance-behind-teacher-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dance-behind-teacher-rock {
+  0%,
+  100% {
+    transform: rotate(-26deg);
+  }
+
+  50% {
+    transform: rotate(28deg);
+  }
+}
+
+@keyframes dance-behind-teacher-half-spin {
+  0% {
+    transform: rotate(-80deg);
+  }
+
+  45% {
+    transform: rotate(120deg);
+  }
+
+  100% {
+    transform: rotate(-80deg);
+  }
+}
+
+@keyframes dance-behind-teacher-fast-twist {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  30% {
+    transform: rotate(-140deg);
+  }
+
+  65% {
+    transform: rotate(170deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes nanaimo-player-hit-fall {
+  0% {
+    filter: brightness(1.8) saturate(1.4);
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+
+  12% {
+    filter: brightness(2.2) saturate(1.8);
+    transform: translate(-54%, -54%) rotate(-9deg) scale(1.08);
+  }
+
+  24% {
+    filter: brightness(1.6) saturate(1.2);
+    transform: translate(-47%, -47%) rotate(12deg) scale(0.96);
+  }
+
+  42% {
+    filter: brightness(1.1) saturate(0.7);
+    transform: translate(-50%, -38%) rotate(32deg) scale(0.94);
+  }
+
+  100% {
+    filter: brightness(0.55) grayscale(0.8);
+    transform: translate(-42%, 125%) rotate(118deg) scale(0.8);
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

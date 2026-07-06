@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MICROGAME_BGM_BY_CANVAS } from "@/data/microgameBgmTracks";
 import type { Microgame } from "@/data/microgames";
+import { SUDDEN_DEATH_ANIMATION_MS } from "@/games/useSurviveMolaMolaGame";
 import type { InstructionStep } from "@/hooks/useBeatGameRound";
 import { useMicrogameInput } from "@/hooks/useMicrogameInput";
 import {
@@ -160,7 +161,12 @@ export function usePracticeMicrogame(
 
     const startedAt = window.performance.now();
     const durationMs = microgame.beatCount * beatDurationMs;
+    const resultDelayMs =
+      microgame.canvas === "surviveMolaMolaShrimp"
+        ? SUDDEN_DEATH_ANIMATION_MS
+        : 0;
     const endsAt = startedAt + durationMs;
+    let timeoutFailureResultTimer: number | null = null;
     const beatTimer = window.setInterval(() => {
       const remainingMs = Math.max(endsAt - window.performance.now(), 0);
 
@@ -170,14 +176,25 @@ export function usePracticeMicrogame(
     }, BEAT_PROGRESS_INTERVAL_MS);
     const finishTimer = window.setTimeout(() => {
       setBeatsLeft(0);
-      showResult(hasClearedRef.current ? "success" : "failure");
+      if (hasClearedRef.current) {
+        showResult("success");
+        return;
+      }
+
+      timeoutFailureResultTimer = window.setTimeout(() => {
+        timeoutFailureResultTimer = null;
+        showResult("failure");
+      }, resultDelayMs);
     }, durationMs);
 
     return () => {
       window.clearInterval(beatTimer);
       window.clearTimeout(finishTimer);
+      if (timeoutFailureResultTimer !== null) {
+        window.clearTimeout(timeoutFailureResultTimer);
+      }
     };
-  }, [beatDurationMs, microgame.beatCount, phase, showResult]);
+  }, [beatDurationMs, microgame.beatCount, microgame.canvas, phase, showResult]);
 
   useEffect(() => {
     const canShowSuccessfulResultEarly =

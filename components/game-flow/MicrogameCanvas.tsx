@@ -21,6 +21,7 @@ import { CookieRunKingdomGame } from "@/games/CookieRunKingdomGame";
 import { CourseRegistrationNumberGame } from "@/games/CourseRegistrationNumberGame";
 import { CrosswordGame } from "@/games/CrosswordGame";
 import { CrazyArcadeGame } from "@/games/CrazyArcadeGame";
+import { DancingBehindTeacherGame } from "@/games/DancingBehindTeacherGame";
 import { DaveTheDiverGame } from "@/games/DaveTheDiverGame";
 import { DefaultMicrogameCanvas } from "@/games/DefaultMicrogameCanvas";
 import { DobbleGame } from "@/games/DobbleGame";
@@ -47,6 +48,7 @@ import { MiniMetroGame } from "@/games/MiniMetroGame";
 import { MinesweeperGame } from "@/games/MinesweeperGame";
 import { MinigameExGame } from "@/games/MinigameExGame";
 import { ModooMarbleGame } from "@/games/ModooMarbleGame";
+import { NanaimoGame } from "@/games/NanaimoGame";
 import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
 import { PinballGame } from "@/games/PinballGame";
@@ -58,6 +60,7 @@ import { PokemonTcgPocketGame } from "@/games/PokemonTcgPocketGame";
 import { PokemonTypingGame } from "@/games/PokemonTypingGame";
 import { RhythmHeavenChorusGame } from "@/games/RhythmHeavenChorusGame";
 import { RhythmHeroGame } from "@/games/RhythmHeroGame";
+import { RhythmStarGame } from "@/games/RhythmStarGame";
 import { RummikubGame } from "@/games/RummikubGame";
 import { SnakeGame } from "@/games/SnakeGame";
 import { StarcraftMoveGame } from "@/games/StarcraftMoveGame";
@@ -149,6 +152,16 @@ function renderGameCanvas(
     return <DaveTheDiverGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "dancingBehindTeacher") {
+    return (
+      <DancingBehindTeacherGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
+  }
+
   if (microgame.canvas === "undertaleMouse") {
     return <UndertaleMouseGame microgame={microgame} />;
   }
@@ -206,6 +219,16 @@ function renderGameCanvas(
     );
   }
 
+  if (microgame.canvas === "rhythmStar") {
+    return (
+      <RhythmStarGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
+  }
+
   if (microgame.canvas === "rummikubAttach") {
     return <RummikubGame microgame={microgame} />;
   }
@@ -224,6 +247,16 @@ function renderGameCanvas(
 
   if (microgame.canvas === "modooMarble") {
     return <ModooMarbleGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "nanaimoBulletHell") {
+    return (
+      <NanaimoGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
   }
 
   if (microgame.canvas === "maplestoryLieDetector") {
@@ -373,7 +406,13 @@ function renderGameCanvas(
   }
 
   if (microgame.canvas === "surviveMolaMolaShrimp") {
-    return <SurviveMolaMolaGame microgame={microgame} />;
+    return (
+      <SurviveMolaMolaGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
   }
 
   if (microgame.canvas === "sudokuMissingNumber") {

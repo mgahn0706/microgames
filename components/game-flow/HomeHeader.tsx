@@ -72,7 +72,7 @@ export function HomeHeader({
             <div className="relative">
               <button
                 aria-expanded={isSettingsOpen}
-                aria-label="BGM 테마 선택 열기"
+                aria-label="설정 열기"
                 className={`grid size-10 place-items-center rounded-md border bg-black/20 text-cyan-50/82 transition hover:bg-white/10 hover:text-white ${
                   isSettingsOpen
                     ? "border-cyan-100/65 text-cyan-50 shadow-[0_0_18px_rgba(103,232,249,0.34)]"

@@ -9,6 +9,7 @@ import {
 import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
 import { MICROGAME_BGM_BY_CANVAS } from "@/data/microgameBgmTracks";
 import { getMicrogamePoolForRound, type Microgame } from "@/data/microgames";
+import { SUDDEN_DEATH_ANIMATION_MS } from "@/games/useSurviveMolaMolaGame";
 import { useBeatGameRound } from "@/hooks/useBeatGameRound";
 import { useMicrogameInput } from "@/hooks/useMicrogameInput";
 import { useRecordSeenMicrogame } from "@/hooks/useRecordSeenMicrogame";
@@ -239,6 +240,10 @@ export function GameScreen({
   } = useBeatGameRound({
     getGameBeatCount: (nextRoundNumber) =>
       getMicrogameForRound(nextRoundNumber).beatCount,
+    getGameTimeoutDelayMs: (nextRoundNumber) =>
+      getMicrogameForRound(nextRoundNumber).canvas === "surviveMolaMolaShrimp"
+        ? SUDDEN_DEATH_ANIMATION_MS
+        : 0,
     initialSpeedMultiplier: challengeModes.fastStart
       ? FAST_START_INITIAL_SPEED_MULTIPLIER
       : 1,

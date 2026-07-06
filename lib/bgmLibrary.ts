@@ -46,12 +46,14 @@ export type BgmTrack =
   | "minecraft"
   | "modooMarble"
   | "molaMolaSuddenDeath"
+  | "nanaimo"
   | "poppyPlaytime"
   | "pokerouge"
   | "pokemon"
   | "pokemonMysteryDungeon"
   | "pokemonTcgPocket"
   | "rhythmHero"
+  | "rhythmStar"
   | "rummikub"
   | "starcraft"
   | "sudoku"
@@ -174,6 +176,7 @@ const STATIC_BGM_TRACK_PATHS = {
   minecraft: "/games/minecraft/sounds/minecraft-bgm.mp3",
   modooMarble: "/games/modoo-marble/sounds/modoo-bgm.mp3",
   molaMolaSuddenDeath: "/games/survive-mola-mola/sounds/sudden-death-bgm.mp3",
+  nanaimo: "/games/nana-imo/sounds/nanaimo-bgm.mp3",
   poppyPlaytime: "/games/poppy-playtime/sounds/poppy-playtime-bgm.mp3",
   pokerouge: "/games/pokerouge/sounds/pokegoruge-bgm.flac",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
@@ -182,6 +185,7 @@ const STATIC_BGM_TRACK_PATHS = {
   pokemonTcgPocket:
     "/games/pokemon-tcg-pocket/sounds/pokemon-card-pocket-bgm.mp3",
   rhythmHero: "/games/rhythm-hero/sounds/rhythm-hero-bgm.mp3",
+  rhythmStar: "/games/rhythm-star/sounds/rhythm-star-bgm.mp3",
   rummikub: "/games/rummikub/sounds/rummikub-bgm.mp3",
   starcraft: "/games/starcraft/sounds/starcraft-bgm.mp3",
   sudoku: "/games/sudoku/sounds/sudoku-bgm.mp3",
@@ -321,6 +325,7 @@ const BGM_TRACK_BEATS = {
   minecraft: 8,
   modooMarble: 8,
   molaMolaSuddenDeath: 4,
+  nanaimo: 8,
   oneUp: 8,
   poppyPlaytime: 8,
   pokerouge: 8,
@@ -329,6 +334,7 @@ const BGM_TRACK_BEATS = {
   pokemonTcgPocket: 12,
   mainLoop: 83,
   rhythmHero: 8,
+  rhythmStar: 12,
   rummikub: 12,
   setup: 4,
   speedUp: 8,
@@ -359,9 +365,11 @@ const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<
   gogunbuntu: DEFAULT_BEAT_DURATION_SECONDS,
   infiniteStairs: DEFAULT_BEAT_DURATION_SECONDS,
   luigiMansion: DEFAULT_BEAT_DURATION_SECONDS,
+  nanaimo: DEFAULT_BEAT_DURATION_SECONDS,
   poppyPlaytime: DEFAULT_BEAT_DURATION_SECONDS,
   pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
   pokemonMysteryDungeon: DEFAULT_BEAT_DURATION_SECONDS,
+  rhythmStar: DEFAULT_BEAT_DURATION_SECONDS,
   rummikub: DEFAULT_BEAT_DURATION_SECONDS,
   surviveMolaMola: DEFAULT_BEAT_DURATION_SECONDS,
   wordle: DEFAULT_BEAT_DURATION_SECONDS,
@@ -371,6 +379,7 @@ const BGM_TRACK_SOURCE_START_SECONDS: Partial<Record<BgmTrack, number>> = {
   anipang: 6,
   luigiMansion: 8,
   poppyPlaytime: 8,
+  rhythmStar: 8,
 };
 
 export const GAME_OVER_DURATION_MS = 5208;

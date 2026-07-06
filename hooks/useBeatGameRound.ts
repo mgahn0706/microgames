@@ -43,6 +43,7 @@ const PHASE_LABELS = {
 type UseBeatGameRoundParams = Readonly<{
   gameBeatCount?: number;
   getGameBeatCount?: (roundNumber: number) => number;
+  getGameTimeoutDelayMs?: (roundNumber: number) => number;
   initialSpeedMultiplier?: number;
   noControlHints?: boolean;
   shouldPlayOneUp: boolean;
@@ -120,6 +121,7 @@ function getPhaseBeatDurationMs(
 export function useBeatGameRound({
   gameBeatCount = DEFAULT_GAME_BEATS,
   getGameBeatCount,
+  getGameTimeoutDelayMs,
   initialSpeedMultiplier = 1,
   noControlHints = false,
   onFailure,
@@ -151,6 +153,7 @@ export function useBeatGameRound({
   >(null);
   const [shouldOneUpAfterResult, setShouldOneUpAfterResult] = useState(false);
   const currentGameBeatCount = getGameBeatCount?.(roundNumber) ?? gameBeatCount;
+  const currentGameTimeoutDelayMs = getGameTimeoutDelayMs?.(roundNumber) ?? 0;
   const phaseBeatCount = getPhaseBeatCount(
     phase,
     currentGameBeatCount,
@@ -212,6 +215,7 @@ export function useBeatGameRound({
   }, [phase, roundNumber]);
 
   useEffect(() => {
+    let timeoutFailureResultTimer: number | null = null;
     const phaseTimer = window.setTimeout(() => {
       if (phase === "instruction") {
         setGameBeatProgress({
@@ -223,7 +227,20 @@ export function useBeatGameRound({
       }
 
       if (phase === "game") {
-        showResult(hasClearedCurrentGameRef.current ? "success" : "failure");
+        if (hasClearedCurrentGameRef.current) {
+          showResult("success");
+          return;
+        }
+
+        if (currentGameTimeoutDelayMs > 0) {
+          timeoutFailureResultTimer = window.setTimeout(() => {
+            timeoutFailureResultTimer = null;
+            showResult("failure");
+          }, currentGameTimeoutDelayMs);
+          return;
+        }
+
+        showResult("failure");
         return;
       }
 
@@ -294,10 +311,14 @@ export function useBeatGameRound({
 
     return () => {
       window.clearTimeout(phaseTimer);
+      if (timeoutFailureResultTimer !== null) {
+        window.clearTimeout(timeoutFailureResultTimer);
+      }
     };
   }, [
     beginInstruction,
     currentGameBeatCount,
+    currentGameTimeoutDelayMs,
     onFinish,
     phase,
     phaseDurationMs,

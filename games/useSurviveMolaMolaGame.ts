@@ -10,7 +10,7 @@ import { bgmLibrary } from "@/lib/bgmLibrary";
 const TARGET_SHRIMP_COUNT = 2;
 const EAT_ANIMATION_MS = 520;
 const EAT_SETTLE_MS = 140;
-const SUDDEN_DEATH_ANIMATION_MS = 1100;
+export const SUDDEN_DEATH_ANIMATION_MS = 1100;
 
 export type MolaMolaDirection = "left" | "right";
 
@@ -40,7 +40,15 @@ function dispatchFailure() {
   window.dispatchEvent(new CustomEvent(MICROGAME_FAILURE_EVENT));
 }
 
-export function useSurviveMolaMolaGame() {
+export function useSurviveMolaMolaGame({
+  beatCount,
+  beatDurationMs,
+  isActive,
+}: Readonly<{
+  beatCount: number;
+  beatDurationMs: number;
+  isActive: boolean;
+}>) {
   const [activeShrimpId, setActiveShrimpId] = useState<number | null>(null);
   const [eatenShrimpIds, setEatenShrimpIds] = useState<readonly number[]>([]);
   const [hasFailed, setHasFailed] = useState(false);
@@ -51,6 +59,13 @@ export function useSurviveMolaMolaGame() {
   const [molaMotion, setMolaMotion] = useState<MolaMolaMotion>(
     INITIAL_MOLA_MOLA_MOTION,
   );
+
+  const clearRegisteredTimeouts = useCallback(() => {
+    clearTimeoutsRef.current.forEach((timeout) => {
+      window.clearTimeout(timeout);
+    });
+    clearTimeoutsRef.current.clear();
+  }, []);
 
   const registerTimeout = useCallback(
     (callback: () => void, delayMs: number) => {
@@ -121,34 +136,72 @@ export function useSurviveMolaMolaGame() {
     [activeShrimpId, eatenShrimpIds, moveMolaMola, registerTimeout],
   );
 
+  const startSuddenDeath = useCallback(
+    (shouldDispatchFailure: boolean) => {
+      if (hasResolvedRef.current) {
+        return;
+      }
+
+      hasResolvedRef.current = true;
+      setActiveShrimpId(null);
+      setHasFailed(true);
+      setIsEating(false);
+      bgmLibrary
+        .play("molaMolaSuddenDeath", "once", "now")
+        .catch((error: unknown) => {
+          console.error(error);
+        });
+      bgmLibrary.playSoundEffect("molaMolaDeath").catch((error: unknown) => {
+        console.error(error);
+      });
+
+      if (shouldDispatchFailure) {
+        registerTimeout(dispatchFailure, SUDDEN_DEATH_ANIMATION_MS);
+      }
+    },
+    [registerTimeout],
+  );
+
   const handleMolaMolaPointerDown = useCallback(() => {
     if (hasResolvedRef.current) {
       return;
     }
 
-    hasResolvedRef.current = true;
-    setHasFailed(true);
-    bgmLibrary
-      .play("molaMolaSuddenDeath", "once", "now")
-      .catch((error: unknown) => {
-        console.error(error);
-      });
-    bgmLibrary.playSoundEffect("molaMolaDeath").catch((error: unknown) => {
-      console.error(error);
-    });
-    registerTimeout(dispatchFailure, SUDDEN_DEATH_ANIMATION_MS);
-  }, [registerTimeout]);
+    startSuddenDeath(true);
+  }, [startSuddenDeath]);
 
   useEffect(() => {
-    const clearTimeouts = clearTimeoutsRef.current;
+    if (!isActive) {
+      clearRegisteredTimeouts();
+      return;
+    }
 
-    return () => {
-      clearTimeouts.forEach((timeout) => {
-        window.clearTimeout(timeout);
-      });
-      clearTimeouts.clear();
-    };
-  }, []);
+    clearRegisteredTimeouts();
+    hasResolvedRef.current = false;
+    molaMotionRef.current = INITIAL_MOLA_MOLA_MOTION;
+    setActiveShrimpId(null);
+    setEatenShrimpIds([]);
+    setHasFailed(false);
+    setIsEating(false);
+    setMolaMotion(INITIAL_MOLA_MOLA_MOTION);
+
+    const timeoutDelayMs = beatCount * beatDurationMs;
+
+    registerTimeout(() => {
+      startSuddenDeath(false);
+    }, timeoutDelayMs);
+  }, [
+    beatCount,
+    beatDurationMs,
+    clearRegisteredTimeouts,
+    isActive,
+    registerTimeout,
+    startSuddenDeath,
+  ]);
+
+  useEffect(() => {
+    return clearRegisteredTimeouts;
+  }, [clearRegisteredTimeouts]);
 
   return {
     activeShrimpId,
