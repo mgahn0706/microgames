@@ -12,7 +12,6 @@ import { getMicrogamePoolForRound, type Microgame } from "@/data/microgames";
 import { SUDDEN_DEATH_ANIMATION_MS } from "@/games/useSurviveMolaMolaGame";
 import { useBeatGameRound } from "@/hooks/useBeatGameRound";
 import { useMicrogameInput } from "@/hooks/useMicrogameInput";
-import { useRecordSeenMicrogame } from "@/hooks/useRecordSeenMicrogame";
 import { useSynchronizedRhythm } from "@/hooks/useSynchronizedRhythm";
 import { bgmLibrary, type SoundEffectTrack } from "@/lib/bgmLibrary";
 import { FixedLivesOverlay } from "./FixedLivesOverlay";
@@ -201,7 +200,6 @@ export function GameScreen({
   onLoseLife,
   onReachRound,
   onResetResult,
-  onSeenMicrogame,
   onSuccess,
 }: Readonly<{
   challengeModes: ChallengeModes;
@@ -212,7 +210,6 @@ export function GameScreen({
   onLoseLife: () => void;
   onReachRound: (roundNumber: number) => void;
   onResetResult: () => void;
-  onSeenMicrogame: (microgameId: string) => void;
   onSuccess: () => void;
 }>) {
   const oneUpAppliedRoundRef = useRef<number | null>(null);
@@ -296,11 +293,6 @@ export function GameScreen({
     onFailure: recordFailure,
     roundNumber,
   });
-  useRecordSeenMicrogame({
-    isActive: phase === "game",
-    microgameId: microgame.id,
-    onSeen: onSeenMicrogame,
-  });
 
   useEffect(() => {
     if (phase !== "game") {
@@ -335,9 +327,11 @@ export function GameScreen({
         return;
       }
 
-      bgmLibrary.play(microgameBgmTrack, "once", "now").catch((error: unknown) => {
-        console.error(error);
-      });
+      bgmLibrary
+        .play(microgameBgmTrack, "once", "now")
+        .catch((error: unknown) => {
+          console.error(error);
+        });
       return;
     }
 

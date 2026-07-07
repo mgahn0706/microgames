@@ -6,7 +6,6 @@ import {
   type ChallengeModes,
 } from "@/data/challengeModes";
 import { useGameScreenFlow } from "@/hooks/useGameScreenFlow";
-import { useSeenMicrogames } from "@/hooks/useSeenMicrogames";
 import { GameScreen } from "./GameScreen";
 import type { HomeView } from "./HomeHeader";
 import {
@@ -24,7 +23,6 @@ export function GameFlowExperience({
   const [challengeModes, setChallengeModes] = useState<ChallengeModes>(
     DEFAULT_CHALLENGE_MODES,
   );
-  const { recordSeenMicrogameId, seenMicrogameIds } = useSeenMicrogames();
   const {
     completeSetup,
     finalReachedRound,
@@ -71,7 +69,6 @@ export function GameFlowExperience({
         onLoseLife={loseLife}
         onReachRound={recordReachedRound}
         onResetResult={resetRoundResult}
-        onSeenMicrogame={recordSeenMicrogameId}
         onSuccess={recordSuccess}
       />
     );
@@ -94,7 +91,6 @@ export function GameFlowExperience({
       homeView={homeView}
       onChallengeModesChange={setChallengeModes}
       onStart={startGame}
-      seenMicrogameIds={seenMicrogameIds}
     />
   );
 }

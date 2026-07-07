@@ -8,11 +8,13 @@ import { AnimalFarmBossGame } from "@/games/AnimalFarmBossGame";
 import { AppleGame } from "@/games/AppleGame";
 import { AmongUsWireGame } from "@/games/AmongUsWireGame";
 import { BabaIsYouGame } from "@/games/BabaIsYouGame";
+import { BattleGroundGame } from "@/games/BattleGroundGame";
 import { BindingOfIsaacGame } from "@/games/BindingOfIsaacGame";
 import { BounceBallGame } from "@/games/BounceBallGame";
 import { BrainAgeMathGame } from "@/games/BrainAgeMathGame";
 import { BrainAcademyBlockGame } from "@/games/BrainAcademyBlockGame";
 import { BubbleBobbleGame } from "@/games/BubbleBobbleGame";
+import { BubbleShooterBossGame } from "@/games/BubbleShooterBossGame";
 import { ChessGame } from "@/games/ChessGame";
 import { ChromeDinoSpaceGame } from "@/games/ChromeDinoSpaceGame";
 import { CookieClickerGame } from "@/games/CookieClickerGame";
@@ -49,6 +51,7 @@ import { MinesweeperGame } from "@/games/MinesweeperGame";
 import { MinigameExGame } from "@/games/MinigameExGame";
 import { ModooMarbleGame } from "@/games/ModooMarbleGame";
 import { NanaimoGame } from "@/games/NanaimoGame";
+import { NintendogsGame } from "@/games/NintendogsGame";
 import type { Microgame } from "@/data/microgames";
 import { PianoMelodyGame } from "@/games/PianoMelodyGame";
 import { PinballGame } from "@/games/PinballGame";
@@ -124,6 +127,16 @@ function renderGameCanvas(
     return <BabaIsYouGame microgame={microgame} />;
   }
 
+  if (microgame.canvas === "battleGroundPlaneDrop") {
+    return (
+      <BattleGroundGame
+        beatDurationMs={beatDurationMs}
+        isActive={isActive}
+        microgame={microgame}
+      />
+    );
+  }
+
   if (microgame.canvas === "bindingOfIsaacFlies") {
     return <BindingOfIsaacGame isActive={isActive} microgame={microgame} />;
   }
@@ -142,6 +155,10 @@ function renderGameCanvas(
 
   if (microgame.canvas === "bubbleBobble") {
     return <BubbleBobbleGame microgame={microgame} />;
+  }
+
+  if (microgame.canvas === "bubbleShooterBoss") {
+    return <BubbleShooterBossGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "chessCapture") {
@@ -257,6 +274,10 @@ function renderGameCanvas(
         microgame={microgame}
       />
     );
+  }
+
+  if (microgame.canvas === "nintendogsPet") {
+    return <NintendogsGame microgame={microgame} />;
   }
 
   if (microgame.canvas === "maplestoryLieDetector") {

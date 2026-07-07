@@ -17,8 +17,10 @@ export type BgmTrack =
   | "animalFarm"
   | "appleGame"
   | "babaIsYou"
+  | "battleGround"
   | "brainAge"
   | "brainAcademy"
+  | "bubbleShooter"
   | "cookieRun"
   | "cookieRunKingdom"
   | "crossword"
@@ -47,6 +49,7 @@ export type BgmTrack =
   | "modooMarble"
   | "molaMolaSuddenDeath"
   | "nanaimo"
+  | "nintendogs"
   | "poppyPlaytime"
   | "pokerouge"
   | "pokemon"
@@ -81,6 +84,9 @@ export type SoundEffectTrack =
   | "animalCrossingNewLeafType"
   | "angryBirdFlying"
   | "angryBirdSlingshot"
+  | "battleGroundPlane"
+  | "bubbleShooterPop"
+  | "bubbleShooterShoot"
   | "cookieRunJump"
   | "cookieRunSlide"
   | "crazyArcadeBombInstall"
@@ -101,6 +107,8 @@ export type SoundEffectTrack =
   | "modooDiceRoll"
   | "molaMolaDeath"
   | "molaMolaEat"
+  | "nintendogsBark"
+  | "nintendogsRub"
   | "pinballBounce"
   | "pinballFlipper"
   | "pinballGameOver"
@@ -118,6 +126,10 @@ export type SoundEffectTrack =
   | "runeEffect"
   | "starcraftMove"
   | "twentyFortyEightSwipe";
+
+export type SoundEffectPlayback = Readonly<{
+  stop: () => void;
+}>;
 
 const BGM_THEME_TRACKS: ReadonlySet<BgmTrack> = new Set([
   "bossStage",
@@ -146,8 +158,10 @@ const STATIC_BGM_TRACK_PATHS = {
   animalFarm: "/games/animal-farm/sounds/animal-farm-bgm.mp3",
   appleGame: "/games/apple-game/sounds/apple-game-bgm.mp3",
   babaIsYou: "/games/baba-is-you/sounds/baba-is-you.mp3",
+  battleGround: "/games/battle-ground/sounds/battle-ground-bgm.mp3",
   brainAge: "/games/brain-age/sounds/brain-age-bgm.mp3",
   brainAcademy: "/games/brain-academy/sounds/brain-academy-bgm.mp3",
+  bubbleShooter: "/games/bubble-shooter/sounds/Bubbleshoot Theme Music.mp3",
   cookieRun: "/games/cookie-run/sounds/cookie-run-bgm.mp3",
   cookieRunKingdom:
     "/games/cookie-run-kingdom/sounds/cookie-run-kingdom-bgm.mp3",
@@ -177,6 +191,7 @@ const STATIC_BGM_TRACK_PATHS = {
   modooMarble: "/games/modoo-marble/sounds/modoo-bgm.mp3",
   molaMolaSuddenDeath: "/games/survive-mola-mola/sounds/sudden-death-bgm.mp3",
   nanaimo: "/games/nana-imo/sounds/nanaimo-bgm.mp3",
+  nintendogs: "/games/nintendogs/sounds/nintendogs-bgm.mp3",
   poppyPlaytime: "/games/poppy-playtime/sounds/poppy-playtime-bgm.mp3",
   pokerouge: "/games/pokerouge/sounds/pokegoruge-bgm.flac",
   pokemon: "/games/pokemon/sounds/pokemon-bgm.mp3",
@@ -214,6 +229,9 @@ const SOUND_EFFECT_TRACK_PATHS = {
   animalCrossingNewLeafType: "/games/animal-crossing-new-leaf/sounds/type.wav",
   angryBirdFlying: "/games/angry-bird/sounds/angry-birds-flying.mp3",
   angryBirdSlingshot: "/games/angry-bird/sounds/angry-birds-slingshot.mp3",
+  battleGroundPlane: "/games/battle-ground/sounds/plane-sfx.mp3",
+  bubbleShooterPop: "/games/bubble-shooter/sounds/bubble-pop.mp3",
+  bubbleShooterShoot: "/games/bubble-shooter/sounds/bubble-shoot.mp3",
   cookieRunJump: "/games/cookie-run/sounds/cookie-jump.mp3",
   cookieRunSlide: "/games/cookie-run/sounds/cookie-slide.mp3",
   crazyArcadeBombInstall:
@@ -238,6 +256,8 @@ const SOUND_EFFECT_TRACK_PATHS = {
   modooDiceRoll: "/games/modoo-marble/sounds/dice-roll.mp3",
   molaMolaDeath: "/games/survive-mola-mola/sounds/death-sfx.mp3",
   molaMolaEat: "/games/survive-mola-mola/sounds/eat-sfx.mp3",
+  nintendogsBark: "/games/nintendogs/sounds/dog-barking.mp3",
+  nintendogsRub: "/games/nintendogs/sounds/srubbing.mp3",
   pinballBounce: "/games/pinball/sounds/bounced-electronic.mp3",
   pinballFlipper: "/games/pinball/sounds/flipper-hand.mp3",
   pinballGameOver: "/games/pinball/sounds/game-over.mp3",
@@ -276,6 +296,7 @@ const BGM_TRACK_GAINS: Partial<Record<BgmTrack, number>> = {
   kartrider: 0.94,
   mapleRune: 0.94,
   poppyPlaytime: 1.08,
+  surviveMolaMola: 1.18,
   undertale: 0.52,
 };
 const SOUND_EFFECT_GAIN = 0.86;
@@ -293,9 +314,11 @@ const BGM_TRACK_BEATS = {
   animalFarm: 36,
   appleGame: 12,
   babaIsYou: 8,
+  battleGround: 12,
   bossStage: 8,
   brainAge: 12,
   brainAcademy: 12,
+  bubbleShooter: 36,
   cookieRun: 12,
   cookieRunKingdom: 8,
   crossword: 8,
@@ -326,6 +349,7 @@ const BGM_TRACK_BEATS = {
   modooMarble: 8,
   molaMolaSuddenDeath: 4,
   nanaimo: 8,
+  nintendogs: 8,
   oneUp: 8,
   poppyPlaytime: 8,
   pokerouge: 8,
@@ -359,6 +383,8 @@ const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<
   angryBird: DEFAULT_BEAT_DURATION_SECONDS,
   anipang: DEFAULT_BEAT_DURATION_SECONDS,
   animalCrossingNewLeaf: DEFAULT_BEAT_DURATION_SECONDS,
+  battleGround: DEFAULT_BEAT_DURATION_SECONDS,
+  bubbleShooter: DEFAULT_BEAT_DURATION_SECONDS,
   crossword: DEFAULT_BEAT_DURATION_SECONDS,
   brainAge: DEFAULT_BEAT_DURATION_SECONDS,
   daveTheDiver: DEFAULT_BEAT_DURATION_SECONDS,
@@ -366,6 +392,7 @@ const BGM_TRACK_SOURCE_BEAT_DURATION_SECONDS: Partial<
   infiniteStairs: DEFAULT_BEAT_DURATION_SECONDS,
   luigiMansion: DEFAULT_BEAT_DURATION_SECONDS,
   nanaimo: DEFAULT_BEAT_DURATION_SECONDS,
+  nintendogs: DEFAULT_BEAT_DURATION_SECONDS,
   poppyPlaytime: DEFAULT_BEAT_DURATION_SECONDS,
   pokerouge: DEFAULT_BEAT_DURATION_SECONDS,
   pokemonMysteryDungeon: DEFAULT_BEAT_DURATION_SECONDS,
@@ -495,6 +522,7 @@ class BgmLibrary {
     const buffer = await this.loadTrack(track);
     const gainNode = audioContext.createGain();
     const source = audioContext.createBufferSource();
+    let hasStopped = false;
 
     source.buffer = buffer;
     source.connect(gainNode);
@@ -504,6 +532,34 @@ class BgmLibrary {
       audioContext.currentTime,
     );
     source.start(audioContext.currentTime);
+
+    source.onended = () => {
+      hasStopped = true;
+    };
+
+    return {
+      stop: () => {
+        if (hasStopped) {
+          return;
+        }
+
+        hasStopped = true;
+        const stopAt = audioContext.currentTime + RELEASE_FADE_SECONDS;
+
+        gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+        gainNode.gain.setValueAtTime(
+          gainNode.gain.value,
+          audioContext.currentTime,
+        );
+        gainNode.gain.linearRampToValueAtTime(0, stopAt);
+
+        try {
+          source.stop(stopAt);
+        } catch {
+          // The sound effect may have already ended naturally.
+        }
+      },
+    } satisfies SoundEffectPlayback;
   }
 
   async play(

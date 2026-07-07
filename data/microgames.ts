@@ -21,11 +21,13 @@ export type MicrogameCanvas =
   | "appleNumberSum"
   | "amongUsWires"
   | "babaIsYou"
+  | "battleGroundPlaneDrop"
   | "bindingOfIsaacFlies"
   | "bounceBall"
   | "brainAgeMath"
   | "brainAcademyBlocks"
   | "bubbleBobble"
+  | "bubbleShooterBoss"
   | "chessCapture"
   | "chromeDinoSpace"
   | "cookieClicker"
@@ -62,6 +64,7 @@ export type MicrogameCanvas =
   | "minesweeperMineClick"
   | "modooMarble"
   | "nanaimoBulletHell"
+  | "nintendogsPet"
   | "pianoMelody"
   | "pinballSurvival"
   | "pongSurvival"
@@ -174,6 +177,20 @@ export const MICROGAMES = [
     id: "nanaimo-bullet-hell",
     startPrompt: "피하고 공격해라!",
     title: "나나이모",
+    type: "normal",
+  },
+
+  {
+    beatCount: 8,
+    canvas: "nintendogsPet",
+    microscope: {
+      imageAlt: "닌텐독스 강아지 세 마리",
+      imageSrc: "/games/nintendogs/images/background-and-dogs.png",
+    },
+    control: "mouseDrag",
+    id: "nintendogs",
+    startPrompt: "쓰다듬어라!",
+    title: "닌텐독스",
     type: "normal",
   },
 
@@ -459,6 +476,20 @@ export const MICROGAMES = [
 
   {
     beatCount: 12,
+    canvas: "battleGroundPlaneDrop",
+    microscope: {
+      imageAlt: "배틀그라운드 비행기와 목표 구간",
+      imageSrc: "/games/battle-ground/images/map.png",
+    },
+    control: "space",
+    id: "baatle-ground",
+    startPrompt: "내려라!",
+    title: "배틀그라운드",
+    type: "normal",
+  },
+
+  {
+    beatCount: 12,
     canvas: "bubbleBobble",
     microscope: {
       imageAlt: "버블보블 버블 드래곤",
@@ -466,7 +497,7 @@ export const MICROGAMES = [
     },
     control: "arrowAndSpace",
     id: "bubble-bobble-defeat-enemies",
-    startPrompt: "모든 적을 무찔러라!",
+    startPrompt: "무찔러라!",
     title: "버블보블",
     type: "normal",
   },
@@ -536,7 +567,7 @@ export const MICROGAMES = [
     },
     control: "space",
     id: "dancing-behind-the-teacher",
-    startPrompt: "안 볼 때 춤춰라!",
+    startPrompt: "춤춰라!",
     title: "선생님 안 볼 때 춤추기",
     type: "normal",
   },
@@ -564,7 +595,7 @@ export const MICROGAMES = [
     },
     control: "space",
     id: "super-mario-coin-count",
-    startPrompt: "코인을 정확히 모아라!",
+    startPrompt: "코인을 모아라!",
     title: "슈퍼 마리오",
     type: "normal",
   },
@@ -1126,6 +1157,20 @@ export const MICROGAMES = [
     id: "animal-farm-reverse-typing",
     startPrompt: "단어를 거꾸로 써라!",
     title: "동물농장",
+    type: "boss",
+  },
+
+  {
+    beatCount: 36,
+    canvas: "bubbleShooterBoss",
+    microscope: {
+      imageAlt: "버블슈터 빨간 버블",
+      imageSrc: "/games/bubble-shooter/images/red.png",
+    },
+    control: "space",
+    id: "bubble-shooter-boss",
+    startPrompt: "버블을 터뜨려라!",
+    title: "버블슈터",
     type: "boss",
   },
 

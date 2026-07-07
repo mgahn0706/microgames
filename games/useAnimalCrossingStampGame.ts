@@ -39,6 +39,13 @@ type LoadedImages = Partial<
   Record<keyof typeof ANIMAL_CROSSING_ASSETS, HTMLImageElement>
 >;
 
+type CoverImageRect = Readonly<{
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+}>;
+
 type Point = {
   x: number;
   y: number;
@@ -79,20 +86,45 @@ function getPointerPoint(canvas: HTMLCanvasElement, event: PointerEvent) {
   };
 }
 
-function getTargetPoints(width: number, height: number) {
+function getCoverImageRect(
+  image: HTMLImageElement,
+  width: number,
+  height: number,
+): CoverImageRect {
+  const scale = Math.max(
+    width / image.naturalWidth,
+    height / image.naturalHeight,
+  );
+  const imageWidth = image.naturalWidth * scale;
+  const imageHeight = image.naturalHeight * scale;
+
+  return {
+    height: imageHeight,
+    width: imageWidth,
+    x: (width - imageWidth) / 2,
+    y: (height - imageHeight) / 2,
+  };
+}
+
+function getTargetPoints(images: LoadedImages, width: number, height: number) {
+  const coverRect = isImageReady(images.background)
+    ? getCoverImageRect(images.background, width, height)
+    : { height, width, x: 0, y: 0 };
+
   return STAMP_TARGET_RATIOS.map((target) => ({
-    x: width * target.x,
-    y: height * target.y,
+    x: coverRect.x + coverRect.width * target.x,
+    y: coverRect.y + coverRect.height * target.y,
   }));
 }
 
 function getTargetIndexAtPoint(
   state: GameState,
   point: Point,
+  images: LoadedImages,
   width: number,
   height: number,
 ) {
-  return getTargetPoints(width, height).findIndex((target, index) => {
+  return getTargetPoints(images, width, height).findIndex((target, index) => {
     if (state.stampedTargets[index]) {
       return false;
     }
@@ -115,19 +147,14 @@ function drawCoverImage(
   width: number,
   height: number,
 ) {
-  const scale = Math.max(
-    width / image.naturalWidth,
-    height / image.naturalHeight,
-  );
-  const imageWidth = image.naturalWidth * scale;
-  const imageHeight = image.naturalHeight * scale;
+  const coverRect = getCoverImageRect(image, width, height);
 
   context.drawImage(
     image,
-    (width - imageWidth) / 2,
-    (height - imageHeight) / 2,
-    imageWidth,
-    imageHeight,
+    coverRect.x,
+    coverRect.y,
+    coverRect.width,
+    coverRect.height,
   );
 }
 
@@ -237,7 +264,7 @@ function drawScene(
   context.fillStyle = "rgba(255, 251, 235, 0.2)";
   context.fillRect(0, 0, width, height);
 
-  const targetPoints = getTargetPoints(width, height);
+  const targetPoints = getTargetPoints(images, width, height);
   const targetRadius = Math.min(TARGET_HIT_RADIUS, width * 0.07, height * 0.12);
   const stampRadius = targetRadius * 0.76;
 
@@ -385,6 +412,7 @@ export function useAnimalCrossingStampGameCanvas() {
       const targetIndex = getTargetIndexAtPoint(
         state,
         pointer,
+        imagesRef.current,
         canvasWidth,
         canvasHeight,
       );

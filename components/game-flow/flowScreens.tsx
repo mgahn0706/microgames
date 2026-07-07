@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ScoreSubmissionPanel } from "@/components/ranking/ScoreSubmissionPanel";
 import {
@@ -307,12 +306,6 @@ function HowToPlayPanel() {
   );
 }
 
-function maskMicroscopeText(value: string) {
-  return Array.from(value)
-    .map((character) => (character.trim() ? "?" : character))
-    .join("");
-}
-
 function getMicrogamePracticeHref(
   microgame: Microgame,
   practiceSpeedMultiplier: number,
@@ -322,45 +315,9 @@ function getMicrogamePracticeHref(
   return `/microscope/${microgame.id}?speed=${speed}`;
 }
 
-function MicroscopePanel({
-  seenMicrogameIds,
-}: Readonly<{
-  seenMicrogameIds: readonly string[];
-}>) {
-  const router = useRouter();
-  const [testPracticeMicrogameId, setTestPracticeMicrogameId] = useState<
-    string | null
-  >(null);
+function MicroscopePanel() {
   const [practiceSpeedMultiplier, setPracticeSpeedMultiplier] =
     usePracticeSpeedMultiplierState();
-  const discoveredMicrogameCount = MICROGAMES.filter(({ id }) =>
-    seenMicrogameIds.includes(id),
-  ).length;
-
-  useEffect(() => {
-    if (!testPracticeMicrogameId) {
-      return;
-    }
-
-    const openHoveredPractice = (event: KeyboardEvent) => {
-      if (event.key !== "Enter" || event.metaKey || event.ctrlKey) {
-        return;
-      }
-
-      event.preventDefault();
-      router.push(
-        `/microscope/${testPracticeMicrogameId}?speed=${formatPracticeSpeedMultiplier(
-          practiceSpeedMultiplier,
-        )}`,
-      );
-    };
-
-    window.addEventListener("keydown", openHoveredPractice);
-
-    return () => {
-      window.removeEventListener("keydown", openHoveredPractice);
-    };
-  }, [practiceSpeedMultiplier, router, testPracticeMicrogameId]);
 
   return (
     <div className="space-y-2">
@@ -370,7 +327,7 @@ function MicroscopePanel({
         </h1>
         <div className="flex w-full items-center gap-2 sm:w-[22rem]">
           <p className="grid shrink-0 place-items-center whitespace-nowrap rounded border border-cyan-100/15 bg-black/25 px-2 py-1 text-xs font-black text-cyan-50/85">
-            {discoveredMicrogameCount}/{MICROGAMES.length}
+            {MICROGAMES.length}/{MICROGAMES.length}
           </p>
           <label className="min-w-0 flex-1 rounded border border-cyan-100/15 bg-black/25 px-2 py-1.5">
             <span className="flex items-center justify-between gap-2 text-[0.62rem] font-black uppercase tracking-normal text-cyan-100/70">
@@ -398,120 +355,48 @@ function MicroscopePanel({
           </label>
         </div>
       </div>
-      <div className="grid gap-px overflow-hidden rounded border border-cyan-100/15 bg-white/10 sm:grid-cols-4 lg:grid-cols-7">
+      <div className="grid gap-px overflow-hidden rounded border border-cyan-100/15 bg-white/10 sm:grid-cols-4 lg:grid-cols-10">
         {MICROGAMES.map((microgame) => {
           const formInstruction = getMicrogameFormInstruction(microgame);
-          const isSeen = seenMicrogameIds.includes(microgame.id);
-          const displayTitle = isSeen
-            ? microgame.title
-            : maskMicroscopeText(microgame.title);
-          const displayControlTitle = isSeen
-            ? formInstruction.title
-            : maskMicroscopeText(formInstruction.title);
-
-          const card = (
-            <article
-              className={`grid h-full min-h-22 grid-rows-[40px_1fr] gap-0.5 p-1 ${
-                isSeen
-                  ? "bg-slate-950/90 transition hover:bg-cyan-950/90"
-                  : "bg-black/90 text-white/62"
-              }`}
-            >
-              <div className="relative mx-auto size-10 overflow-hidden rounded border border-white/10 bg-slate-950">
-                <Image
-                  alt={microgame.microscope.imageAlt}
-                  className={`size-full object-cover ${
-                    isSeen ? "opacity-100" : "opacity-20"
-                  }`}
-                  decoding="async"
-                  height={40}
-                  sizes="40px"
-                  src={microgame.microscope.imageSrc}
-                  width={40}
-                />
-                {isSeen ? null : (
-                  <div className="absolute inset-0 grid place-items-center bg-black/45">
-                    <span className="rounded border border-white/25 bg-black/70 px-1 py-px text-[0.48rem] font-black text-white">
-                      잠금
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 text-center">
-                <div className="flex min-w-0 items-baseline justify-center gap-1">
-                  <h2 className="line-clamp-2 min-w-0 text-[0.68rem] font-black leading-[1.05] text-white">
-                    {displayTitle}
-                  </h2>
-                  {microgame.type === "boss" ? (
-                    <span className="relative -top-px shrink-0 rounded border border-amber-200/40 px-1 py-px text-[0.52rem] font-black uppercase tracking-normal text-amber-50">
-                      Boss
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mx-auto mt-0.5 max-w-full truncate text-[0.56rem] font-black leading-none text-cyan-50/62">
-                  {displayControlTitle}
-                </p>
-              </div>
-            </article>
-          );
-
-          if (isSeen) {
-            return (
-              <Link
-                aria-label={`${microgame.title} 연습하기`}
-                className="block"
-                href={getMicrogamePracticeHref(
-                  microgame,
-                  practiceSpeedMultiplier,
-                )}
-                key={microgame.id}
-              >
-                {card}
-              </Link>
-            );
-          }
-
           return (
-            <div
-              aria-label={`${microgame.title} 테스트 연습 열기`}
-              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/80"
+            <Link
+              aria-label={`${microgame.title} 연습하기`}
+              className="block"
+              href={getMicrogamePracticeHref(
+                microgame,
+                practiceSpeedMultiplier,
+              )}
               key={microgame.id}
-              onBlur={() => {
-                setTestPracticeMicrogameId((currentMicrogameId) =>
-                  currentMicrogameId === microgame.id
-                    ? null
-                    : currentMicrogameId,
-                );
-              }}
-              onFocus={() => {
-                setTestPracticeMicrogameId(microgame.id);
-              }}
-              onMouseEnter={() => {
-                setTestPracticeMicrogameId(microgame.id);
-              }}
-              onMouseLeave={() => {
-                setTestPracticeMicrogameId((currentMicrogameId) =>
-                  currentMicrogameId === microgame.id
-                    ? null
-                    : currentMicrogameId,
-                );
-              }}
-              onKeyDown={(event) => {
-                if (event.key !== "Enter" || event.metaKey || event.ctrlKey) {
-                  return;
-                }
-
-                event.preventDefault();
-                event.stopPropagation();
-                router.push(
-                  getMicrogamePracticeHref(microgame, practiceSpeedMultiplier),
-                );
-              }}
-              role="button"
-              tabIndex={0}
             >
-              {card}
-            </div>
+              <article className="grid h-full min-h-22 grid-rows-[40px_1fr] gap-0.5 bg-slate-950/90 p-1 transition hover:bg-cyan-950/90">
+                <div className="relative mx-auto size-10 overflow-hidden rounded border border-white/10 bg-slate-950">
+                  <Image
+                    alt={microgame.microscope.imageAlt}
+                    className="size-full object-cover opacity-100"
+                    decoding="async"
+                    height={40}
+                    sizes="40px"
+                    src={microgame.microscope.imageSrc}
+                    width={40}
+                  />
+                </div>
+                <div className="min-w-0 text-center">
+                  <div className="flex min-w-0 items-baseline justify-center gap-1">
+                    <h2 className="line-clamp-2 min-w-0 text-[0.68rem] font-black leading-[1.05] text-white">
+                      {microgame.title}
+                    </h2>
+                    {microgame.type === "boss" ? (
+                      <span className="relative -top-px shrink-0 rounded border border-amber-200/40 px-1 py-px text-[0.52rem] font-black uppercase tracking-normal text-amber-50">
+                        Boss
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mx-auto mt-0.5 max-w-full truncate text-[0.56rem] font-black leading-none text-cyan-50/62">
+                    {formInstruction.title}
+                  </p>
+                </div>
+              </article>
+            </Link>
           );
         })}
       </div>
@@ -526,14 +411,13 @@ function renderHomeView(
   isStarting: boolean,
   onChallengeModesChange: (challengeModes: ChallengeModes) => void,
   startGame: () => void,
-  seenMicrogameIds: readonly string[],
 ) {
   if (homeView === "howToPlay") {
     return <HowToPlayPanel />;
   }
 
   if (homeView === "microscope") {
-    return <MicroscopePanel seenMicrogameIds={seenMicrogameIds} />;
+    return <MicroscopePanel />;
   }
 
   return (
@@ -553,14 +437,12 @@ export function MainScreen({
   homeView,
   onChallengeModesChange,
   onStart,
-  seenMicrogameIds,
 }: Readonly<{
   challengeModes: ChallengeModes;
   highestReachedRound: number;
   homeView: HomeView;
   onChallengeModesChange: (challengeModes: ChallengeModes) => void;
   onStart: () => void;
-  seenMicrogameIds: readonly string[];
 }>) {
   useBgmThemeSelection();
 
@@ -622,7 +504,6 @@ export function MainScreen({
           isStarting,
           onChallengeModesChange,
           startGame,
-          seenMicrogameIds,
         )}
       </div>
     </NeonShell>
