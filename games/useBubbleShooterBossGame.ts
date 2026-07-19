@@ -20,7 +20,8 @@ const MAX_DELTA_SECONDS = 1 / 30;
 const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
 const POP_CLUSTER_SIZE = 3;
-const POPS_TO_CLEAR = 3;
+const POPS_TO_CLEAR = 1;
+const PLAYFIELD_HORIZONTAL_INSET = 56;
 
 type BubbleColor = keyof typeof BUBBLE_ASSETS;
 type Point = Readonly<{
@@ -101,20 +102,19 @@ function createInitialBubbles(width: number) {
   });
 }
 
-function getInitialBubbleBounds(bubbles: readonly Bubble[]) {
-  const xPositions = bubbles.map(({ x }) => x);
+function getInitialBubbleBounds(width: number, bubbles: readonly Bubble[]) {
   const yPositions = bubbles.map(({ y }) => y);
 
   return {
-    left: Math.min(...xPositions) - BUBBLE_RADIUS,
-    right: Math.max(...xPositions) + BUBBLE_RADIUS,
+    left: PLAYFIELD_HORIZONTAL_INSET,
+    right: width - PLAYFIELD_HORIZONTAL_INSET,
     top: Math.min(...yPositions) - BUBBLE_RADIUS,
   } satisfies PlayfieldBounds;
 }
 
 function createInitialState(width: number) {
   const bubbles = createInitialBubbles(width);
-  const playfieldBounds = getInitialBubbleBounds(bubbles);
+  const playfieldBounds = getInitialBubbleBounds(width, bubbles);
 
   return {
     aimElapsedSeconds: 0,
