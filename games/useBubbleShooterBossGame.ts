@@ -12,7 +12,7 @@ const BUBBLE_ASSETS = {
   yellow: "/games/bubble-shooter/images/yellow.png",
 } as const;
 const AIM_MAX_RADIANS = 0.82;
-const AIM_SWEEP_SECONDS = 2.4;
+const AIM_SWEEP_SECONDS = 4;
 const BUBBLE_RADIUS = 24;
 const BUBBLE_SPEED = 820;
 const DEFAULT_BEAT_DURATION_MS = 500;
@@ -21,7 +21,7 @@ const MIN_CANVAS_HEIGHT = 360;
 const MIN_CANVAS_WIDTH = 640;
 const POP_CLUSTER_SIZE = 3;
 const POPS_TO_CLEAR = 1;
-const PLAYFIELD_HORIZONTAL_INSET = 56;
+const PLAYFIELD_HORIZONTAL_INSET = 128;
 
 type BubbleColor = keyof typeof BUBBLE_ASSETS;
 type Point = Readonly<{
@@ -186,6 +186,42 @@ function getShotCenterBounds(playfieldBounds: PlayfieldBounds) {
     left: playfieldBounds.left + BUBBLE_RADIUS,
     right: playfieldBounds.right - BUBBLE_RADIUS,
   };
+}
+
+function getAimGuidePoints(
+  shooter: Point,
+  aimAngle: number,
+  playfieldBounds: PlayfieldBounds,
+) {
+  const shotBounds = getShotCenterBounds(playfieldBounds);
+  const ceilingY = playfieldBounds.top + BUBBLE_RADIUS;
+  const points: Point[] = [shooter];
+  let currentPoint = shooter;
+  let directionX = Math.cos(aimAngle);
+  const directionY = Math.sin(aimAngle);
+
+  while (currentPoint.y > ceilingY) {
+    const wallX = directionX < 0 ? shotBounds.left : shotBounds.right;
+    const distanceToWall = (wallX - currentPoint.x) / directionX;
+    const distanceToCeiling = (ceilingY - currentPoint.y) / directionY;
+
+    if (distanceToCeiling <= distanceToWall) {
+      points.push({
+        x: currentPoint.x + directionX * distanceToCeiling,
+        y: ceilingY,
+      });
+      break;
+    }
+
+    currentPoint = {
+      x: wallX,
+      y: currentPoint.y + directionY * distanceToWall,
+    };
+    points.push(currentPoint);
+    directionX *= -1;
+  }
+
+  return points;
 }
 
 function getConnectedCluster(bubbles: readonly Bubble[], startBubble: Bubble) {
@@ -434,7 +470,11 @@ function drawShooter(
 ) {
   const shooter = getShooterPoint(width, height);
   const aimAngle = getAimAngle(state.aimElapsedSeconds);
-  const aimLength = Math.min(210, height * 0.36);
+  const aimGuidePoints = getAimGuidePoints(
+    shooter,
+    aimAngle,
+    state.playfieldBounds,
+  );
   const nextBubble = {
     color: state.nextBubbleColor,
     id: 0,
@@ -449,11 +489,14 @@ function drawShooter(
   context.lineCap = "round";
   context.setLineDash([12, 13]);
   context.beginPath();
-  context.moveTo(shooter.x, shooter.y);
-  context.lineTo(
-    shooter.x + Math.cos(aimAngle) * aimLength,
-    shooter.y + Math.sin(aimAngle) * aimLength,
-  );
+  aimGuidePoints.forEach((point, index) => {
+    if (index === 0) {
+      context.moveTo(point.x, point.y);
+      return;
+    }
+
+    context.lineTo(point.x, point.y);
+  });
   context.stroke();
   context.setLineDash([]);
 
