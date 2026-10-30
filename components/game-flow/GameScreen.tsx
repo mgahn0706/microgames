@@ -1,12 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FAST_START_INITIAL_SPEED_MULTIPLIER,
   type ChallengeModes,
 } from "@/data/challengeModes";
-import { FORM_INSTRUCTIONS } from "@/data/formInstructions";
 import { MICROGAME_BGM_BY_CANVAS } from "@/data/microgameBgmTracks";
 import { getMicrogamePoolForRound, type Microgame } from "@/data/microgames";
 import { SUDDEN_DEATH_ANIMATION_MS } from "@/games/useSurviveMolaMolaGame";
@@ -41,27 +39,6 @@ function getRandomClearSoundEffect() {
   return CLEAR_SOUND_EFFECTS[
     Math.floor(Math.random() * CLEAR_SOUND_EFFECTS.length)
   ];
-}
-
-function FormInstructionImageCache() {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed -left-[9999px] top-0 size-px overflow-hidden opacity-0"
-    >
-      {FORM_INSTRUCTIONS.map((instruction) => (
-        <Image
-          src={instruction.imageSrc}
-          alt=""
-          width={1448}
-          height={1086}
-          key={instruction.imageSrc}
-          priority
-          unoptimized
-        />
-      ))}
-    </div>
-  );
 }
 
 function createSeededRandom(seed: number) {
@@ -415,7 +392,6 @@ export function GameScreen({
       shouldDim={false}
       transition={phase === "result" ? "toElevator" : "none"}
     >
-      <FormInstructionImageCache />
       {phase === "game" ? null : (
         <FixedLivesOverlay
           getStaggeredRhythmStyle={getStaggeredRhythmStyle}

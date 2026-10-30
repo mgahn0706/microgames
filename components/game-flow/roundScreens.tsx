@@ -119,7 +119,7 @@ export function InstructionRoundScreen({
                         key={candidate.imageSrc}
                       >
                         <Image
-                          src={candidate.imageSrc}
+                          src={candidate.thumbnailSrc}
                           alt={isSelected ? formInstruction.alt : ""}
                           fill
                           sizes="96px"

@@ -373,7 +373,10 @@ export const ALL_GAME_PRELOAD_ASSETS = [
   "/games/zelda-ocarina-of-time/images/zeldas_lullaby.png",
   "/games/zelda/images/background.webp",
   "/games/zelda/images/cursor.png",
-  ...FORM_INSTRUCTIONS.map(({ imageSrc }) => imageSrc),
+  ...FORM_INSTRUCTIONS.flatMap(({ imageSrc, thumbnailSrc }) => [
+    imageSrc,
+    thumbnailSrc,
+  ]),
   "/audio/bgm/themes/yaong-elevator/boss-stage.mp3",
   "/audio/bgm/themes/yaong-elevator/failure.mp3",
   "/games/game-flow/sounds/fail-no-control.mp3",
